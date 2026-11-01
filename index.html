@@ -1458,6 +1458,8 @@
     .rc-chip.low { border-color: rgba(230, 92, 80, .6); color: #f3b3a8; }
     @media screen and (max-width: 720px) { .rc-wrap { padding: 12px; } .rc-modes { grid-template-columns: 1fr 1fr; } }
     @media print { .rc-mode:not(.on) { display: none; } .rc-wrap, .rc-person, .rc-share, .rc-sum { background: #fff !important; border: 1px solid #bbb !important; color: #111 !important; } .store-ex .undo-btn { display: none !important; } }
+    .crisis-pill { position: relative; }
+    .crisis-check { position: absolute; top: 6px; right: 9px; font-size: 14px; font-weight: 700; color: var(--cyan); }
     .pk-sec { margin-bottom: 10px; }
     .pk-sec-h { font-size: 12.5px; font-weight: 700; color: var(--cyan); margin: 6px 0 4px; padding-bottom: 3px; border-bottom: 1px solid var(--card-border); }
     @media print { .device-badge { display: none !important; } }
@@ -1531,7 +1533,7 @@
           <span>1. สถานการณ์วิกฤติ & ภัยพิบัติในไทย (Crisis Scenario)</span>
           <span style="font-size: 13px; font-weight: normal; color: var(--text-muted);" id="active-crisis-badge">ความเสี่ยง: น้ำท่วมใหญ่</span>
         </div>
-        <div class="card-desc">เลือกวิกฤติเพื่อปรับตัวคูณเสบียง อาหาร ยา และอุปกรณ์เฉพาะทางตามมาตรฐานสากล</div>
+        <div class="card-desc">เลือกวิกฤติเพื่อปรับตัวคูณเสบียง อาหาร ยา และอุปกรณ์เฉพาะทางตามมาตรฐานสากล — <b>เลือกได้หลายภัยพร้อมกัน</b> (กดซ้ำเพื่อยกเลิก ต้องเหลืออย่างน้อย 1 ภัย) ระบบจะรวมรายการของทุกภัยที่เลือกและใช้ตัวคูณที่สูงสุด · ปุ่ม “เตรียมพร้อมรับมือรอบด้าน” ครอบคลุมทุกภัยแล้ว จึงเลือกได้เพียงอันเดียว</div>
 
         <div class="crisis-grid" id="crisis-selector-grid">
           <!-- Crisis items injected by JS -->
@@ -2057,7 +2059,9 @@
     // --- helper สำหรับสูตรคำนวณ ---
     const isFoot = a => a.plan === 'bug-out-foot';
     const isLight = a => !!(PLANS[a.plan] && PLANS[a.plan].light);
-    const inSc = (a, ...ids) => a.crisis.id === ALL || ids.includes(a.crisis.id);
+    const crisisIdsOf = a => (a.crisis && a.crisis.ids) || [a.crisis.id];
+    const inSc = (a, ...ids) => { const s = crisisIdsOf(a); return s.includes(ALL) || ids.some(i => s.includes(i)); };
+    const hasSc = (a, id) => crisisIdsOf(a).includes(id);
     const planKey = a => isFoot(a) ? 'foot' : (isLight(a) ? 'bike' : 'home');
 
     // อาหารคำนวณจาก "แคลอรี่" × สัดส่วนต่อรายการ (ตรงกับ KPI วันที่อาหารพอ)
@@ -2258,7 +2262,7 @@
         name: 'หน้ากาก N95 / KN95 (ขนาดสวมแนบหน้า)',
         desc: 'ใช้ซ้ำได้ราว 2 วันหากไม่เปียก/ชำรุด ไม่แนะนำสำหรับเด็กเล็ก — ให้เด็กเล็กอยู่ในห้องปิด',
         stores: ['pharmacy', '711', 'lotus', 'bigc'], unit: 'ชิ้น',
-        calc: a => a.people * Math.max(5, Math.ceil(a.days * (a.crisis.id === 'air_toxic' ? 0.5 : (a.crisis.id === 'pandemic' ? 0.3 : 0.4))))
+        calc: a => a.people * Math.max(5, Math.ceil(a.days * (hasSc(a, 'air_toxic') ? 0.5 : (hasSc(a, 'pandemic') ? 0.3 : 0.4))))
       },
       {
         id: 'alcohol_gel', cat: 'med', pri: 2, wt: 0.3, sc: ['pandemic'],
@@ -2676,6 +2680,7 @@
     // --- 3. STATE MANAGEMENT ---
     let state = {
       crisisId: 'flood',
+      crisisIds: ['flood'],   // เลือกได้หลายภัย (ALL = ครอบคลุมทั้งหมด เลือกได้อันเดียว)
       plan: 'bug-in',
       days: 7,
       activeCategory: 'all',
@@ -2730,6 +2735,11 @@
         console.warn('Failed to load localStorage', e);
       }
       if (!CRISIS_DATA.some(c => c.id === state.crisisId)) state.crisisId = 'flood';
+      if (!Array.isArray(state.crisisIds) || !state.crisisIds.includes(state.crisisId)) state.crisisIds = [state.crisisId];   // ข้อมูลเก่า: เลือกภัยเดียว
+      state.crisisIds = state.crisisIds.filter(id => CRISIS_DATA.some(c => c.id === id));
+      if (state.crisisIds.includes(ALL)) state.crisisIds = [ALL];
+      if (!state.crisisIds.length) state.crisisIds = [state.crisisId];
+      state.crisisId = state.crisisIds[0];
       if (state.plan === 'bike') state.plan = 'motorbike';            // ข้อมูลเก่า
       if (!PLANS[state.plan]) state.plan = 'bug-in';
       state.vehicle = Object.assign({ carType: 'sedan', boatType: 'small', bikes: 0, cars: 0, boats: 0, bicycles: 0, distanceKm: 0 }, state.vehicle || {});
@@ -2764,8 +2774,24 @@
       return Math.round(bmr * act);
     }
 
+    // รวมหลายภัยเป็นสถานการณ์เดียว: ตัวคูณใช้ค่าสูงสุด รายการ/คำแนะนำรวมทุกภัย
+    function getCrisis() {
+      const ids = (state.crisisIds && state.crisisIds.length ? state.crisisIds : [state.crisisId]).filter(id => CRISIS_DATA.some(c => c.id === id));
+      const list = ids.map(id => CRISIS_DATA.find(c => c.id === id));
+      if (!list.length) list.push(CRISIS_DATA[0]);
+      if (list.length === 1) return Object.assign({}, list[0], { ids: [list[0].id] });
+      const uniq = arr => Array.from(new Set(arr));
+      return {
+        id: list.map(c => c.id).join('+'), ids: list.map(c => c.id),
+        icon: list.map(c => c.icon).join(''), name: list.map(c => c.name.split(' / ')[0]).join(' + '),
+        sub: list.map(c => c.sub).join(' · '), banner: list.map(c => c.icon + ' ' + c.banner).join('   ◆   '),
+        waterMult: Math.max(...list.map(c => c.waterMult)), foodMult: Math.max(...list.map(c => c.foodMult)), fuelMult: Math.max(...list.map(c => c.fuelMult)),
+        focus: uniq([].concat(...list.map(c => c.focus))), tips: uniq([].concat(...list.map(c => c.tips)))
+      };
+    }
+
     function computeAggregates() {
-      const crisis = CRISIS_DATA.find(c => c.id === state.crisisId) || CRISIS_DATA[0];
+      const crisis = getCrisis();
       const plan = state.plan;
       const people = state.members.length || 1;
       const days = Math.max(1, DAYS_OVERRIDE != null ? DAYS_OVERRIDE : (state.plan === 'bug-in' ? state.days : autoDaysInfo().days));
@@ -2818,7 +2844,7 @@
     function isActive(item, a) {
       if (item.onlyPlans && !item.onlyPlans.includes(a.plan)) return false;
       if (!item.sc || item.sc.length === 0) return true;
-      if (a.crisis.id === ALL || item.sc.includes(a.crisis.id)) return true;
+      if (inSc(a, ...item.sc)) return true;
       return !!(item.plans && item.plans.includes(a.plan));
     }
 
@@ -2894,17 +2920,18 @@
       grid.innerHTML = '';
       CRISIS_DATA.forEach(c => {
         const div = document.createElement('div');
-        div.className = `crisis-pill ${c.id === state.crisisId ? 'active' : ''}`;
+        const on = (state.crisisIds || [state.crisisId]).includes(c.id);
+        div.className = `crisis-pill ${on ? 'active' : ''}`;
         div.onclick = () => selectCrisis(c.id);
-        div.innerHTML = `
+        div.innerHTML = `${on ? '<span class="crisis-check">✓</span>' : ''}
           <div class="crisis-icon">${c.icon}</div>
           <div class="crisis-name">${c.name}</div>
           <div class="crisis-sub">${c.sub}</div>
         `;
         grid.appendChild(div);
       });
-      const activeCrisis = CRISIS_DATA.find(c => c.id === state.crisisId);
-      document.getElementById('active-crisis-badge').textContent = `ความเสี่ยง: ${activeCrisis.name}`;
+      const activeCrisis = getCrisis();
+      document.getElementById('active-crisis-badge').textContent = `ความเสี่ยง: ${activeCrisis.ids.length > 1 ? activeCrisis.icon + ' ' : ''}${activeCrisis.name}`;
       document.getElementById('crisis-banner-text').textContent = activeCrisis.banner;
     }
 
@@ -3065,7 +3092,7 @@
     }
 
     function renderScenarioTipsBase() {
-      const c = CRISIS_DATA.find(x => x.id === state.crisisId) || CRISIS_DATA[0];
+      const c = getCrisis();
       const el = document.getElementById('scenario-tips');
       if (!el) return;
       el.innerHTML = `
@@ -3176,7 +3203,7 @@
     let DAYS_OVERRIDE = null;
     const _ad = { key: null, val: null };
     function autoDaysInfo() {
-      const key = JSON.stringify([state.members, state.plan, state.crisisId, state.vehicle, state.capOverride, state.pets, state.excl]);
+      const key = JSON.stringify([state.members, state.plan, state.crisisIds, state.vehicle, state.capOverride, state.pets, state.excl]);
       if (_ad.key === key) return _ad.val;
       const prev = DAYS_OVERRIDE;
       const info = { days: 1, exact: 1, hours: null, plus: false, limit: '', cap: null };
@@ -3681,7 +3708,16 @@
       items.forEach(({ item, qty }) => {
         const step = item.step || 1;
         if (item.perUnit) {
-          bins.forEach((b, i) => add(b, item, Math.floor(qty / bins.length) + (i < qty % bins.length ? 1 : 0)));
+          let spill = 0;
+          bins.forEach((b, i) => {
+            let q = Math.floor(qty / bins.length) + (i < qty % bins.length ? 1 : 0);
+            if (b.strict && (item.wt || 0) > 0) {
+              const fit = Math.floor(Math.max(0, b.capKg - b.kg) / item.wt + 1e-9);
+              if (q > fit) { spill += q - fit; q = fit; }
+            }
+            add(b, item, q);
+          });
+          if (spill > 0 && overflow) overflow.push({ item, qty: spill });
           return;
         }
         const totalRem = bins.reduce((s, b) => s + Math.max(0, b.capKg - b.kg), 0);
@@ -3689,6 +3725,7 @@
         bins.forEach(b => {
           let share = totalRem > 0 ? Math.floor((qty * Math.max(0, b.capKg - b.kg) / totalRem) / step + 1e-9) * step : 0;
           share = Math.min(share, left);
+          if (b.strict && (item.wt || 0) > 0) share = Math.min(share, Math.floor(Math.max(0, b.capKg - b.kg) / item.wt / step + 1e-9) * step);
           add(b, item, share); left = r2(left - share);
         });
         if (left > 1e-9) {
@@ -3760,6 +3797,10 @@
       saveState(); renderAll();
     }
     function restoreStoreItem(ref) { delete state.excl.store[ref]; saveState(); renderAll(); }
+    function cutStoreQtyQuiet(ref, qty) {
+      const cur = state.excl.store[ref];
+      state.excl.store[ref] = r2((typeof cur === 'number' ? cur : 0) + qty);
+    }
     function cutStoreQty(ref, qty) {
       const cur = state.excl.store[ref];
       state.excl.store[ref] = r2((typeof cur === 'number' ? cur : 0) + qty);
@@ -3842,8 +3883,7 @@
         const sh = i.share[planKey(a)];
         if (sh) foods.push({ item: i, qty: kcal * sh / i.kcal });
       });
-      const cid = a.crisis.id;
-      const maskRate = cid === 'pandemic' ? 1 : (cid === 'air_toxic' ? 0.5 : (cid === ALL ? 0.4 : 0));
+      const maskRate = hasSc(a, 'pandemic') ? 1 : (hasSc(a, 'air_toxic') ? 0.5 : (hasSc(a, ALL) ? 0.4 : 0));
       return {
         drink, extra, kcal, foods,
         tp: m.age >= 3 ? (0.4 - 0.15 * t) : 0,
@@ -4079,7 +4119,7 @@
         const names = b.parts.map(p => esc(p.name));
         const detail = b.parts.map(p => `${esc(p.name)} ${qFrac(p.q)}`).join(' · ');
         if (b.parts.length > 1) out.push(`<b>${names.join(' + ')}</b> แบ่งกัน ${b.used >= 1 - 1e-9 ? `1 ${u}พอดี` : `${qFrac(b.used)} ${u} (เหลือ ${qFrac(1 - b.used)} ปิดเก็บไว้มื้อถัดไป)`} <span class="rc-dim">(${detail})</span>`);
-        else out.push(`<b>${names[0]}</b> ${qFrac(b.parts[0].q)} ${u}${b.used < 1 - 1e-9 ? ` <span class="rc-dim">(แบ่งส่วนที่เหลือกับคนอื่นหรือเก็บไว้)</span>` : ''}`);
+        else out.push(`<b>${names[0]}</b> ${qFrac(b.parts[0].q)} ${u}`);
       });
       return out;
     }
@@ -4511,7 +4551,7 @@
         where = `<div class="pk-stat">ของเพิ่มเติม (ไม่ใช่ของส่วนตัว) แบ่งกันแบกตามเพดานน้ำหนักของแต่ละคน — ปิดสวิตช์เพื่อตัดทั้งรายการ</div>` +
           groupedList(Object.values(agg), undefined, 'store') +
           (rows.length ? `<div class="pk-sec-h">🤝 ใครแบกอะไร</div>` + rows.map(x => `<div class="pk-grp"><div class="pk-grp-h">${esc(x.p.m.name)}</div>${x.ex.map(i => `<span class="pk-chip">${esc(i.name)} <b>×${fmt(i.qty)}</b> <i>${esc(i.unit)}</i></span>`).join('')}</div>`).join('') : '') +
-          (ovf.length ? `<div class="pk-warn">⚠️ ของส่วนรวมที่ทุกคนแบกไม่ไหวแล้ว (เกินเพดานน้ำหนักปลอดภัย ≤ 20% ของน้ำหนักตัว) — ตัดออก ฝากไว้ที่บ้าน หรือเตรียมเป้เสริม/คนช่วยแบก</div>` + ovf.map(o => `<div class="pk-row ex"><span class="pk-name">${esc(o.name)}</span><b>×${fmt(o.qty)} <i>${esc(o.unit)}</i></b><button type="button" class="undo-btn" onclick="cutStoreQty('${o.id}', ${o.qty})">✂ ตัดส่วนเกิน</button></div>`).join('') : '') +
+          (ovf.length ? `<div class="pk-warn">⚠️ ของส่วนรวมที่ทุกคนแบกไม่ไหวแล้ว (เกินเพดานน้ำหนักปลอดภัย ≤ 20% ของน้ำหนักตัว) ${ovf.length} รายการ — ตัดออก ฝากไว้ที่บ้าน หรือเตรียมเป้เสริม/คนช่วยแบก<br><button type="button" class="undo-btn" onclick="${ovf.map(o => `cutStoreQtyQuiet('${o.id}', ${o.qty})`).join('; ')}; saveState(); renderAll()">✂ ตัดส่วนเกินทั้งหมด (${ovf.length} รายการ)</button></div>` + ovf.map(o => `<div class="pk-row ex"><span class="pk-name">${esc(o.name)}</span><b>×${fmt(o.qty)} <i>${esc(o.unit)}</i></b><button type="button" class="undo-btn" onclick="cutStoreQty('${o.id}', ${o.qty})">✂ ตัดส่วนเกิน</button></div>`).join('') : '') +
           (M.unplaced && M.unplaced.length ? `<div class="pk-grp"><div class="pk-grp-h">📌 ของเฉพาะตัวส่วนที่เกินโควตาเป้ 72 ชม. (ไม่ได้แบก — เก็บที่บ้าน/ฝากไว้/หาซื้อปลายทาง)</div>${M.unplaced.map(c => `<span class="pk-chip">${esc(short(c.item.name))} <b>×${fmt(c.qty)}</b> <i>${esc(c.item.unit)}</i></span>`).join('')}</div>` : '') +
           (M.cap ? barHtml('น้ำหนักรวมที่ต้องแบก', getLoad(M.reqs).kg, M.cap.kg, 'กก.') : '');
       }
@@ -4584,7 +4624,14 @@
 
     // --- 6. USER INTERACTIONS ---
     function selectCrisis(id) {
-      state.crisisId = id;
+      let ids = (state.crisisIds || [state.crisisId]).slice();
+      if (id === ALL) ids = [ALL];                               // ครอบคลุมทั้งหมด = เหลืออันเดียว
+      else {
+        ids = ids.filter(x => x !== ALL);
+        if (ids.includes(id)) { if (ids.length > 1) ids = ids.filter(x => x !== id); }   // ต้องเหลืออย่างน้อย 1 ภัย
+        else ids.push(id);
+      }
+      state.crisisIds = ids; state.crisisId = ids[0];
       saveState();
       renderAll();
     }
