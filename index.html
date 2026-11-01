@@ -2,7 +2,8 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1a1816">
   <title>Crisis Survival Stockpile - ระบบวางแผนและบริหารคลังเสบียงเอาตัวรอด</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1241,6 +1242,7 @@
     .pk-row.ex em { color: var(--amber); font-size: 11px; font-style: normal; }
     .undo-btn { background: var(--input-bg); border: 1px solid var(--card-border); color: var(--text-main); border-radius: 6px; font-size: 11.5px; padding: 1px 8px; cursor: pointer; font-family: var(--font-sans); }
     .undo-btn:hover { border-color: var(--green); color: var(--green); }
+    .cons-row .cons-undo { display: block; margin-top: 6px; padding: 3px 10px; }
     .pcard.h { grid-template-areas: "id bag list use" "ex ex list cons"; }
     .pc-id { grid-area: id; } .pc-bag { grid-area: bag; } .pc-list { grid-area: list; } .pc-use { grid-area: use; }
     .pc-ex { grid-area: ex; border: 1px dashed var(--card-border); border-radius: 12px; padding: 10px 12px !important; background: rgba(0,0,0,.12); margin-top: 6px; }
@@ -1271,6 +1273,152 @@
       .person-grid, .unit-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
+    /* =====================================================================
+       V9 — AUTO RESPONSIVE (คอม / แท็บเล็ต / มือถือ)
+       เลเยอร์นี้วางท้ายสุด เพื่อปรับเฉพาะหน้าจอ ไม่แตะตรรกะการคำนวณ
+       ===================================================================== */
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    body { overflow-wrap: break-word; padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+    img, svg, video, canvas { max-width: 100%; }
+    .unit-grid, .person-grid { grid-template-columns: repeat(auto-fill, minmax(min(330px, 100%), 1fr)); }
+    .crisis-grid { grid-template-columns: repeat(auto-fit, minmax(min(185px, 100%), 1fr)); }
+    .dropdown-content { max-width: calc(100vw - 24px); }
+    .modal-card { max-height: 92vh; max-height: 92dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .device-badge { font-size: 13px; color: var(--cyan); background: var(--cyan-dim); border: 1px solid var(--cyan); padding: 6px 14px; border-radius: 8px; white-space: nowrap; }
+
+    /* ---------- จอใหญ่ / 2K / TV ---------- */
+    @media screen and (min-width: 1600px) {
+      body { font-size: 16px; }
+      .main-container, .header-inner { max-width: 1680px; }
+    }
+    @media screen and (min-width: 2200px) {
+      body { font-size: 18px; }
+      .main-container, .header-inner { max-width: 2000px; }
+    }
+
+    /* ---------- แท็บเล็ต (721–1100px) ---------- */
+    @media screen and (min-width: 721px) and (max-width: 1100px) {
+      header.top-header { padding: 18px 24px 14px; }
+      .brand-title { font-size: 28px; }
+      .main-container { padding: 20px 20px; gap: 20px; }
+      .card { padding: 20px 22px; }
+      .inventory-table { font-size: 13.5px; }
+      .inventory-table td, .inventory-table th { padding-left: 8px; padding-right: 8px; }
+      .store-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ---------- จอสัมผัส (แท็บเล็ต + มือถือ) ---------- */
+    @media screen and (pointer: coarse) {
+      .btn-header, .store-filter-btn, .sev-quick button, .plan-btn, .dur-pill, .undo-btn, .dropdown-item { min-height: 44px; }
+      .qty-btn { width: 40px; height: 40px; }
+      .qty-input { width: 56px; font-size: 16px; }
+      .sw { position: relative; }
+      .sw::after { content: ''; position: absolute; inset: -12px -6px; }
+      #sev-slider { height: 10px; }
+      input[type="range"] { touch-action: pan-y; }
+      .crisis-pill:hover { transform: none; }
+    }
+    @media screen and (hover: none) {
+      .crisis-pill:hover { transform: none; }
+    }
+
+    /* ---------- มือถือ (≤720px) ---------- */
+    @media screen and (max-width: 720px) {
+      body { font-size: 14.5px; padding-bottom: 40px; }
+
+      /* Header: ไม่ sticky เพื่อไม่กินพื้นที่จอ */
+      header.top-header { position: static; padding: 14px 14px 12px; }
+      .brand-title { font-size: 22px; letter-spacing: .3px; }
+      .brand-sub { font-size: 12.5px; }
+      .header-quick-bar { gap: 8px; margin-top: 10px; }
+      .date-badge, .device-badge { font-size: 12px; padding: 5px 10px; }
+      .btn-header { padding: 8px 12px; font-size: 13px; }
+      .dropdown-content { position: fixed; left: 12px; right: 12px; top: auto; bottom: 12px; min-width: 0; max-height: 70vh; overflow-y: auto; z-index: 300; }
+
+      .main-container { padding: 12px 10px; gap: 14px; }
+      .card { padding: 16px 14px; border-radius: 14px; }
+      .card-title { font-size: 17px; }
+      .card-desc { font-size: 13px; margin-bottom: 12px; }
+      .crisis-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .crisis-pill { padding: 10px; }
+      .crisis-desc-banner { padding: 10px 12px; font-size: 13px; flex-direction: column; align-items: flex-start; gap: 6px; }
+      .plan-selector-grid { grid-template-columns: 1fr; }
+      .summary-stats-box { grid-template-columns: repeat(2, 1fr); padding: 12px; }
+      .stat-item .stat-val { font-size: 17px; }
+      .grid-2col, .report-sections-grid { gap: 14px; }
+      .sub-panel { padding: 14px; }
+      .custom-day-box { flex-wrap: wrap; }
+
+      /* กันจอ iOS ซูมเองตอนแตะช่องกรอก */
+      input:not([type="checkbox"]):not([type="range"]), select, textarea { font-size: 16px; }
+
+      /* Modal */
+      .modal-overlay { align-items: flex-end; }
+      .modal-card { width: 100%; max-width: 100%; border-radius: 16px 16px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); }
+      .form-row { grid-template-columns: 1fr; gap: 0; }
+
+      /* ตารางสมาชิก -> การ์ด */
+      .members-table, .members-table tbody { display: block; width: 100%; }
+      .members-table thead { display: none; }
+      .members-table tr { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+      .members-table td { display: block; border: none !important; padding: 0 !important; text-align: left !important; font-size: 13.5px; }
+      .members-table td:nth-child(1) { grid-column: 1 / -1; font-size: 15.5px; }
+      .members-table td:nth-child(2)::before, .members-table td:nth-child(3)::before,
+      .members-table td:nth-child(4)::before, .members-table td:nth-child(5)::before { display: block; font-size: 11px; color: var(--text-sub); }
+      .members-table td:nth-child(2)::before { content: 'เพศ / อายุ'; }
+      .members-table td:nth-child(3)::before { content: 'น้ำหนัก / ส่วนสูง'; }
+      .members-table td:nth-child(4)::before { content: 'สุขภาพ'; }
+      .members-table td:nth-child(5)::before { content: 'น้ำ / แคลอรี่'; }
+      .members-table td:nth-child(6) { grid-column: 1 / -1; display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+
+      /* ตารางเช็คลิสต์ซื้อของ -> การ์ดต่อรายการ */
+      .store-filter-bar { gap: 6px; }
+      .inventory-table, .inventory-table tbody { display: block; width: 100%; }
+      .inventory-table thead { display: none; }
+      .inventory-table tr { display: block; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+      .inventory-table tr.row-excluded { opacity: .5; }
+      .inventory-table td { display: block; width: 100%; border: none !important; padding: 6px 0 !important; }
+      .inventory-table td:nth-child(2)::before, .inventory-table td:nth-child(3)::before, .inventory-table td:nth-child(4)::before { display: block; font-size: 11px; color: var(--text-sub); margin-bottom: 3px; }
+      .inventory-table td:nth-child(2)::before { content: 'จำนวนที่ต้องใช้'; }
+      .inventory-table td:nth-child(3)::before { content: 'จำนวนที่มีตอนนี้'; }
+      .inventory-table td:nth-child(4)::before { content: 'สถานะความพร้อม'; }
+      .inventory-table td:nth-child(3) { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+      .inventory-table td:nth-child(3)::before { flex: 0 0 100%; }
+      .status-cell { min-width: 0; }
+
+      /* รายงาน */
+      .runway-hero { flex-direction: column; text-align: center; gap: 8px; padding: 14px; }
+      .rh-num { font-size: 38px; min-width: 0; }
+      #sev-slider { min-width: 100%; }
+      .sev-pill { min-width: 0; }
+      .rw-table { min-width: 560px; }
+      .use-grid { grid-template-columns: 1fr 1fr; }
+      .unit-grid, .person-grid { grid-template-columns: 1fr; gap: 12px; }
+      .pcard.petcard { grid-template-columns: 1fr; grid-template-areas: "id" "use"; }
+      .store-grid { grid-template-columns: 1fr; gap: 14px; }
+      .unit-top, .store-top { flex-wrap: wrap; }
+      .hero-banner { max-height: 180px; }
+    }
+
+    /* ---------- มือถือจอเล็กมาก (≤380px) ---------- */
+    @media screen and (max-width: 380px) {
+      .brand-title { font-size: 19px; }
+      .crisis-grid { grid-template-columns: 1fr; }
+      .use-grid { grid-template-columns: 1fr; }
+      .members-table tr { grid-template-columns: 1fr; }
+    }
+
+    /* ---------- มือถือแนวนอน (จอเตี้ย) ---------- */
+    @media screen and (max-height: 520px) and (orientation: landscape) {
+      header.top-header { position: static; }
+      .modal-card { max-height: 96vh; max-height: 96dvh; }
+      .modal-overlay { align-items: center; }
+    }
+
+    .pk-sec { margin-bottom: 10px; }
+    .pk-sec-h { font-size: 12.5px; font-weight: 700; color: var(--cyan); margin: 6px 0 4px; padding-bottom: 3px; border-bottom: 1px solid var(--card-border); }
+    @media print { .device-badge { display: none !important; } }
+
   </style>
 </head>
 <body>
@@ -1283,6 +1431,7 @@
       
       <div class="header-quick-bar">
         <div class="date-badge" id="current-date-badge">30/10/2026</div>
+        <div class="device-badge" id="device-badge" title="ปรับหน้าตาอัตโนมัติตามอุปกรณ์">💻 คอมพิวเตอร์</div>
         
         <!-- Print Zone Dropdown Menu -->
         <div class="print-menu-dropdown">
@@ -3048,24 +3197,30 @@
     // ---- สเปคเป้ตามอายุ (อิงเป้ที่ขายจริงในไทย: เป้เด็กอนุบาล/ประถม/มัธยม และเป้เดินป่า 40-50L) ----
     const PACK_BANDS = [
       { min: 0,  max: 2,   none: true, label: 'ยังไม่แบกเป้ (อุ้ม/นั่งคาร์ซีท — ผู้ใหญ่ถือกระเป๋าผ้าอ้อมแทน)' },
-      { min: 3,  max: 4,   L: 8,  pct: 0.08, label: 'เป้อนุบาล 8 ลิตร' },
-      { min: 5,  max: 6,   L: 10, pct: 0.10, label: 'เป้เด็กเล็ก 10 ลิตร' },
-      { min: 7,  max: 9,   L: 15, pct: 0.10, label: 'เป้ประถมต้น 15 ลิตร' },
-      { min: 10, max: 12,  L: 20, pct: 0.10, label: 'เป้ประถมปลาย 20 ลิตร' },
-      { min: 13, max: 17,  L: 28, pct: 0.10, label: 'เป้วัยรุ่น 28 ลิตร' },
-      { min: 18, max: 59,  L: 45, pct: 0.20, cap: 15, label: 'เป้ใหญ่ผู้ใหญ่ 45 ลิตร (เทียบเป้เดินป่า 40-50L)' },
+      { min: 3,  max: 5,   L: 8,  lo: 0.5, hi: 1.5, label: 'เป้จิ๋ว 0.5–1.5 กก.' },
+      { min: 6,  max: 8,   L: 12, lo: 2.0, hi: 3.5, label: 'เป้เล็ก 2.0–3.5 กก.' },
+      { min: 9,  max: 12,  L: 20, lo: 4.5, hi: 8.0, label: 'เป้กลาง 4.5–8.0 กก.' },
+      { min: 13, max: 14,  L: 28, lo: 6.7, hi: 9.0, label: 'เป้เกือบใหญ่ 6.7–9 กก.' },
+      { min: 15, max: 59,  L: 45, pct: 0.20, cap: 15, label: 'เป้ใหญ่ผู้ใหญ่ 45 ลิตร (เทียบเป้เดินป่า 40-50L)' },
       { min: 60, max: 200, L: 25, pct: 0.10, cap: 7,  label: 'เป้เดย์แพ็ก 25 ลิตร (ผู้สูงอายุ)' }
     ];
     function packSpec(m) {
       if (m.health === 'bedridden') return { has: false, label: 'ไม่แบกเป้ (เคลื่อนไหวลำบาก — ผู้ดูแลถือของให้)' };
-      const b = PACK_BANDS.find(x => m.age >= x.min && m.age <= x.max) || PACK_BANDS[6];
+      const b = PACK_BANDS.find(x => m.age >= x.min && m.age <= x.max) || PACK_BANDS[5];
       if (b.none) return { has: false, label: b.label };
-      let L = b.L, pct = b.pct;
-      if (m.health === 'pregnant') { L = Math.min(L, 25); pct = Math.min(pct, 0.10); }
-      if (m.health === 'chronic') pct *= 0.85;
-      let kg = m.weight * pct;
-      if (b.cap) kg = Math.min(kg, b.cap);
-      kg = Math.max(0.5, r1(kg));
+      let L = b.L, kg, ratio = m.health === 'chronic' ? 0.85 : 1;
+      if (b.lo != null) {
+        // เด็ก: เลื่อนตามอายุภายในช่วง แต่ไม่เกิน 20% ของน้ำหนักตัว
+        const f = b.max > b.min ? (m.age - b.min) / (b.max - b.min) : 0;
+        kg = Math.min(b.lo + (b.hi - b.lo) * f, m.weight * 0.2) * ratio;
+        kg = Math.max(0.5, r1(Math.max(kg, Math.min(b.lo, m.weight * 0.2) * 0.9)));
+      } else {
+        let pct = b.pct;
+        if (m.health === 'pregnant') { L = Math.min(L, 25); pct = Math.min(pct, 0.10); }
+        kg = m.weight * pct * ratio;
+        if (b.cap) kg = Math.min(kg, b.cap);
+        kg = Math.max(0.5, r1(kg));
+      }
       return { has: true, L, maxKg: kg, label: b.label + (m.health === 'pregnant' ? ' (ลดน้ำหนักเพราะตั้งครรภ์)' : '') };
     }
 
@@ -3329,22 +3484,29 @@
     ];
     function ownList(m) {
       const sc = m.age >= 13 ? 1 : (m.age >= 7 ? 0.7 : 0.5), o = [];
-      if (m.age < 13) o.push({ name: 'ป้ายชื่อ + เบอร์ผู้ปกครอง', unit: 'ป้าย', wt: 0.005, vol: 0.01, qty: 1 });
+      if (m.age < 13) o.push({ name: 'ป้ายชื่อ + เบอร์ผู้ปกครอง', unit: 'ป้าย', wt: 0.005, vol: 0.01, qty: 1, stay: true });
       o.push({ name: 'เสื้อยืดสำรอง', unit: 'ตัว', wt: 0.15 * sc, vol: 0.8 * sc, qty: 1 });
       o.push({ name: 'ชุดชั้นใน', unit: 'ตัว', wt: 0.06 * sc, vol: 0.2 * sc, qty: 2 });
       o.push({ name: 'ถุงเท้า', unit: 'คู่', wt: 0.08 * sc, vol: 0.2 * sc, qty: 1 });
-      if (m.age >= 3 && m.age < 10) o.push({ name: 'ตุ๊กตา/ของเล่นชิ้นโปรด', unit: 'ชิ้น', wt: 0.1, vol: 0.6, qty: 1 });
+      if (m.age >= 3 && m.age < 10) o.push({ name: 'ตุ๊กตา/ของเล่นชิ้นโปรด', unit: 'ชิ้น', wt: 0.1, vol: 0.6, qty: 1, stay: true });
       return o;
     }
+
+    // ของที่ "ผูกกับตัวเจ้าของ" (ยา/เอกสาร/เงิน/ของใช้ส่วนตัว/ผ้าอนามัย/ผ้าอ้อม) — ห้ามถูกโยนไปปนเป็นของส่วนรวม
+    const SPECIAL_REFS = new Set(['chronic_meds', 'documents_pack', 'cash_reserve', 'toothbrush', 'toothpaste', 'soap_bar', 'sanitary_pads', 'adult_diapers', 'diapers_baby', 'infant_formula']);
+    // ของส่วนกลาง (ไม่ต้องมีทุกคน) — ให้คนที่แบกไหวที่สุดถือ ไม่ใช่ใครก็ได้/ไม่ใช่ผู้สูงอายุ-เด็ก
+    const GROUP_REFS = new Set(['first_aid_kit', 'water_filter', 'multitool_whistle', 'lighter_matches', 'offline_map', 'flashlight_batteries']);
+    const packExAny = key => Object.values(state.excl.packs).some(o => o && o[key]);
 
     function buildPacks(a, reqs, T, ignoreExcl) {
       const remain = {};
       reqs.forEach(r => remain[r.item.id] = r.req);
       const byId = Object.fromEntries(BASE_ITEMS.map(i => [i.id, i]));
-      const list = state.members.map(m => ({ m, sp: packSpec(m), items: [], extra: [], kg: 0, L: 0, carry: [] }));
+      const list = state.members.map(m => ({ m, sp: packSpec(m), items: [], extra: [], kg: 0, L: 0, carry: [], bearers: [] }));
       list.forEach(p => { p.cap = p.sp.has ? { kg: p.sp.maxKg, L: p.sp.L } : null; });
 
-      // ผู้ดูแลเด็กเล็ก (<3 ปี)
+      // 1) ใครอุ้มเด็กเล็ก (<3 ปี) — เลือกผู้ใหญ่ที่แข็งแรง ไม่ใช่ผู้สูงอายุ/ตั้งครรภ์ (ถ้ามีตัวเลือก)
+      const frail = p => p.m.age >= 60 || p.m.health === 'pregnant';
       const young = list.filter(p => p.m.age < 3 && p.m.health !== 'bedridden');
       const adultsP = list.filter(p => p.m.age >= 18 && p.m.age <= 65 && p.m.health !== 'bedridden' && p.cap);
       const nonDrv = adultsP.filter(p => !T.driverIds.has(p.m.id));
@@ -3352,7 +3514,9 @@
       young.forEach((y, i) => {
         const u = T.units.find(x => x.people.some(pp => pp.id === y.m.id));
         const inUnit = u ? list.filter(p => p.cap && u.people.some(pp => pp.id === p.m.id) && (!u.driver || p.m.id !== u.driver.id || a.plan === 'bicycle') && p.m.age >= 15 && p.m.health !== 'bedridden') : [];
-        const pool = inUnit.length ? inUnit : carers;
+        let pool = inUnit.length ? inUnit : carers;
+        const strong = pool.filter(p => !frail(p));
+        if (strong.length) pool = strong;
         if (!pool.length) return;
         const c = pool[i % pool.length]; c.carry.push(y); y.carer = c;
       });
@@ -3361,7 +3525,7 @@
         if (p.cap && a.plan === 'bug-out-foot') p.cap.kg = Math.max(0, r1(p.cap.kg - p.carryKg));
       });
 
-      const put = (p, name, unit, wt, vol, qty, ref) => {
+      const put = (p, name, unit, wt, vol, qty, ref, opts) => {
         if (!p.cap || qty <= 0) return 0;
         if (ref) { if (!(ref in remain)) return 0; qty = Math.min(qty, Math.floor(remain[ref] + 1e-9)); }
         if (qty <= 0) return 0;
@@ -3369,30 +3533,88 @@
         if (wt > 0) qty = Math.min(qty, Math.floor((p.cap.kg - p.kg + 1e-9) / wt));
         if (vol > 0) qty = Math.min(qty, Math.floor((p.cap.L - p.L + 1e-9) / vol));
         if (qty <= 0) return 0;
-        p.items.push({ ref, name, unit, qty, kg: qty * wt, L: qty * vol });
+        p.items.push(Object.assign({ ref, name, unit, qty, kg: qty * wt, L: qty * vol }, opts || {}));
         p.kg += qty * wt; p.L += qty * vol;
         if (ref) remain[ref] -= qty;
         return qty;
       };
-      const isEx = (p, key) => !ignoreExcl && (state.excl.items[key] || (state.excl.packs[p.m.id] && state.excl.packs[p.m.id][key]));
-      const putRef = (p, id, qty) => { const it = byId[id]; if (!it || isEx(p, id)) return; put(p, short(it.name), it.unit, it.wt || 0, volOf(it), qty, id); };
-      const putOwn = (p, o) => {
-        const k = 'own:' + o.name;
-        if (isEx(p, k)) { (p.ownExcl = p.ownExcl || []).push({ key: k, name: o.name, unit: o.unit, qty: o.qty, why: 'person' }); return; }
-        put(p, o.name, o.unit, o.wt, o.vol, o.qty, null);
+      // ของที่ถือให้คนอื่น: เช็คการตัดออกแบบไม่ผูกกับคนถือ (กันของย้ายคนถือแล้วสวิตช์หลุด)
+      const isEx = (p, key, ref) => !ignoreExcl && (state.excl.items[ref || key] || (key.includes('@') ? packExAny(key) : (state.excl.packs[p.m.id] && state.excl.packs[p.m.id][key])));
+      const putRef = (p, id, qty, opts) => {
+        const it = byId[id]; if (!it) return 0;
+        const key = (opts && opts.key) || id;
+        if (isEx(p, key, id)) return 0;
+        return put(p, short(it.name), it.unit, it.wt || 0, volOf(it), qty, id, opts);
       };
 
-      // ของเด็กเล็กไปอยู่ในเป้ผู้ดูแลก่อน
-      list.forEach(c => c.carry.forEach(y => {
-        putRef(c, 'diapers_baby', 18);
-        if (y.m.age < 1) putRef(c, 'infant_formula', 1);
-        putRef(c, 'wet_wipes', 30);
-        putRef(c, 'space_blanket', 1);
-        putOwn(c, { name: `เสื้อผ้าสำรอง ${y.m.name}`, unit: 'ชุด', wt: 0.12, vol: 0.5, qty: 2 });
-      }));
-      list.slice().sort((x, y) => y.m.age - x.m.age).forEach(p => {
-        PACK_LIST.forEach(e => putRef(p, e.ref, e.want(p.m, a)));
-        ownList(p.m).forEach(o => putOwn(p, o));
+      // 2) ของส่วนตัวของแต่ละคน: ของจำเป็นเฉพาะตัวก่อน แล้วค่อยของทั่วไป (น้ำ/อาหาร/ปฐมพยาบาลย่อย)
+      const deferred = []; // ของเฉพาะตัวที่เจ้าของแบกเองไม่ได้ ต้องฝากคนที่แบกไหว
+      const giveRef = (p, id, qty) => {
+        const it = byId[id]; if (!it || isEx(p, id, id)) return;
+        const can = Math.min(qty, Math.floor((remain[id] || 0) + 1e-9));
+        if (can <= 0) return;
+        const got = putRef(p, id, can) || 0;
+        if (can - got > 0 && SPECIAL_REFS.has(id)) deferred.push({ owner: p, ref: id, qty: can - got });
+      };
+      const giveOwn = (p, o) => {
+        const k = 'own:' + o.name;
+        if (isEx(p, k)) { (p.ownExcl = p.ownExcl || []).push({ key: k, name: o.name, unit: o.unit, qty: o.qty, why: 'person' }); return; }
+        const got = put(p, o.name, o.unit, o.wt, o.vol, o.qty, null) || 0;
+        if (got < o.qty && !o.stay) deferred.push({ owner: p, own: o, qty: o.qty - got });
+      };
+      list.filter(p => p.cap).sort((x, y) => y.m.age - x.m.age).forEach(p => {
+        PACK_LIST.filter(e => SPECIAL_REFS.has(e.ref)).forEach(e => giveRef(p, e.ref, e.want(p.m, a)));
+        ownList(p.m).forEach(o => giveOwn(p, o));
+      });
+
+      // 3) คนที่ไม่มีเป้ (เด็กเล็ก <3 ปี / ติดเตียง): เอาเฉพาะของจำเป็นเฉพาะตัว ฝากไว้ในเป้คนที่แบกไหว
+      list.filter(p => !p.cap).forEach(n => {
+        const m = n.m, baby = m.age < 3 && m.health !== 'bedridden';
+        const add = (ref, q) => { if (q > 0 && !(state.excl.items[ref] && !ignoreExcl)) deferred.push({ owner: n, ref, qty: q }); };
+        PACK_LIST.forEach(e => { if (SPECIAL_REFS.has(e.ref)) add(e.ref, e.want(m, a)); });
+        if (baby) { add('diapers_baby', 18); if (m.age < 1) add('infant_formula', 1); add('wet_wipes', 30); add('space_blanket', 1); }
+        if (m.health === 'bedridden') { add('adult_diapers', 15); add('wet_wipes', 30); }
+        if (baby) deferred.push({ owner: n, own: { name: 'เสื้อผ้าสำรอง', unit: 'ชุด', wt: 0.12, vol: 0.5, qty: 2 }, qty: 2 });
+        else ownList(m).filter(o => !o.stay).forEach(o => deferred.push({ owner: n, own: o, qty: o.qty }));
+      });
+
+      // 4) ฝากของเฉพาะตัว → คนที่เหลือที่ว่างมากที่สุด (ไม่ใช่เด็ก/ผู้สูงอายุ/ตั้งครรภ์ ถ้ามีตัวเลือก; คนขับหักคะแนนเล็กน้อย)
+      const score = p => (p.cap.kg - p.kg) - (T.driverIds.has(p.m.id) ? 3 : 0);
+      const ranked = owner => {
+        let pool = list.filter(p => p.cap && p !== owner && p.m.age >= 15 && p.m.age <= 64 && p.m.health !== 'pregnant');
+        if (!pool.length) pool = list.filter(p => p.cap && p !== owner);
+        pool.sort((x, y) => score(y) - score(x));
+        const pref = owner.bearers[0];
+        if (pref && pool.includes(pref)) { pool.splice(pool.indexOf(pref), 1); pool.unshift(pref); }
+        return pool;
+      };
+      const reasonOf = o => o.m.age < 3 ? 'เด็กเล็ก ยังแบกเป้ไม่ได้' : (o.m.health === 'bedridden' ? 'ติดเตียง ไม่แบกเป้' : 'เกินเพดานแบกของเจ้าตัว');
+      deferred.forEach(d => {
+        let left = d.qty;
+        const o = d.owner, why = reasonOf(o), key = (d.ref || ('own:' + d.own.name)) + '@' + o.m.id;
+        if (!ignoreExcl && ((d.ref && state.excl.items[d.ref]) || packExAny(key))) {
+          if (!d.ref) { const b0 = ranked(o)[0]; if (b0) (b0.ownExcl = b0.ownExcl || []).push({ key, name: `${d.own.name} (ของ ${o.m.name})`, unit: d.own.unit, qty: d.qty, why: 'person' }); }
+          return;
+        }
+        for (const b of ranked(o)) {
+          if (left <= 0) break;
+          const opts = { forId: o.m.id, forName: o.m.name, why, key };
+          const got = d.ref ? putRef(b, d.ref, left, opts) : put(b, d.own.name, d.own.unit, d.own.wt, d.own.vol, left, null, opts);
+          if (got > 0) { left -= got; if (!o.bearers.includes(b)) o.bearers.push(b); }
+        }
+      });
+
+      // 4.5) ของทั่วไปของทุกคน (น้ำ อาหาร ปฐมพยาบาลย่อย ฯลฯ) — เติมหลังจากของเฉพาะตัวของทุกคนมีที่แล้ว
+      // ถ้าเป้เต็ม ส่วนที่ไม่พอจะไหลไปเป็นของส่วนรวม (ของทั่วไปเหมือนกัน แบ่งกันถือได้)
+      list.filter(p => p.cap).sort((x, y) => y.m.age - x.m.age).forEach(p => {
+        PACK_LIST.filter(e => !SPECIAL_REFS.has(e.ref) && !GROUP_REFS.has(e.ref)).forEach(e => putRef(p, e.ref, e.want(p.m, a)));
+      });
+
+      // 5) ของส่วนกลาง (ชุดปฐมพยาบาล เครื่องกรองน้ำ ไฟแช็ก แผนที่ ฯลฯ) — ให้คนที่แบกไหวที่สุดถือก่อน
+      PACK_LIST.filter(e => GROUP_REFS.has(e.ref)).forEach(e => {
+        let pool = list.filter(p => p.cap && p.m.age >= 18 && p.m.age <= 59 && p.m.health !== 'pregnant');
+        if (!pool.length) pool = list.filter(p => p.cap);
+        pool.sort((x, y) => score(y) - score(x)).forEach(p => { const q = e.want(p.m, a); if (q > 0) putRef(p, e.ref, q, { grp: true }); });
       });
 
       const communal = reqs.filter(r => remain[r.item.id] > 1e-9 && r.item.id !== 'fuel_full')
@@ -3441,16 +3663,17 @@
       const exclQty = {};
       P1.list.forEach(p => p.items.forEach(it => {
         if (!it.ref) return;
-        const g = ex.items[it.ref], pe = ex.packs[p.m.id] && ex.packs[p.m.id][it.ref];
+        const key = it.key || it.ref;
+        const g = ex.items[it.ref], pe = it.key ? packExAny(key) : (ex.packs[p.m.id] && ex.packs[p.m.id][key]);
         if (!g && !pe) return;
         const m = exclQty[p.m.id] = exclQty[p.m.id] || {};
-        const e = m[it.ref] = m[it.ref] || { qty: 0, name: it.name, unit: it.unit, why: g ? 'global' : 'person', ref: it.ref, key: it.ref };
+        const e = m[key] = m[key] || { qty: 0, name: it.forName ? `${it.name} (ของ ${it.forName})` : it.name, unit: it.unit, why: g ? 'global' : 'person', ref: it.ref, key };
         e.qty += it.qty;
       }));
       const out = raw.map(r => {
         if (ex.items[r.item.id]) return Object.assign({}, r, { rawReq: r.req, req: 0, excluded: true, pct: 1 });
         let cut = 0;
-        Object.values(exclQty).forEach(m => { const e = m[r.item.id]; if (e && e.why === 'person') cut += e.qty; });
+        Object.values(exclQty).forEach(m => Object.values(m).forEach(e => { if (e.ref === r.item.id && e.why === 'person') cut += e.qty; }));
         if (cut > 0) { const req = Math.max(0, r2(r.req - cut)); return Object.assign({}, r, { rawReq: r.req, req, cutPersons: cut, pct: req > 0 ? Math.min(1, r.cur / req) : 1 }); }
         return r;
       });
@@ -3463,6 +3686,10 @@
     }
     function togglePackItem(mid, enc) {
       const key = decodeURIComponent(enc);
+      if (key.includes('@') && packExAny(key)) {
+        Object.keys(state.excl.packs).forEach(id => { const q = state.excl.packs[id]; if (q && q[key]) delete q[key]; if (q && !Object.keys(q).length) delete state.excl.packs[id]; });
+        saveState(); renderAll(); return;
+      }
       const o = state.excl.packs[mid] = state.excl.packs[mid] || {};
       if (o[key]) delete o[key]; else o[key] = true;
       if (!Object.keys(o).length) delete state.excl.packs[mid];
@@ -3505,14 +3732,18 @@
         }
         bins.push(u);
       });
-      if (['bug-out-foot', 'bicycle', 'motorbike'].includes(a.plan)) {
-        P.list.filter(p => p.cap).forEach(p => {
+      const personBins = ['bug-out-foot', 'bicycle', 'motorbike'].includes(a.plan);
+      if (personBins) {
+        const capable = P.list.filter(p => p.cap && p.m.age >= 15 && p.m.age <= 59 && p.m.health !== 'pregnant');
+        (capable.length ? capable : P.list.filter(p => p.cap)).forEach(p => {
           p.bin = { capKg: p.cap.kg * (a.plan === 'bug-out-foot' ? fk : 1), capL: p.cap.L, kg: p.kg, L: p.L, items: p.extra };
           bins.push(p.bin);
         });
       }
-      distribute(P.communal, bins);
-      return { a, reqs, T, packs: P.list, communal: P.communal, bins, cap };
+      // โหมดเดินเท้า: ของเฉพาะตัวที่เกินโควตาเป้ 72 ชม. ไม่โยนไปปนในเป้คนอื่น
+      const unplaced = a.plan === 'bug-out-foot' ? P.communal.filter(c => SPECIAL_REFS.has(c.item.id)) : [];
+      distribute(P.communal.filter(c => !unplaced.includes(c)), bins);
+      return { a, reqs, T, packs: P.list, communal: P.communal, unplaced, bins, cap };
     }
 
     // ---- อัตราการใช้ทรัพยากร (ปกติ → ลดการใช้สูงสุด) ----
@@ -3793,7 +4024,7 @@
         (g[c] = g[c] || []).push(i);
       });
       return CAT_ORDER.filter(c => g[c]).map(c => `<div class="pk-grp"><div class="pk-grp-h">${CAT_LABEL[c]}</div>${g[c].map(i => {
-        const key = i.ref || ('own:' + i.name);
+        const key = i.key || i.ref || ('own:' + i.name);
         const sw = mid !== undefined ? `<label class="sw sm" title="ปิด = ไม่พกชิ้นนี้ในเป้ใบนี้"><input type="checkbox" checked onchange="togglePackItem(${mid}, '${encodeURIComponent(key)}')"><span></span></label>` : '';
         return `<div class="pk-row">${sw}<span class="pk-name">${esc(i.name)}</span><b>×${fmt(i.qty)} <i>${esc(i.unit)}</i></b></div>`;
       }).join('')}</div>`).join('');
@@ -3844,22 +4075,23 @@
     };
     function consequences(p, a, u) {
       const out = [];
-      let bottles = 0, kcalLost = 0, foodNames = [];
+      let bottles = 0, kcalLost = 0, foodNames = [], waterUndo = [], foodUndo = [];
+      const undoOf = e => e.why === 'global' ? `toggleItemExcluded('${e.ref}')` : `togglePackItem(${p.m.id}, '${encodeURIComponent(e.key)}')`;
       p.excl.forEach(e => {
         const it = e.ref ? BASE_ITEMS.find(b => b.id === e.ref) : null;
-        if (e.ref === 'water_15l') { bottles += e.qty; return; }
-        if (it && it.kcal) { kcalLost += e.qty * it.kcal; foodNames.push(e.name); return; }
+        if (e.ref === 'water_15l') { bottles += e.qty; waterUndo.push(undoOf(e)); return; }
+        if (it && it.kcal) { kcalLost += e.qty * it.kcal; foodNames.push(e.name); foodUndo.push(undoOf(e)); return; }
         const k = e.ref || e.key;
         const c = CONSEQ[k] || (String(k).startsWith('own:') && String(k).includes('เสื้อผ้าสำรอง') ? ['mid', 'เด็กเล็กไม่มีเสื้อผ้าสำรอง เปียก/เปื้อนแล้วเปลี่ยนไม่ได้'] : ['low', 'ของชิ้นนี้ต้องพึ่งชุดส่วนรวม — ถ้าพลัดจากกลุ่มจะไม่มีใช้']);
-        out.push({ lv: c[0], name: e.name, t: c[1] });
+        out.push({ lv: c[0], name: e.name, t: c[1], undo: [undoOf(e)] });
       });
       if (bottles > 0) {
         const L = bottles * 1.5, days = L / Math.max(0.1, u.drink);
-        out.push({ lv: 'life', name: 'น้ำดื่ม', t: `ไม่พกน้ำ ${r1(L)} ลิตร (= ดื่มได้ ~${r1(days)} วันของคนนี้) — ถ้าแยกกลุ่มหรือต้องทิ้งรถ/บ้านจะไม่มีน้ำดื่มเลย ในอากาศร้อนขาดน้ำรุนแรงได้ภายใน 1–2 วัน` });
+        out.push({ lv: 'life', name: 'น้ำดื่ม', t: `ไม่พกน้ำ ${r1(L)} ลิตร (= ดื่มได้ ~${r1(days)} วันของคนนี้) — ถ้าแยกกลุ่มหรือต้องทิ้งรถ/บ้านจะไม่มีน้ำดื่มเลย ในอากาศร้อนขาดน้ำรุนแรงได้ภายใน 1–2 วัน`, undo: waterUndo });
       }
       if (kcalLost > 0) {
         const d = u.kcal > 0 ? kcalLost / u.kcal : 0;
-        out.push({ lv: 'high', name: 'อาหาร', t: `อาหารในเป้หายไป ~${Math.round(kcalLost).toLocaleString()} kcal (= ~${r1(d)} วันของคนนี้) — ต้องพึ่งอาหารส่วนรวม ถ้าพลัดหลงหรือแยกกลุ่มจะอดอาหาร (${foodNames.slice(0, 3).join(', ')}${foodNames.length > 3 ? '…' : ''})` });
+        out.push({ lv: 'high', name: 'อาหาร', t: `อาหารในเป้หายไป ~${Math.round(kcalLost).toLocaleString()} kcal (= ~${r1(d)} วันของคนนี้) — ต้องพึ่งอาหารส่วนรวม ถ้าพลัดหลงหรือแยกกลุ่มจะอดอาหาร (${foodNames.slice(0, 3).join(', ')}${foodNames.length > 3 ? '…' : ''})`, undo: foodUndo });
       }
       const rank = { life: 0, high: 1, mid: 2, low: 3 };
       return out.sort((x, y) => rank[x.lv] - rank[y.lv]);
@@ -3923,12 +4155,24 @@
              <div class="pc-baglabel">${esc(p.sp.label)}</div>
              ${barHtml('น้ำหนักในเป้', totalKg, p.cap.kg, 'กก.')}
              <div class="pk-stat">เพดานแบก ${p.cap.kg} กก. = ${Math.round(p.cap.kg / m.weight * 100)}% ของน้ำหนักตัว ${m.weight} กก.<br>น้ำในเป้ ${r1(bottles * 1.5)} ลิตร (~${r1(waterDays)} วัน) · อาหาร ~${Math.round(pk).toLocaleString()} kcal${u.kcal > 0 ? ' (~' + r1(foodDays) + ' วัน)' : ''}</div>`
-          : `<div class="pc-bagart nobag">${m.age < 3 ? '👶' : '🛏️'}</div><div class="pc-baglabel">${esc(p.sp.label)}</div>${p.carer ? `<div class="pk-stat">ผู้ดูแล: <b>${esc(p.carer.m.name)}</b> (ของใช้เด็กอยู่ในเป้ผู้ดูแล)</div>` : ''}`;
+          : `<div class="pc-bagart nobag">${m.age < 3 ? '👶' : '🛏️'}</div><div class="pc-baglabel">${esc(p.sp.label)}</div>`;
+        const depTxt = p.bearers && p.bearers.length ? `<div class="pk-stat">🤝 ${p.sp.has ? 'ของเฉพาะตัวที่เกินเพดานแบก ฝากไว้กับ' : 'ของจำเป็นของ' + esc(m.name) + 'อยู่ในเป้ของ'}: <b>${p.bearers.map(b => esc(b.m.name)).join(', ')}</b></div>` : '';
         const carryTxt = p.carry && p.carry.length ? `<div class="pk-stat">🤱 ต้องอุ้ม: ${p.carry.map(c => esc(c.m.name) + ' (' + c.m.weight + ' กก.)').join(', ')}${a.plan === 'bug-out-foot' && p.carryKg > p.sp.maxKg ? ' — <b class="cap-over">หนักเกินแรงแบก ควรมีผู้ใหญ่ช่วย</b>' : ''}</div>` : '';
         const foodLine = u.foods.filter(f => f.qty >= 0.05).map(f => `${short(f.item.name).split(' ')[0]} ${r1(f.qty)} ${f.item.unit}`).join(' · ');
         const hyg = [`ทิชชู่ ${r1(u.tp)} ม้วน`, `ทิชชู่เปียก ${Math.round(u.wipes)} แผ่น`]
           .concat(u.diapers ? [`ผ้าอ้อม ${u.diapers} ชิ้น`] : [], u.adultDiapers ? [`ผ้าอ้อมผู้ใหญ่ ${u.adultDiapers} ชิ้น`] : [], u.pads ? [`ผ้าอนามัย ${r1(u.pads)} ชิ้น`] : [], u.mask ? [`หน้ากาก ${r1(u.mask)} ชิ้น`] : [], u.formula ? [`นมผง ${u.formula} กระป๋อง`] : []);
-        const allItems = p.items.concat(extra);
+        const mineItems = p.items.filter(x => !x.forId && !x.grp);
+        const gearItems = p.items.filter(x => x.grp);
+        const forMap = {};
+        p.items.filter(x => x.forId).forEach(x => { (forMap[x.forId] = forMap[x.forId] || { name: x.forName, why: x.why, items: [] }).items.push(x); });
+        const sec = (title, inner) => `<div class="pk-sec"><div class="pk-sec-h">${title}</div>${inner}</div>`;
+        let listHtml = '<span class="pk-none">ไม่มีเป้ส่วนตัว</span>';
+        if (p.sp.has) {
+          listHtml = sec('🧍 ของส่วนตัวของ ' + nm(m), groupedList(mineItems, m.id));
+          if (gearItems.length) listHtml += sec('🧰 ของส่วนกลางที่ได้รับมอบหมายให้ถือ (เพราะแบกไหว)', groupedList(gearItems, m.id));
+          Object.values(forMap).forEach(f => { listHtml += sec(`🤝 ถือให้ ${esc(f.name)} — ${esc(f.why)}`, groupedList(f.items, m.id)); });
+          if (extra.length) listHtml += sec('📦 ของส่วนรวมที่แบกเพิ่ม (ไม่ใช่ของส่วนตัว)', groupedList(extra.map(x => ({ id: x.id, name: x.name, unit: x.unit, qty: x.qty }))));
+        }
 
         // กรอบ B: ของที่ไม่พก / กรอบ C: ผลที่ตามมา
         const exRows = p.excl.map(e => {
@@ -3939,7 +4183,7 @@
         const lifeN = cons.filter(c => c.lv === 'life').length;
         const consHtml = cons.length
           ? `<div class="cons-sum ${lifeN ? 'bad' : 'warn'}">ตัดออก ${p.excl.length} รายการ${lifeN ? ` · <b>มี ${lifeN} เรื่องอันตรายถึงชีวิต</b>` : ''}</div>` +
-            cons.map(c => `<div class="cons-row ${c.lv}"><span class="cons-lv">${LV_LABEL[c.lv]}</span><b>${esc(c.name)}</b><span>${esc(c.t)}</span></div>`).join('')
+            cons.map(c => `<div class="cons-row ${c.lv}"><span class="cons-lv">${LV_LABEL[c.lv]}</span><b>${esc(c.name)}</b><span>${esc(c.t)}</span>${c.undo && c.undo.length ? `<button type="button" class="undo-btn cons-undo" onclick="${c.undo.join('; ')}">↩ คืนใส่เป้${c.undo.length > 1 ? ' (' + c.undo.length + ' รายการ)' : ''}</button>` : ''}</div>`).join('')
           : '<div class="pk-none">ยังไม่ได้ตัดอะไร — เป้ครบตามเกณฑ์ฉุกเฉิน 72 ชั่วโมง</div>';
 
         return `<div class="pcard h">
@@ -3951,8 +4195,8 @@
             <div class="role-chip">${role.icon || ''} ${esc(role.text || '')}</div>
             ${role.swap ? `<div class="role-swap">🔁 ${esc(role.swap)}</div>` : ''}
           </div>
-          <div class="pc-bag">${bag}${carryTxt}</div>
-          <div class="pc-list"><div class="pk-title">🎒 ของในเป้ (นับเป็นชิ้น) — ปิดสวิตช์เพื่อไม่พกชิ้นนั้น${extra.length ? ' · รวมของส่วนรวมที่แบกเพิ่ม' : ''}</div><div class="pk-cols">${p.sp.has ? groupedList(allItems, m.id) : '<span class="pk-none">ไม่มีเป้ส่วนตัว</span>'}${p.sp.has ? '' : ''}</div></div>
+          <div class="pc-bag">${bag}${carryTxt}${depTxt}</div>
+          <div class="pc-list"><div class="pk-title">🎒 ของในเป้ (นับเป็นชิ้น) — ปิดสวิตช์เพื่อไม่พกชิ้นนั้น</div><div class="pk-cols">${listHtml}</div></div>
           <div class="pc-use">
             <div class="pk-title">📅 แผนใช้ทรัพยากรต่อวัน — โหมด${sevName(t)}</div>
             <div class="use-grid">
@@ -3994,6 +4238,7 @@
         const rows = M.packs.filter(p => p.bin).map(p => ({ p, ex: (p.extra || []) })).filter(x => x.ex.length);
         where = `<div class="pk-stat">ของส่วนรวมแบ่งแบกตามเพดานน้ำหนักของแต่ละคน (ดูในรายการของแต่ละการ์ด)</div>` +
           rows.map(x => `<div class="pk-grp"><div class="pk-grp-h">${esc(x.p.m.name)}</div>${x.ex.map(i => `<span class="pk-chip">${esc(i.name)} <b>×${fmt(i.qty)}</b> <i>${esc(i.unit)}</i></span>`).join('')}</div>`).join('') +
+          (M.unplaced && M.unplaced.length ? `<div class="pk-grp"><div class="pk-grp-h">📌 ของเฉพาะตัวส่วนที่เกินโควตาเป้ 72 ชม. (ไม่ได้แบก — เก็บที่บ้าน/ฝากไว้/หาซื้อปลายทาง)</div>${M.unplaced.map(c => `<span class="pk-chip">${esc(short(c.item.name))} <b>×${fmt(c.qty)}</b> <i>${esc(c.item.unit)}</i></span>`).join('')}</div>` : '') +
           (M.cap ? barHtml('น้ำหนักรวมที่ต้องแบก', getLoad(M.reqs).kg, M.cap.kg, 'กก.') : '');
       }
       const plan = [
@@ -4264,6 +4509,31 @@
         location.reload();
       }
     }
+
+    // ===== V9: ตรวจอุปกรณ์อัตโนมัติ (ปรับตามขนาดจอ + การหมุนจอ) =====
+    (function setupAutoDevice() {
+      const root = document.documentElement;
+      const badge = document.getElementById('device-badge');
+      function detect() {
+        const w = window.innerWidth;
+        const touch = window.matchMedia('(pointer: coarse)').matches;
+        let dev = 'desktop';
+        if (w <= 720) dev = 'mobile';
+        else if (w <= 1100 || (touch && w <= 1366)) dev = 'tablet';
+        const orient = window.innerHeight > window.innerWidth ? 'แนวตั้ง' : 'แนวนอน';
+        root.setAttribute('data-device', dev);
+        root.setAttribute('data-touch', touch ? '1' : '0');
+        if (badge) {
+          const label = { mobile: '📱 มือถือ', tablet: '📲 แท็บเล็ต', desktop: '💻 คอมพิวเตอร์' }[dev];
+          badge.textContent = dev === 'desktop' ? label : label + ' · ' + orient;
+        }
+      }
+      let t;
+      const run = () => { clearTimeout(t); t = setTimeout(detect, 80); };
+      window.addEventListener('resize', run);
+      window.addEventListener('orientationchange', run);
+      detect();
+    })();
 
     // Init Date badge
     const today = new Date();
