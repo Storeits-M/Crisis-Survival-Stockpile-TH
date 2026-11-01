@@ -1415,6 +1415,49 @@
       .modal-overlay { align-items: center; }
     }
 
+
+    /* ===== V10: ตัด/คืนของส่วนรวม, เตือนน้ำหนักเป้, การ์ดสรุปรายวัน ===== */
+    .pk-warn { background: rgba(230, 92, 80, 0.12); border: 1px solid rgba(230, 92, 80, 0.55); color: #f3b3a8; border-radius: 8px; padding: 8px 10px; font-size: 12.5px; line-height: 1.55; margin: 8px 0; }
+    .pk-warn b { color: #ff9c8d; }
+    .store-ex { margin-top: 10px; }
+    .pc-ex.store-ex, .pc-cons.store-ex { grid-area: auto; }
+    .rc-wrap { margin-top: 18px; border: 1px solid var(--card-border); border-radius: 14px; padding: 16px 18px; background: rgba(0,0,0,.12); }
+    .rc-title { font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
+    .rc-note { font-size: 12.5px; color: var(--text-sub); line-height: 1.55; margin-bottom: 12px; }
+    .rc-dim { color: var(--text-sub); font-size: 11.5px; }
+    .rc-modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; margin-bottom: 12px; }
+    .rc-mode { text-align: left; display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-main); font-family: var(--font-sans); font-size: 12px; cursor: pointer; }
+    .rc-mode b { font-size: 13.5px; }
+    .rc-mode span { color: var(--text-sub); }
+    .rc-mode.on { border-color: var(--cyan); background: var(--cyan-dim); }
+    .rc-sum { display: grid; gap: 4px; font-size: 13px; margin-bottom: 12px; padding: 10px 12px; border-radius: 10px; background: var(--input-bg); border: 1px solid var(--card-border); }
+    .rc-strips { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin-bottom: 14px; }
+    .rc-lab { display: block; font-size: 12.5px; margin-bottom: 4px; }
+    .rc-strip { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 3px; }
+    .rc-cell { font-style: normal; font-size: 10px; min-width: 20px; height: 20px; line-height: 20px; text-align: center; border-radius: 4px; }
+    .rc-cell.ok { background: rgba(140, 179, 104, .35); color: #cfe6b8; }
+    .rc-cell.out { background: rgba(230, 92, 80, .35); color: #f3b3a8; }
+    .rc-people { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: 10px; }
+    .rc-person { border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; background: var(--input-bg); }
+    .rc-ph { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+    .rc-ph small { display: block; color: var(--text-sub); font-size: 11.5px; }
+    .rc-ico { font-size: 28px; }
+    .rc-kcal { font-size: 13px; margin-bottom: 4px; }
+    .rc-kcal small { font-size: 11.5px; }
+    .rc-row { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; padding: 2px 0; border-bottom: 1px dashed rgba(255,255,255,.07); }
+    .rc-row b { color: var(--amber); text-align: right; }
+    .rc-water { margin-top: 8px; font-size: 13px; line-height: 1.6; }
+    .rc-water.low { color: #f3b3a8; }
+    .rc-sec-h { margin: 16px 0 6px; font-weight: 700; font-size: 13.5px; color: var(--cyan); }
+    .rc-shares { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 10px; }
+    .rc-share { border: 1px solid var(--card-border); border-radius: 10px; padding: 10px 12px; background: var(--input-bg); }
+    .rc-share-h { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+    .rc-line { font-size: 13px; line-height: 1.6; }
+    .rc-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .rc-chip { font-size: 12.5px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--card-border); background: var(--input-bg); }
+    .rc-chip.low { border-color: rgba(230, 92, 80, .6); color: #f3b3a8; }
+    @media screen and (max-width: 720px) { .rc-wrap { padding: 12px; } .rc-modes { grid-template-columns: 1fr 1fr; } }
+    @media print { .rc-mode:not(.on) { display: none; } .rc-wrap, .rc-person, .rc-share, .rc-sum { background: #fff !important; border: 1px solid #bbb !important; color: #111 !important; } .store-ex .undo-btn { display: none !important; } }
     .pk-sec { margin-bottom: 10px; }
     .pk-sec-h { font-size: 12.5px; font-weight: 700; color: var(--cyan); margin: 6px 0 4px; padding-bottom: 3px; border-bottom: 1px solid var(--card-border); }
     @media print { .device-badge { display: none !important; } }
@@ -1734,6 +1777,7 @@
           <div id="sev-desc"></div>
           <div id="runway-summary"></div>
           <div id="runway-table"></div>
+          <div id="ration-card"></div>
         </div>
 
         <!-- 5.2 PERSON CARDS -->
@@ -2640,7 +2684,7 @@
       pets: 0,
       vehicle: { carType: 'sedan', boatType: 'small', bikes: 0, cars: 0, boats: 0, bicycles: 0, distanceKm: 0 },  // 0 = อัตโนมัติ
       severity: 0,
-      excl: { items: {}, packs: {} },
+      excl: { items: {}, packs: {}, store: {} },
       capOverride: {},
       members: [
         { id: 1, name: 'คุณพ่อ', gender: 'male', age: 38, weight: 70, height: 173, health: 'normal', medication: '' },
@@ -2690,8 +2734,8 @@
       if (!PLANS[state.plan]) state.plan = 'bug-in';
       state.vehicle = Object.assign({ carType: 'sedan', boatType: 'small', bikes: 0, cars: 0, boats: 0, bicycles: 0, distanceKm: 0 }, state.vehicle || {});
       state.severity = Math.max(0, Math.min(100, parseInt(state.severity) || 0));
-      state.excl = Object.assign({ items: {}, packs: {} }, state.excl || {});
-      state.excl.items = state.excl.items || {}; state.excl.packs = state.excl.packs || {};
+      state.excl = Object.assign({ items: {}, packs: {}, store: {} }, state.excl || {});
+      state.excl.items = state.excl.items || {}; state.excl.packs = state.excl.packs || {}; state.excl.store = state.excl.store || {};
       if (!CAR_TYPES[state.vehicle.carType]) state.vehicle.carType = 'sedan';
       if (!BOAT_TYPES[state.vehicle.boatType]) state.vehicle.boatType = 'small';
       state.vehicle.bikes = Math.max(0, parseInt(state.vehicle.bikes) || 0);
@@ -3617,19 +3661,22 @@
         pool.sort((x, y) => score(y) - score(x)).forEach(p => { const q = e.want(p.m, a); if (q > 0) putRef(p, e.ref, q, { grp: true }); });
       });
 
-      const communal = reqs.filter(r => remain[r.item.id] > 1e-9 && r.item.id !== 'fuel_full')
+      const communal = reqs.filter(r => remain[r.item.id] > 1e-9 && r.item.id !== 'fuel_full' && (ignoreExcl || state.excl.store[r.item.id] !== true))
         .map(r => ({ item: r.item, qty: r2(remain[r.item.id]) }));
       return { list, communal };
     }
 
-    function distribute(items, bins) {
-      if (!bins.length) return;
+    function distribute(items, bins, overflow) {
+      if (!bins.length) { if (overflow) items.forEach(c => overflow.push({ item: c.item, qty: c.qty })); return; }
       items.sort((x, y) => y.qty * (y.item.wt || 0) - x.qty * (x.item.wt || 0));
       const add = (b, it, q) => {
         if (q <= 0) return;
         q = r2(q);
-        b.items.push({ id: it.id, name: short(it.name), unit: it.unit, qty: q, kg: q * (it.wt || 0), L: q * volOf(it) });
-        b.kg += q * (it.wt || 0); b.L += q * volOf(it);
+        const kg = q * (it.wt || 0), L = q * volOf(it);
+        const ex = b.items.find(x => x.id === it.id);
+        if (ex) { ex.qty = r2(ex.qty + q); ex.kg += kg; ex.L += L; }
+        else b.items.push({ id: it.id, name: short(it.name), unit: it.unit, qty: q, kg, L });
+        b.kg += kg; b.L += L;
       };
       items.forEach(({ item, qty }) => {
         const step = item.step || 1;
@@ -3645,8 +3692,20 @@
           add(b, item, share); left = r2(left - share);
         });
         if (left > 1e-9) {
-          const b = bins.slice().sort((x, y) => (y.capKg - y.kg) - (x.capKg - x.kg))[0];
-          add(b, item, left);
+          const loose = bins.filter(b => !b.strict);
+          if (loose.length) {
+            const b = loose.slice().sort((x, y) => (y.capKg - y.kg) - (x.capKg - x.kg))[0];
+            add(b, item, left);
+          } else {
+            const wt = item.wt || 0;
+            bins.slice().sort((x, y) => (y.capKg - y.kg) - (x.capKg - x.kg)).forEach(b => {
+              if (left <= 1e-9) return;
+              let q = wt > 0 ? Math.floor(Math.max(0, b.capKg - b.kg) / wt / step + 1e-9) * step : left;
+              q = Math.min(q, left);
+              if (q > 0) { add(b, item, q); left = r2(left - q); }
+            });
+            if (left > 1e-9) { if (overflow) overflow.push({ item, qty: left }); else add(bins[0], item, left); }
+          }
         }
       });
     }
@@ -3657,7 +3716,8 @@
       const ex = state.excl;
       const hasG = Object.keys(ex.items).some(k => ex.items[k]);
       const hasP = Object.values(ex.packs).some(o => Object.keys(o).length);
-      if (!hasG && !hasP) { const o = raw.slice(); o.exclQty = {}; return o; }
+      const hasS = Object.keys(ex.store).some(k => ex.store[k]);
+      if (!hasG && !hasP && !hasS) { const o = raw.slice(); o.exclQty = {}; o.storeExcl = []; return o; }
       const T = buildTransport(a);
       const P1 = buildPacks(a, raw, T, true); // ถ้าไม่ตัดอะไรเลย แต่ละคนจะพกอะไร
       const exclQty = {};
@@ -3670,18 +3730,39 @@
         const e = m[key] = m[key] || { qty: 0, name: it.forName ? `${it.name} (ของ ${it.forName})` : it.name, unit: it.unit, why: g ? 'global' : 'person', ref: it.ref, key };
         e.qty += it.qty;
       }));
+      // ของส่วนรวม (ที่เก็บ/ที่แบกเพิ่ม) ที่ผู้ใช้ตัดออก
+      const storeCut = {};
+      P1.communal.forEach(c => {
+        const v = ex.store[c.item.id];
+        if (!v || ex.items[c.item.id]) return;
+        const q = v === true ? c.qty : Math.min(c.qty, Number(v) || 0);
+        if (q > 0) storeCut[c.item.id] = { ref: c.item.id, item: c.item, qty: r2(q), partial: v !== true };
+      });
       const out = raw.map(r => {
         if (ex.items[r.item.id]) return Object.assign({}, r, { rawReq: r.req, req: 0, excluded: true, pct: 1 });
         let cut = 0;
         Object.values(exclQty).forEach(m => Object.values(m).forEach(e => { if (e.ref === r.item.id && e.why === 'person') cut += e.qty; }));
+        if (storeCut[r.item.id]) cut += storeCut[r.item.id].qty;
         if (cut > 0) { const req = Math.max(0, r2(r.req - cut)); return Object.assign({}, r, { rawReq: r.req, req, cutPersons: cut, pct: req > 0 ? Math.min(1, r.cur / req) : 1 }); }
         return r;
       });
       out.exclQty = exclQty;
+      out.storeExcl = Object.values(storeCut);
       return out;
     }
     function toggleItemExcluded(id) {
       if (state.excl.items[id]) delete state.excl.items[id]; else state.excl.items[id] = true;
+      saveState(); renderAll();
+    }
+    // ตัด/คืน ของส่วนรวม (ที่เก็บในบ้าน/รถ/เรือ/จักรยาน หรือของเพิ่มเติมที่แบกกระจาย)
+    function toggleStoreItem(ref) {
+      if (state.excl.store[ref]) delete state.excl.store[ref]; else state.excl.store[ref] = true;
+      saveState(); renderAll();
+    }
+    function restoreStoreItem(ref) { delete state.excl.store[ref]; saveState(); renderAll(); }
+    function cutStoreQty(ref, qty) {
+      const cur = state.excl.store[ref];
+      state.excl.store[ref] = r2((typeof cur === 'number' ? cur : 0) + qty);
       saveState(); renderAll();
     }
     function togglePackItem(mid, enc) {
@@ -3736,14 +3817,15 @@
       if (personBins) {
         const capable = P.list.filter(p => p.cap && p.m.age >= 15 && p.m.age <= 59 && p.m.health !== 'pregnant');
         (capable.length ? capable : P.list.filter(p => p.cap)).forEach(p => {
-          p.bin = { capKg: p.cap.kg * (a.plan === 'bug-out-foot' ? fk : 1), capL: p.cap.L, kg: p.kg, L: p.L, items: p.extra };
+          p.bin = { capKg: p.cap.kg * (a.plan === 'bug-out-foot' ? fk : 1), capL: p.cap.L, kg: p.kg, L: p.L, items: p.extra, strict: true };
           bins.push(p.bin);
         });
       }
       // โหมดเดินเท้า: ของเฉพาะตัวที่เกินโควตาเป้ 72 ชม. ไม่โยนไปปนในเป้คนอื่น
       const unplaced = a.plan === 'bug-out-foot' ? P.communal.filter(c => SPECIAL_REFS.has(c.item.id)) : [];
-      distribute(P.communal.filter(c => !unplaced.includes(c)), bins);
-      return { a, reqs, T, packs: P.list, communal: P.communal, unplaced, bins, cap };
+      const overflow = [];
+      distribute(P.communal.filter(c => !unplaced.includes(c)), bins, overflow);
+      return { a, reqs, T, packs: P.list, communal: P.communal, unplaced, overflow, bins, cap };
     }
 
     // ---- อัตราการใช้ทรัพยากร (ปกติ → ลดการใช้สูงสุด) ----
@@ -3954,6 +4036,151 @@
     }
 
     // ---- รายงาน 5.1: อยู่ได้กี่วัน + อัตราใช้ ----
+
+    // ============ V10: สรุปการใช้ทรัพยากรแต่ละวัน (แบ่งจากของที่มีทั้งหมด) ============
+    const FOOD_ICON = { jasmine_rice: '🍚', instant_noodles: '🍜', canned_fish: '🐟', instant_porridge: '🥣', uht_milk: '🥛', energy_snacks: '🍫', peanut_butter_nuts: '🥜', cooking_oil: '🧈' };
+    const GRAM_ITEMS = new Set(['jasmine_rice', 'peanut_butter_nuts', 'cooking_oil']);
+    function qFrac(q) {
+      if (q < 0.125) return '';
+      const steps = [[0, ''], [0.25, '¼'], [1 / 3, '⅓'], [0.5, '½'], [2 / 3, '⅔'], [0.75, '¾'], [1, '']];
+      const w = Math.floor(q + 1e-9), f = q - w;
+      let best = steps[0], bd = 9;
+      steps.forEach(s => { const d = Math.abs(s[0] - f); if (d < bd) { bd = d; best = s; } });
+      const whole = w + (best[0] === 1 ? 1 : 0);
+      return (whole > 0 ? String(whole) : '') + best[1];
+    }
+    const unitOf = it => String(it.unit).replace(/\s*\(.*\)/, '');
+    function portionText(it, q) {
+      if (it.id === 'jasmine_rice') { const g = Math.max(10, Math.round(q * 1000 / 10) * 10); const c = qFrac(g / 180); return `${g} ก.${c ? ` (≈ ${c} ถ้วยตวง)` : ''}`; }
+      if (it.id === 'peanut_butter_nuts') { const g = Math.round(q * 400 / 5) * 5; return g >= 5 ? `${g} ก. (~${Math.max(1, Math.round(g / 16))} ช้อนโต๊ะ)` : ''; }
+      if (it.id === 'cooking_oil') { const s = Math.round(q * 67); return s >= 1 ? `${s} ช้อนโต๊ะ` : ''; }
+      const f = qFrac(q); return f ? `${f} ${unitOf(it)}` : '';
+    }
+    // แบ่งหน่วยที่นับได้ (ซอง/กระป๋อง/กล่อง) ให้หลายคนแบ่งกัน — ปัดเป็น ¼ แล้วจัดลงหน่วยละ 1
+    function splitUnits(rows) {
+      const whole = [], bins = [];
+      rows.slice().sort((x, y) => y.q - x.q).forEach(r => {
+        const q = Math.round(r.q * 4) / 4; if (q <= 0) return;
+        const w = Math.floor(q + 1e-9);
+        if (w >= 1) whole.push({ name: r.name, q: w });
+        const rem = Math.round((q - w) * 4) / 4;
+        if (rem > 0) {
+          let b = bins.find(x => x.used + rem <= 1 + 1e-9);
+          if (!b) { b = { used: 0, parts: [] }; bins.push(b); }
+          b.used += rem; b.parts.push({ name: r.name, q: rem });
+        }
+      });
+      return { whole, bins };
+    }
+    function shareLines(it, rows) {
+      const u = unitOf(it), { whole, bins } = splitUnits(rows), out = [];
+      if (whole.length) out.push(`<b>เต็ม${u}:</b> ${whole.map(w => `${esc(w.name)} ${w.q} ${u}`).join(' · ')}`);
+      bins.forEach(b => {
+        const names = b.parts.map(p => esc(p.name));
+        const detail = b.parts.map(p => `${esc(p.name)} ${qFrac(p.q)}`).join(' · ');
+        if (b.parts.length > 1) out.push(`<b>${names.join(' + ')}</b> แบ่งกัน ${b.used >= 1 - 1e-9 ? `1 ${u}พอดี` : `${qFrac(b.used)} ${u} (เหลือ ${qFrac(1 - b.used)} ปิดเก็บไว้มื้อถัดไป)`} <span class="rc-dim">(${detail})</span>`);
+        else out.push(`<b>${names[0]}</b> ${qFrac(b.parts[0].q)} ${u}${b.used < 1 - 1e-9 ? ` <span class="rc-dim">(แบ่งส่วนที่เหลือกับคนอื่นหรือเก็บไว้)</span>` : ''}`);
+      });
+      return out;
+    }
+    function rcFmt(x) { return x >= 100 ? Math.round(x).toLocaleString() : (x >= 10 ? r1(x) : (x >= 1 ? r1(x) : r2(x))); }
+    function rcStrip(days, lastOk, total) {
+      const n = Math.min(Math.max(1, Math.round(total)), 30);
+      let s = '';
+      for (let d = 1; d <= n; d++) s += `<i class="rc-cell ${d <= lastOk ? 'ok' : 'out'}">${d}</i>`;
+      return `<div class="rc-strip">${s}${total > 30 ? '<span class="rc-dim">…</span>' : ''}</div>`;
+    }
+    function renderRation(a, t, R) {
+      const el = document.getElementById('ration-card');
+      if (!el) return;
+      const U = R.U, target = a.days;
+      const inv = id => parseFloat(state.currentInventory[id]) || 0;
+      const foods = BASE_ITEMS.filter(i => i.kcal && inv(i.id) > 0).map(i => ({ item: i, stock: inv(i.id) }));
+      const K = foods.reduce((s, f) => s + f.stock * f.item.kcal, 0);
+      const Kd = U.kcal, eaters = U.per.filter(x => x.kcal > 0).length;
+      const fullDaysF = Kd > 0 ? K / Kd : Infinity;
+      const NdF = Math.max(isFinite(fullDaysF) ? fullDaysF : target, target);
+      const ratioF = Kd > 0 ? Math.min(1, (K / NdF) / Kd) : 1;
+      const S = inv('water_15l') * 1.5;
+      const drinkNeed = U.per.reduce((s, x) => s + x.drink, 0), extraNeed = Math.max(0, U.water - drinkNeed);
+      const fullDaysW = U.water > 0 ? S / U.water : Infinity;
+      const NdW = Math.max(isFinite(fullDaysW) ? fullDaysW : target, target);
+      const availW = S / NdW;
+      const drinkGive = Math.min(drinkNeed, availW), extraGive = Math.max(0, Math.min(extraNeed, availW - drinkGive));
+      const dRatio = drinkNeed > 0 ? drinkGive / drinkNeed : 1, eRatio = extraNeed > 0 ? extraGive / extraNeed : 1;
+      const sn = nm => String(nm).replace(/\s*\(.*\)/, '');
+      const icon = m => m.age < 1 ? '👶' : m.age < 13 ? '🧒' : m.age >= 60 ? (m.gender === 'female' ? '👵' : '👴') : (m.gender === 'female' ? '👩' : '👨');
+      const people = state.members.map((m, i) => {
+        const u = U.per[i], share = Kd > 0 ? u.kcal / Kd : 0;
+        return { m, u, share, kcalGet: Kd > 0 ? (K / NdF) * share : 0, items: foods.map(f => ({ item: f.item, q: f.stock / NdF * share })), drink: u.drink * dRatio, use: u.extra * eRatio };
+      });
+      const pct = x => Math.round(x * 100);
+      const tone = r => r >= 0.95 ? 'green' : r >= 0.6 ? 'amber' : 'red';
+
+      // โหมดประหยัด 4 ระดับ (เทียบกัน)
+      const modes = [['ปกติ', 0], ['เริ่มประหยัด', 40], ['ลดการใช้ระดับสูง', 75], ['ลดการใช้สูงสุด', 100]];
+      const act = modes.reduce((b, m, i) => Math.abs((state.severity || 0) - m[1]) < Math.abs((state.severity || 0) - modes[b][1]) ? i : b, 0);
+      const modeHtml = modes.map(([lb, v], i) => {
+        const tt = v / 100, Rt = computeRunway(a, tt), Ut = Rt.U;
+        const fd = Ut.kcal > 0 ? K / Ut.kcal : Infinity, nd = Math.max(isFinite(fd) ? fd : target, target);
+        const rr = Ut.kcal > 0 ? Math.min(1, (K / nd) / Ut.kcal) : 1;
+        const dN = Ut.per.reduce((s, x) => s + x.drink, 0), eN = Math.max(0, Ut.water - dN);
+        const fw = Ut.water > 0 ? S / Ut.water : Infinity, nw = Math.max(isFinite(fw) ? fw : target, target);
+        const dg = Math.min(dN, S / nw);
+        return `<button type="button" class="rc-mode ${i === act ? 'on' : ''}" onclick="setSeverity(${v}); document.getElementById('sev-slider').value=${v}">
+          <b>${lb}</b>
+          <span>กินเต็มโควตาได้ ${dayTxt(Rt.overall)} วัน</span>
+          <span>แบ่งให้ครบ ${target} วัน → ได้ <b class="rw-${tone(rr)}">${pct(rr)}%</b> (~${Math.round(Ut.kcal > 0 ? (K / nd) / Math.max(1, Ut.per.filter(x => x.kcal > 0).length) : 0).toLocaleString()} kcal/คน)</span>
+          <span>น้ำดื่ม ~${r1(dg / Math.max(1, state.members.length))} ลิตร/คน/วัน</span></button>`;
+      }).join('');
+
+      // การ์ดรายคน
+      const peopleHtml = people.map(p => {
+        const m = p.m, u = p.u;
+        const foodRows = p.items.map(x => ({ x, txt: portionText(x.item, x.q) })).filter(r => r.txt)
+          .map(r => `<div class="rc-row"><span>${FOOD_ICON[r.x.item.id] || '🍽️'} ${esc(short(r.x.item.name).split(' ')[0])}</span><b>${r.txt}</b></div>`).join('');
+        const cups = Math.round(p.drink * 4 * 2) / 2;
+        const lowW = m.age >= 13 && p.drink < Math.min(p.u.drink, 1.5) - 0.05;
+        return `<div class="rc-person">
+          <div class="rc-ph"><span class="rc-ico">${icon(m)}</span><div><b>${esc(sn(m.name))}</b><small>${m.age} ปี · ${m.weight} กก.</small></div></div>
+          ${u.kcal > 0 ? `<div class="rc-kcal">🔥 ${Math.round(p.kcalGet).toLocaleString()} kcal/วัน <small class="rw-${tone(p.kcalGet / Math.max(1, u.kcal))}">(${pct(p.kcalGet / Math.max(1, u.kcal))}% ของที่ต้องการ ${Math.round(u.kcal).toLocaleString()})</small></div>${foodRows || '<div class="rc-dim">ไม่มีอาหารในสต๊อก</div>'}` : `<div class="rc-kcal">🍼 นมผง ~${u.formula} กระป๋อง/วัน <small>(ไม่ลดการใช้)</small></div>`}
+          <div class="rc-water ${lowW ? 'low' : ''}">💧 ดื่ม <b>${r2(p.drink)} ลิตร</b> (≈ ${cups} แก้ว 250 มล. · ${r1(p.drink / 1.5)} ขวด)${lowW ? ' ⚠️ ต่ำกว่าเกณฑ์' : ''}${p.use > 0.01 ? `<br>🧼 น้ำใช้ ${r2(p.use)} ลิตร` : ''}</div>
+        </div>`;
+      }).join('');
+
+      // ของที่ต้องแบ่งกันกิน (หน่วยเดียวหลายคน)
+      const shareHtml = foods.filter(f => !GRAM_ITEMS.has(f.item.id)).map(f => {
+        const rows = people.filter(p => p.u.kcal > 0).map(p => ({ name: sn(p.m.name), q: f.stock / NdF * p.share }));
+        const lines = shareLines(f.item, rows);
+        if (!lines.length) return '';
+        return `<div class="rc-share"><div class="rc-share-h">${FOOD_ICON[f.item.id] || '🍽️'} ${esc(short(f.item.name).split(' ')[0])} วันละ ~${rcFmt(f.stock / NdF)} ${unitOf(f.item)} (มี ${rcFmt(f.stock)} ${unitOf(f.item)})</div>${lines.map(l => `<div class="rc-line">${l}</div>`).join('')}</div>`;
+      }).join('');
+
+      // ของใช้อื่นต่อวัน
+      const others = R.res.filter(r => !['water', 'food'].includes(r.key)).map(r => {
+        const ok = r.days >= target, allow = ok ? r.use : r.stock / target;
+        return `<span class="rc-chip ${ok ? 'ok' : 'low'}">${r.icon} ${esc(r.name.split(' (')[0])} <b>${rcFmt(allow)}</b> ${r.unit}/วัน ${ok ? '✅' : '⚠️ ต้องลด'}</span>`;
+      }).join('');
+
+      const foodLastFull = isFinite(fullDaysF) ? Math.floor(fullDaysF) : target, waterLastFull = isFinite(fullDaysW) ? Math.floor(fullDaysW) : target;
+      const verdict = K <= 0 ? '⚠️ ยังไม่มีอาหารในสต๊อก — กรอกจำนวนที่มีในหัวข้อ 4' : (ratioF >= 0.95 ? `✅ อาหารพอครบ ${target} วันตามโควตา (เหลือสำรอง ~${r1(Math.max(0, fullDaysF - target))} วัน)` : `⚠️ อาหารแบ่งให้ครบ ${target} วันได้เพียง <b>${pct(ratioF)}%</b> ของที่ต้องการ — ${ratioF < 0.5 ? 'ต่ำกว่าเกณฑ์อันตราย ควรหาของเพิ่มหรือลดจำนวนวัน/คน' : 'เริ่มกินน้อยลงตั้งแต่วันแรก'}`);
+      const wverdict = S <= 0 ? '⚠️ ยังไม่มีน้ำขวดในสต๊อก' : (dRatio >= 0.99 && eRatio >= 0.99 ? `✅ น้ำพอครบ ${target} วัน` : (dRatio >= 0.99 ? `⚠️ น้ำดื่มพอ แต่น้ำใช้เหลือ ${pct(eRatio)}% — ใช้ น้ำฝน/น้ำก๊อกต้มหรือกรองแทน` : `🔴 น้ำดื่มแบ่งได้เพียง ${pct(dRatio)}% ของที่ต้องการ — น้ำคือคอขวดชีวิต หาเพิ่มก่อนสิ่งอื่น`));
+
+      el.innerHTML = `<div class="rc-wrap">
+        <div class="rc-title">🍽️ สรุปการใช้ทรัพยากรแต่ละวัน — แบ่งจากของที่มีทั้งหมด ÷ ${target} วัน แล้วแจกตามความต้องการของแต่ละคน</div>
+        <div class="rc-note">หลักคิด: อาหาร = ของกินทั้งหมดที่มี ÷ จำนวนวันตามแผน (ถ้าของพอมากกว่านั้นก็กินตามโควตาปกติ) แบ่งตามพลังงานที่แต่ละคนต้องการ · น้ำ = แบ่งน้ำดื่มก่อน เหลือจึงเป็นน้ำใช้ · เลือกระดับประหยัดได้ด้านล่าง (ผูกกับแถบเลื่อนด้านบน)</div>
+        <div class="rc-modes">${modeHtml}</div>
+        <div class="rc-sum"><div>${verdict}</div><div>${wverdict}</div></div>
+        <div class="rc-strips">
+          <div><span class="rc-lab">🍚 อาหาร — กินเต็มโควตา</span>${rcStrip(target, foodLastFull, target)}<span class="rc-dim">หมดวันที่ ${isFinite(fullDaysF) ? Math.floor(fullDaysF) + 1 : '—'} ${foodLastFull < target ? '→ ต้องแบ่งกินตามแผนด้านล่าง' : ''}</span></div>
+          <div><span class="rc-lab">💧 น้ำ — ใช้เต็มโควตา</span>${rcStrip(target, waterLastFull, target)}<span class="rc-dim">หมดวันที่ ${isFinite(fullDaysW) ? Math.floor(fullDaysW) + 1 : '—'} ${waterLastFull < target ? '→ ต้องแบ่งตามแผนด้านล่าง' : ''}</span></div>
+        </div>
+        <div class="rc-people">${peopleHtml}</div>
+        ${shareHtml ? `<div class="rc-sec-h">🤝 ใครกินกับใคร (ซอง/กระป๋อง/กล่องที่ต้องแบ่งกัน) — เฉลี่ยต่อวัน</div><div class="rc-shares">${shareHtml}</div>` : ''}
+        <div class="rc-sec-h">🧰 ของใช้อื่นต่อวัน (แบ่งให้ครบ ${target} วัน)</div><div class="rc-chips">${others}</div>
+      </div>`;
+    }
+
     function renderRunway() {
       const a = computeAggregates(), t = sevT();
       const R = computeRunway(a, t), R0 = computeRunway(a, 0), R1 = computeRunway(a, 1);
@@ -3991,6 +4218,7 @@
         }).join('')}
         </tbody></table></div>
         <div class="veh-note" style="margin-top:8px;">ผู้ใช้ทรัพยากรหลักต่อวัน (ทั้งกลุ่ม): น้ำ ${r1(R.U.water)} ลิตร (~${r1(R.U.water / 1.5)} ขวด 1.5L) · อาหาร ${Math.round(R.U.kcal).toLocaleString()} kcal · แก๊ส ${r2(R.U.gas)} กระป๋อง · ถ่าน ${r1(R.U.batt)} ก้อน</div>`;
+      renderRation(a, t, R);
     }
 
     // ---- เป้สะพายหลังแบบการ์ตูน (ขนาดตามลิตร / ระดับการบรรจุตามน้ำหนัก) ----
@@ -4015,7 +4243,7 @@
     }
     const CAT_LABEL = { water: '💧 น้ำ', food: '🍚 อาหาร', med: '💊 ยา/ปฐมพยาบาล', hygiene: '🧼 สุขอนามัย', safety: '🛠️ อุปกรณ์/ความปลอดภัย', energy: '🔋 พลังงาน/ไฟ', own: '👕 เสื้อผ้า/ของใช้ส่วนตัว' };
     const CAT_ORDER = ['water', 'food', 'med', 'energy', 'safety', 'hygiene', 'own'];
-    function groupedList(items, mid) {
+    function groupedList(items, mid, mode) {
       if (!items.length) return '<span class="pk-none">— ไม่มี —</span>';
       const g = {};
       items.forEach(i => {
@@ -4025,7 +4253,7 @@
       });
       return CAT_ORDER.filter(c => g[c]).map(c => `<div class="pk-grp"><div class="pk-grp-h">${CAT_LABEL[c]}</div>${g[c].map(i => {
         const key = i.key || i.ref || ('own:' + i.name);
-        const sw = mid !== undefined ? `<label class="sw sm" title="ปิด = ไม่พกชิ้นนี้ในเป้ใบนี้"><input type="checkbox" checked onchange="togglePackItem(${mid}, '${encodeURIComponent(key)}')"><span></span></label>` : '';
+        const sw = mode === 'store' ? `<label class="sw sm" title="ปิด = ไม่เก็บ/ไม่แบกชิ้นนี้ในส่วนรวม (ตัดทั้งรายการ ทุกที่เก็บ)"><input type="checkbox" checked onchange="toggleStoreItem('${i.id || i.ref}')"><span></span></label>` : mid !== undefined ? `<label class="sw sm" title="ปิด = ไม่พกชิ้นนี้ในเป้ใบนี้"><input type="checkbox" checked onchange="togglePackItem(${mid}, '${encodeURIComponent(key)}')"><span></span></label>` : '';
         return `<div class="pk-row">${sw}<span class="pk-name">${esc(i.name)}</span><b>×${fmt(i.qty)} <i>${esc(i.unit)}</i></b></div>`;
       }).join('')}</div>`).join('');
     }
@@ -4150,10 +4378,19 @@
         const totalKg = p.kg + extra.reduce((s, x) => s + x.kg, 0);
         const waterDays = bottles * 1.5 / Math.max(0.1, u.drink);
         const foodDays = u.kcal > 0 ? pk / Math.max(1, u.kcal) : 0;
+        let warnHtml = '';
+        if (p.sp.has) {
+          const carryW = a.plan === 'bug-out-foot' ? (p.carryKg || 0) : 0;
+          const bodyPct = (totalKg + carryW) / m.weight;
+          const overCap = totalKg > p.cap.kg + 0.05;
+          if (overCap || bodyPct > 0.2 + 1e-6) {
+            warnHtml = `<div class="pk-warn">⚠️ ${overCap ? `เป้หนัก ${r1(totalKg)} กก. เกินเพดานแบกของ${esc(m.name)} (${p.cap.kg} กก.${carryW ? ' หลังหักน้ำหนักเด็กที่อุ้ม' : ''})` : `น้ำหนักที่ต้องแบก ${r1(totalKg + carryW)} กก.`} = <b>${Math.round(bodyPct * 100)}% ของน้ำหนักตัว</b> (เกณฑ์ปลอดภัย ≤ 20%${m.age < 13 ? ' และไม่เกินตามช่วงอายุ' : ''})${carryW ? ` — รวมน้ำหนักเด็กที่ต้องอุ้ม ${r1(carryW)} กก.` : ''}<br>เสี่ยงปวดหลัง/เข่า เดินช้าลง ล้มง่าย → ตัดของส่วนรวมที่แบกเพิ่ม ฝากคนที่แบกไหว หรือเตรียมเป้เสริม</div>`;
+          }
+        }
         const bag = p.sp.has
           ? `<div class="pc-bagart">${packSVG(p.sp, p.kg, i)}</div>
              <div class="pc-baglabel">${esc(p.sp.label)}</div>
-             ${barHtml('น้ำหนักในเป้', totalKg, p.cap.kg, 'กก.')}
+             ${barHtml('น้ำหนักในเป้', totalKg, p.cap.kg, 'กก.')}${warnHtml}
              <div class="pk-stat">เพดานแบก ${p.cap.kg} กก. = ${Math.round(p.cap.kg / m.weight * 100)}% ของน้ำหนักตัว ${m.weight} กก.<br>น้ำในเป้ ${r1(bottles * 1.5)} ลิตร (~${r1(waterDays)} วัน) · อาหาร ~${Math.round(pk).toLocaleString()} kcal${u.kcal > 0 ? ' (~' + r1(foodDays) + ' วัน)' : ''}</div>`
           : `<div class="pc-bagart nobag">${m.age < 3 ? '👶' : '🛏️'}</div><div class="pc-baglabel">${esc(p.sp.label)}</div>`;
         const depTxt = p.bearers && p.bearers.length ? `<div class="pk-stat">🤝 ${p.sp.has ? 'ของเฉพาะตัวที่เกินเพดานแบก ฝากไว้กับ' : 'ของจำเป็นของ' + esc(m.name) + 'อยู่ในเป้ของ'}: <b>${p.bearers.map(b => esc(b.m.name)).join(', ')}</b></div>` : '';
@@ -4171,7 +4408,7 @@
           listHtml = sec('🧍 ของส่วนตัวของ ' + nm(m), groupedList(mineItems, m.id));
           if (gearItems.length) listHtml += sec('🧰 ของส่วนกลางที่ได้รับมอบหมายให้ถือ (เพราะแบกไหว)', groupedList(gearItems, m.id));
           Object.values(forMap).forEach(f => { listHtml += sec(`🤝 ถือให้ ${esc(f.name)} — ${esc(f.why)}`, groupedList(f.items, m.id)); });
-          if (extra.length) listHtml += sec('📦 ของส่วนรวมที่แบกเพิ่ม (ไม่ใช่ของส่วนตัว)', groupedList(extra.map(x => ({ id: x.id, name: x.name, unit: x.unit, qty: x.qty }))));
+          if (extra.length) listHtml += sec('📦 ของส่วนรวมที่แบกเพิ่ม (ไม่ใช่ของส่วนตัว)', groupedList(extra.map(x => ({ id: x.id, name: x.name, unit: x.unit, qty: x.qty })), undefined, 'store'));
         }
 
         // กรอบ B: ของที่ไม่พก / กรอบ C: ผลที่ตามมา
@@ -4216,28 +4453,65 @@
     }
 
     // ---- การ์ดล่างสุด: บ้าน/รถ เก็บของส่วนที่เหลือ + แผนจัดการ ----
+    // กล่อง "ของที่ตัดออกจากส่วนรวม" + ผลที่ตามมา + ปุ่มคืน
+    function storeExclHtml(M, a, t) {
+      const list = M.reqs.storeExcl || [];
+      const U = computeUsage(a, t);
+      let rows = '', bottles = 0, waterUndo = [], kcalLost = 0, foodUndo = [], foodNames = [];
+      const cons = [];
+      list.forEach(e => {
+        const it = e.item, undo = `restoreStoreItem('${e.ref}')`;
+        rows += `<div class="pk-row ex"><span class="pk-name">${esc(short(it.name))}${e.partial ? ' <em>(ตัดเฉพาะส่วนเกิน)</em>' : ''}</span><b>×${fmt(e.qty)} <i>${esc(it.unit)}</i></b><button type="button" class="undo-btn" onclick="${undo}">↩ คืน</button></div>`;
+        if (e.ref === 'water_15l') { bottles += e.qty; waterUndo.push(undo); return; }
+        if (it.kcal) { kcalLost += e.qty * it.kcal; foodNames.push(short(it.name).split(' ')[0]); foodUndo.push(undo); return; }
+        const c = CONSEQ[e.ref] || ['low', 'ไม่มีสำรองในส่วนรวม — ถ้าต้องใช้ต้องหาซื้อ/ยืมระหว่างทาง'];
+        cons.push({ lv: c[0], name: short(it.name), t: 'ส่วนรวมจะไม่มีสำรอง — ' + c[1], undo: [undo] });
+      });
+      if (bottles > 0) {
+        const L = bottles * 1.5, drinkDay = U.per.reduce((s, x) => s + x.drink, 0), days = L / Math.max(0.1, drinkDay);
+        cons.push({ lv: 'life', name: 'น้ำดื่มส่วนรวม', t: `ไม่เก็บน้ำ ${r1(L)} ลิตร (= น้ำดื่มของทั้งกลุ่ม ~${r1(days)} วัน) — ถ้าน้ำในเป้หมดจะไม่มีน้ำสำรอง ในอากาศร้อนขาดน้ำรุนแรงได้ภายใน 1–2 วัน`, undo: waterUndo });
+      }
+      if (kcalLost > 0) {
+        const d = U.kcal > 0 ? kcalLost / U.kcal : 0;
+        cons.push({ lv: 'high', name: 'อาหารส่วนรวม', t: `อาหารสำรองหายไป ~${Math.round(kcalLost).toLocaleString()} kcal (= ทั้งกลุ่ม ~${r1(d)} วัน) (${foodNames.slice(0, 3).join(', ')}${foodNames.length > 3 ? '…' : ''}) — ต้องพึ่งอาหารในเป้ ถ้าหมดจะอด`, undo: foodUndo });
+      }
+      const rank = { life: 0, high: 1, mid: 2, low: 3 };
+      cons.sort((x, y) => rank[x.lv] - rank[y.lv]);
+      const lifeN = cons.filter(c => c.lv === 'life').length;
+      return `<div class="pc-ex store-ex"><div class="pk-title">🚫 ของที่ไม่เก็บ/ไม่แบกในส่วนรวม (ตัดออก)</div>${rows || '<div class="pk-none">ยังไม่มี — ปิดสวิตช์ที่ชิ้นของในรายการ แล้วจะมาอยู่ที่นี่ (และตัดออกจากหัวข้อ 4 ตามกัน) · ตัดแล้วเปลี่ยนใจกด “คืน” ได้</div>'}</div>` +
+        (cons.length ? `<div class="pc-cons store-ex"><div class="pk-title">⚠️ ถ้าไม่มีของที่ตัดออกจากส่วนรวม จะเกิดอะไรขึ้น</div><div class="cons-sum ${lifeN ? 'bad' : 'warn'}">ตัดออก ${list.length} รายการ${lifeN ? ` · <b>มี ${lifeN} เรื่องอันตรายถึงชีวิต</b>` : ''}</div>` +
+          cons.map(c => `<div class="cons-row ${c.lv}"><span class="cons-lv">${LV_LABEL[c.lv]}</span><b>${esc(c.name)}</b><span>${esc(c.t)}</span>${c.undo && c.undo.length ? `<button type="button" class="undo-btn cons-undo" onclick="${c.undo.join('; ')}">↩ คืนใส่ส่วนรวม${c.undo.length > 1 ? ' (' + c.undo.length + ' รายการ)' : ''}</button>` : ''}</div>`).join('') + '</div>' : '');
+    }
+
     function renderStorageCard() {
       const a = computeAggregates(), t = sevT(), el = document.getElementById('storage-card');
       if (!el) return;
       const M = buildModel(a), T = M.T, R = computeRunway(a, t);
-      const meta = { 'bug-in': ['🏠', 'บ้าน — คลังเก็บของส่วนรวม', 'house'], car: ['🚗', 'รถ — คลังเก็บของส่วนรวม', 'car'], motorbike: ['🛵', 'มอเตอร์ไซค์ — ของส่วนรวม', 'moto'], boat: ['🛶', 'เรือ — คลังเก็บของส่วนรวม', 'boat'], bicycle: ['🚲', 'จักรยาน — ของส่วนรวม', 'bicycle'], 'bug-out-foot': ['🥾', 'ของส่วนรวมที่แบกเพิ่มในเป้', null] }[a.plan];
+      const meta = { 'bug-in': ['🏠', 'บ้าน — คลังเก็บของส่วนรวม', 'house'], car: ['🚗', 'รถ — คลังเก็บของส่วนรวม', 'car'], motorbike: ['🛵', 'มอเตอร์ไซค์ — ของส่วนรวม', 'moto'], boat: ['🛶', 'เรือ — คลังเก็บของส่วนรวม', 'boat'], bicycle: ['🚲', 'จักรยาน — ของส่วนรวม', 'bicycle'], 'bug-out-foot': ['🥾', 'ของเพิ่มเติม (ส่วนรวม) ที่แบกกระจายในเป้', null] }[a.plan];
+      const place = { 'bug-in': 'บ้าน', car: 'รถ', motorbike: 'มอเตอร์ไซค์', boat: 'เรือ', bicycle: 'จักรยาน', 'bug-out-foot': 'เป้ (ของเพิ่มเติมที่แบกกระจาย)' }[a.plan];
       const art = k => `<div class="veh-art">${k ? placeSVG(k) : packSVG({ L: 45, maxKg: 15 }, 9, 0)}</div>`;
       let where = '';
       if (T.units.length) {
+        const car = a.plan === 'car' || a.plan === 'boat';
         where = `<div class="unit-grid">${T.units.map(u => `<div class="unit-card">
           <div class="unit-top">${art(meta[2])}<div class="unit-top-info">
             <div class="unit-head"><span>${u.icon} ${esc(u.title)}</span><span class="unit-seat">${u.people.length}/${u.seats} ที่นั่ง</span></div>
             <div class="pk-stat">ผู้ขับ: <b>${u.driver ? esc(u.driver.name) : '—'}</b> · ผู้โดยสาร: ${u.riders.map(m => esc(m.name)).join(', ') || '—'}</div>
           </div></div>
           ${barHtml('น้ำหนักบรรทุก', u.kg, u.capKg, 'กก.')}${barHtml('ปริมาตร', u.L, u.capL, 'ลิตร')}
-          <div class="pk-stat">${(a.plan === 'motorbike' || a.plan === 'bicycle') ? 'เป้ส่วนตัวสะพายติดตัว (ไม่นับในคัน)' : `เป้ส่วนตัว ${u.packCount} ใบ (${r1(u.packKg)} กก.) รวมอยู่ในรถแล้ว`}</div>
-          <div class="pk-cols">${groupedList(u.items)}</div></div>`).join('')}</div>`;
+          <div class="pk-stat">${car ? `📦 ของที่เก็บใน${a.plan === 'car' ? 'รถ' : 'เรือ'} ${r1(Math.max(0, u.kg - u.packKg))} กก. · 🎒 เป้ส่วนตัว ${u.packCount} ใบ ${r1(u.packKg)} กก. <i>(แยกต่างหาก ไม่อยู่ในรายการข้างล่าง แต่ใช้น้ำหนัก/พื้นที่บรรทุก)</i>` : '🎒 เป้ส่วนตัวสะพายติดตัว — แยกต่างหาก ไม่อยู่ในรายการข้างล่างและไม่นับในคัน'}</div>
+          <div class="pk-cols">${groupedList(u.items, undefined, 'store')}</div></div>`).join('')}</div>`;
       } else if (a.plan === 'bug-in') {
-        where = `<div class="pk-cols">${groupedList(M.communal.map(c => ({ id: c.item.id, name: short(c.item.name), unit: c.item.unit, qty: c.qty })))}</div>`;
+        where = `<div class="pk-cols">${groupedList(M.communal.map(c => ({ id: c.item.id, name: short(c.item.name), unit: c.item.unit, qty: c.qty })), undefined, 'store')}</div>`;
       } else {
         const rows = M.packs.filter(p => p.bin).map(p => ({ p, ex: (p.extra || []) })).filter(x => x.ex.length);
-        where = `<div class="pk-stat">ของส่วนรวมแบ่งแบกตามเพดานน้ำหนักของแต่ละคน (ดูในรายการของแต่ละการ์ด)</div>` +
-          rows.map(x => `<div class="pk-grp"><div class="pk-grp-h">${esc(x.p.m.name)}</div>${x.ex.map(i => `<span class="pk-chip">${esc(i.name)} <b>×${fmt(i.qty)}</b> <i>${esc(i.unit)}</i></span>`).join('')}</div>`).join('') +
+        const agg = {};
+        rows.forEach(x => x.ex.forEach(i => { const g = agg[i.id] = agg[i.id] || { id: i.id, name: i.name, unit: i.unit, qty: 0 }; g.qty = r2(g.qty + i.qty); }));
+        const ovf = (M.overflow || []).map(c => ({ id: c.item.id, name: short(c.item.name), unit: c.item.unit, qty: c.qty }));
+        where = `<div class="pk-stat">ของเพิ่มเติม (ไม่ใช่ของส่วนตัว) แบ่งกันแบกตามเพดานน้ำหนักของแต่ละคน — ปิดสวิตช์เพื่อตัดทั้งรายการ</div>` +
+          groupedList(Object.values(agg), undefined, 'store') +
+          (rows.length ? `<div class="pk-sec-h">🤝 ใครแบกอะไร</div>` + rows.map(x => `<div class="pk-grp"><div class="pk-grp-h">${esc(x.p.m.name)}</div>${x.ex.map(i => `<span class="pk-chip">${esc(i.name)} <b>×${fmt(i.qty)}</b> <i>${esc(i.unit)}</i></span>`).join('')}</div>`).join('') : '') +
+          (ovf.length ? `<div class="pk-warn">⚠️ ของส่วนรวมที่ทุกคนแบกไม่ไหวแล้ว (เกินเพดานน้ำหนักปลอดภัย ≤ 20% ของน้ำหนักตัว) — ตัดออก ฝากไว้ที่บ้าน หรือเตรียมเป้เสริม/คนช่วยแบก</div>` + ovf.map(o => `<div class="pk-row ex"><span class="pk-name">${esc(o.name)}</span><b>×${fmt(o.qty)} <i>${esc(o.unit)}</i></b><button type="button" class="undo-btn" onclick="cutStoreQty('${o.id}', ${o.qty})">✂ ตัดส่วนเกิน</button></div>`).join('') : '') +
           (M.unplaced && M.unplaced.length ? `<div class="pk-grp"><div class="pk-grp-h">📌 ของเฉพาะตัวส่วนที่เกินโควตาเป้ 72 ชม. (ไม่ได้แบก — เก็บที่บ้าน/ฝากไว้/หาซื้อปลายทาง)</div>${M.unplaced.map(c => `<span class="pk-chip">${esc(short(c.item.name))} <b>×${fmt(c.qty)}</b> <i>${esc(c.item.unit)}</i></span>`).join('')}</div>` : '') +
           (M.cap ? barHtml('น้ำหนักรวมที่ต้องแบก', getLoad(M.reqs).kg, M.cap.kg, 'กก.') : '');
       }
@@ -4256,7 +4530,7 @@
           <div class="unit-seat">ตอนนี้โหมด${sevName(t)} · ของจำเป็นอยู่ได้ ~${dayTxt(R.overall)} วัน</div>
         </div></div>
         <div class="store-grid">
-          <div><div class="pk-title">📦 ของที่เหลือหลังแบ่งใส่เป้ทุกคนแล้ว</div>${where}</div>
+          <div><div class="pk-title">📦 ของที่เก็บใน${place}${T.units.length || a.plan === 'bug-in' ? ' (ไม่รวมของในเป้ส่วนตัว — เป้แยกอยู่ในการ์ดรายคน)' : ''}</div>${where}${storeExclHtml(M, a, t)}</div>
           <div><div class="pk-title">🗓️ แผนจัดการของ</div>${plan.map(x => `<div class="plan-step"><b>${x[0]}</b><span>${x[1]}</span></div>`).join('')}</div>
         </div>
         ${T.warns.map(w => `<div class="veh-warn">⚠️ ${w}</div>`).join('')}
