@@ -1425,6 +1425,8 @@
     .rc-title { font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
     .rc-note { font-size: 12.5px; color: var(--text-sub); line-height: 1.55; margin-bottom: 12px; }
     .rc-dim { color: var(--text-sub); font-size: 11.5px; }
+    .rc-toggle { display: block; font-size: 12.5px; margin: 0 0 12px; cursor: pointer; }
+    .rc-toggle input { margin-right: 6px; accent-color: var(--cyan); }
     .rc-modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; margin-bottom: 12px; }
     .rc-mode { text-align: left; display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-main); font-family: var(--font-sans); font-size: 12px; cursor: pointer; }
     .rc-mode b { font-size: 13.5px; }
@@ -2689,6 +2691,8 @@
       pets: 0,
       vehicle: { carType: 'sedan', boatType: 'small', bikes: 0, cars: 0, boats: 0, bicycles: 0, distanceKm: 0 },  // 0 = อัตโนมัติ
       severity: 0,
+      protectKids: false,   // true = เด็ก 4–12 ปีลดน้อยกว่าผู้ใหญ่ครึ่งหนึ่งในโหมดประหยัด
+      rationFit: false,   // true = ถ้าของไม่พอ ลดส่วนแบ่งทุกคนเท่าๆ กันให้ครบจำนวนวัน
       excl: { items: {}, packs: {}, store: {} },
       capOverride: {},
       members: [
@@ -3874,7 +3878,7 @@
     const sevName = t => t < 0.2 ? 'ปกติ' : t < 0.55 ? 'เริ่มประหยัด' : t < 0.85 ? 'ลดการใช้ระดับสูง' : 'ลดการใช้สูงสุด';
     function personUse(m, a, t) {
       const P = PLANS[a.plan] || PLANS['bug-in'];
-      const protectedP = (m.age < 4 || m.health === 'pregnant' || m.health === 'chronic' || m.health === 'bedridden') ? 0.25 : (m.age < 13 ? 0.5 : 1);
+      const protectedP = (m.age < 4 || m.health === 'pregnant' || m.health === 'chronic' || m.health === 'bedridden') ? 0.25 : (m.age < 13 ? (state.protectKids ? 0.5 : 1) : 1);
       const drink = personDrinkBase(m) * (P.drink / 2) * a.crisis.waterMult * (1 - 0.25 * t * protectedP);
       const extra = (a.light ? 0 : personExtraBase(m)) * a.crisis.waterMult * (1 - 0.7 * t);
       const kcal = m.age >= 1 ? memberKcal(m, a.plan) * (1 - 0.25 * t * protectedP) : 0;
@@ -4134,86 +4138,102 @@
       const el = document.getElementById('ration-card');
       if (!el) return;
       const U = R.U, target = a.days;
+      const U0 = computeUsage(a, 0);                 // ความต้องการ "จริง" รายคน = ตัวเลข kcal ในหัวข้อ 2 (ล็อกตามอายุ/น้ำหนัก/ส่วนสูง ไม่ขยับตามโหมด)
       const inv = id => parseFloat(state.currentInventory[id]) || 0;
-      const foods = BASE_ITEMS.filter(i => i.kcal && inv(i.id) > 0).map(i => ({ item: i, stock: inv(i.id) }));
-      const K = foods.reduce((s, f) => s + f.stock * f.item.kcal, 0);
-      const Kd = U.kcal, eaters = U.per.filter(x => x.kcal > 0).length;
-      const fullDaysF = Kd > 0 ? K / Kd : Infinity;
-      const NdF = Math.max(isFinite(fullDaysF) ? fullDaysF : target, target);
-      const ratioF = Kd > 0 ? Math.min(1, (K / NdF) / Kd) : 1;
-      const S = inv('water_15l') * 1.5;
-      const drinkNeed = U.per.reduce((s, x) => s + x.drink, 0), extraNeed = Math.max(0, U.water - drinkNeed);
-      const fullDaysW = U.water > 0 ? S / U.water : Infinity;
-      const NdW = Math.max(isFinite(fullDaysW) ? fullDaysW : target, target);
-      const availW = S / NdW;
-      const drinkGive = Math.min(drinkNeed, availW), extraGive = Math.max(0, Math.min(extraNeed, availW - drinkGive));
-      const dRatio = drinkNeed > 0 ? drinkGive / drinkNeed : 1, eRatio = extraNeed > 0 ? extraGive / extraNeed : 1;
+      const fit = !!state.rationFit;
       const sn = nm => String(nm).replace(/\s*\(.*\)/, '');
       const icon = m => m.age < 1 ? '👶' : m.age < 13 ? '🧒' : m.age >= 60 ? (m.gender === 'female' ? '👵' : '👴') : (m.gender === 'female' ? '👩' : '👨');
-      const people = state.members.map((m, i) => {
-        const u = U.per[i], share = Kd > 0 ? u.kcal / Kd : 0;
-        return { m, u, share, kcalGet: Kd > 0 ? (K / NdF) * share : 0, items: foods.map(f => ({ item: f.item, q: f.stock / NdF * share })), drink: u.drink * dRatio, use: u.extra * eRatio };
-      });
       const pct = x => Math.round(x * 100);
-      const tone = r => r >= 0.95 ? 'green' : r >= 0.6 ? 'amber' : 'red';
+      const toneNeed = r => r >= 0.95 ? 'green' : r >= 0.7 ? 'amber' : 'red';   // % ของที่ควรได้จริง
+      const foods = BASE_ITEMS.filter(i => i.kcal && inv(i.id) > 0).map(i => ({ item: i, stock: inv(i.id) }));
+      const K = foods.reduce((s, f) => s + f.stock * f.item.kcal, 0);
 
-      // โหมดประหยัด 4 ระดับ (เทียบกัน)
+      // ---- อาหาร: แผนตามโหมด (plan) แล้วเทียบกับของที่มี ----
+      const Kdp = U.kcal, Kd0 = U0.kcal;
+      const daysF = Kdp > 0 ? K / Kdp : Infinity;                   // ของพอกี่วันถ้ากินตามแผนโหมดนี้
+      const fF = K <= 0 || Kdp <= 0 ? 0 : (fit ? Math.min(1, K / (Kdp * target)) : Math.min(1, K / Kdp));   // สัดส่วนของแผนที่ได้กินจริง
+      // ---- น้ำ ----
+      const S = inv('water_15l') * 1.5;
+      const drinkNeed = U.per.reduce((s, x) => s + x.drink, 0), extraNeed = Math.max(0, U.water - drinkNeed);
+      const daysW = U.water > 0 ? S / U.water : Infinity;
+      const availW = fit ? Math.min(U.water, S / Math.max(target, 1e-9)) : Math.min(U.water, S);
+      const drinkGive = Math.min(drinkNeed, availW), extraGive = Math.max(0, Math.min(extraNeed, availW - drinkGive));
+      const dRatio = drinkNeed > 0 ? drinkGive / drinkNeed : 1, eRatio = extraNeed > 0 ? extraGive / extraNeed : 1;
+
+      const people = state.members.map((m, i) => {
+        const u = U.per[i], u0 = U0.per[i], share = Kdp > 0 ? u.kcal / Kdp : 0;
+        const plan = u.kcal, got = plan * fF;
+        return { m, u, share, need0: u0.kcal, plan, got, drink0: u0.drink,
+          items: foods.map(f => ({ item: f.item, q: K > 0 ? f.stock * (Kdp * fF / K) * share : 0 })),
+          drink: u.drink * dRatio, use: u.extra * eRatio };
+      });
+
+      // ---- 4 โหมด: แผนต่อวัน (kcal/คน, % ของที่ควรได้) + ของอยู่ได้กี่วัน ----
       const modes = [['ปกติ', 0], ['เริ่มประหยัด', 40], ['ลดการใช้ระดับสูง', 75], ['ลดการใช้สูงสุด', 100]];
       const act = modes.reduce((b, m, i) => Math.abs((state.severity || 0) - m[1]) < Math.abs((state.severity || 0) - modes[b][1]) ? i : b, 0);
       const modeHtml = modes.map(([lb, v], i) => {
-        const tt = v / 100, Rt = computeRunway(a, tt), Ut = Rt.U;
-        const fd = Ut.kcal > 0 ? K / Ut.kcal : Infinity, nd = Math.max(isFinite(fd) ? fd : target, target);
-        const rr = Ut.kcal > 0 ? Math.min(1, (K / nd) / Ut.kcal) : 1;
-        const dN = Ut.per.reduce((s, x) => s + x.drink, 0), eN = Math.max(0, Ut.water - dN);
-        const fw = Ut.water > 0 ? S / Ut.water : Infinity, nw = Math.max(isFinite(fw) ? fw : target, target);
-        const dg = Math.min(dN, S / nw);
+        const Ut = computeUsage(a, v / 100), n = Math.max(1, Ut.per.filter(x => x.kcal > 0).length);
+        const dF = Ut.kcal > 0 ? K / Ut.kcal : Infinity, ok = dF >= target;
+        const dN = Ut.per.reduce((s, x) => s + x.drink, 0);
         return `<button type="button" class="rc-mode ${i === act ? 'on' : ''}" onclick="setSeverity(${v}); document.getElementById('sev-slider').value=${v}">
           <b>${lb}</b>
-          <span>กินเต็มโควตาได้ ${dayTxt(Rt.overall)} วัน</span>
-          <span>แบ่งให้ครบ ${target} วัน → ได้ <b class="rw-${tone(rr)}">${pct(rr)}%</b> (~${Math.round(Ut.kcal > 0 ? (K / nd) / Math.max(1, Ut.per.filter(x => x.kcal > 0).length) : 0).toLocaleString()} kcal/คน)</span>
-          <span>น้ำดื่ม ~${r1(dg / Math.max(1, state.members.length))} ลิตร/คน/วัน</span></button>`;
+          <span>แผนกิน: <b class="rw-${toneNeed(Kd0 > 0 ? Ut.kcal / Kd0 : 1)}">${pct(Kd0 > 0 ? Ut.kcal / Kd0 : 1)}%</b> ของที่ควรได้ (เฉลี่ย ~${Math.round(Ut.kcal / n).toLocaleString()} kcal/คน)</span>
+          <span>อาหารอยู่ได้ ${isFinite(dF) ? r1(dF) : '—'} วัน ${isFinite(dF) ? (ok ? '✅' : `⚠️ ไม่ถึง ${target} วัน`) : ''}</span>
+          <span>น้ำดื่ม ~${r1(dN / Math.max(1, state.members.length))} ลิตร/คน/วัน</span></button>`;
       }).join('');
 
-      // การ์ดรายคน
+      // ---- การ์ดรายคน ----
       const peopleHtml = people.map(p => {
         const m = p.m, u = p.u;
         const foodRows = p.items.map(x => ({ x, txt: portionText(x.item, x.q) })).filter(r => r.txt)
           .map(r => `<div class="rc-row"><span>${FOOD_ICON[r.x.item.id] || '🍽️'} ${esc(short(r.x.item.name).split(' ')[0])}</span><b>${r.txt}</b></div>`).join('');
         const cups = Math.round(p.drink * 4 * 2) / 2;
         const lowW = m.age >= 13 && p.drink < Math.min(p.u.drink, 1.5) - 0.05;
+        const r0 = p.need0 > 0 ? p.got / p.need0 : 1;
+        const diff = Math.round(p.got - p.need0);
         return `<div class="rc-person">
           <div class="rc-ph"><span class="rc-ico">${icon(m)}</span><div><b>${esc(sn(m.name))}</b><small>${m.age} ปี · ${m.weight} กก.</small></div></div>
-          ${u.kcal > 0 ? `<div class="rc-kcal">🔥 ${Math.round(p.kcalGet).toLocaleString()} kcal/วัน <small class="rw-${tone(p.kcalGet / Math.max(1, u.kcal))}">(${pct(p.kcalGet / Math.max(1, u.kcal))}% ของที่ต้องการ ${Math.round(u.kcal).toLocaleString()})</small></div>${foodRows || '<div class="rc-dim">ไม่มีอาหารในสต๊อก</div>'}` : `<div class="rc-kcal">🍼 นมผง ~${u.formula} กระป๋อง/วัน <small>(ไม่ลดการใช้)</small></div>`}
-          <div class="rc-water ${lowW ? 'low' : ''}">💧 ดื่ม <b>${r2(p.drink)} ลิตร</b> (≈ ${cups} แก้ว 250 มล. · ${r1(p.drink / 1.5)} ขวด)${lowW ? ' ⚠️ ต่ำกว่าเกณฑ์' : ''}${p.use > 0.01 ? `<br>🧼 น้ำใช้ ${r2(p.use)} ลิตร` : ''}</div>
+          ${u.kcal > 0 || p.need0 > 0 ? `<div class="rc-kcal">🔥 <b>${Math.round(p.got).toLocaleString()}</b> kcal/วัน <small class="rw-${toneNeed(r0)}">= ${pct(r0)}% ของที่ควรได้ ${Math.round(p.need0).toLocaleString()}${diff < 0 ? ` (${diff.toLocaleString()})` : ''}</small></div>
+          ${Math.abs(p.plan - p.need0) > 1 ? `<div class="rc-dim">แผนโหมด${sevName(t)}: ${Math.round(p.plan).toLocaleString()} kcal (${pct(p.plan / Math.max(1, p.need0))}% ของที่ควรได้)</div>` : ''}
+          ${fF < 0.999 && p.plan > 0 ? `<div class="rc-dim rw-red">⚠️ ของไม่พอ: ได้กินจริง ${pct(fF)}% ของแผน${fit ? ' (ยืดให้ครบ ' + target + ' วัน)' : ''}</div>` : ''}
+          ${foodRows || '<div class="rc-dim">ไม่มีอาหารในสต๊อก</div>'}` : `<div class="rc-kcal">🍼 นมผง ~${u.formula} กระป๋อง/วัน <small>(ไม่ลดการใช้)</small></div>`}
+          <div class="rc-water ${lowW ? 'low' : ''}">💧 ดื่ม <b>${r2(p.drink)} ลิตร</b> <small>(${pct(p.drink / Math.max(0.01, p.drink0))}% ของปกติ ${r2(p.drink0)})</small> (≈ ${cups} แก้ว 250 มล. · ${r1(p.drink / 1.5)} ขวด)${lowW ? ' ⚠️ ต่ำกว่าเกณฑ์' : ''}${p.use > 0.01 ? `<br>🧼 น้ำใช้ ${r2(p.use)} ลิตร` : ''}</div>
         </div>`;
       }).join('');
 
-      // ของที่ต้องแบ่งกันกิน (หน่วยเดียวหลายคน)
+      // ---- ใครกินกับใคร ----
       const shareHtml = foods.filter(f => !GRAM_ITEMS.has(f.item.id)).map(f => {
-        const rows = people.filter(p => p.u.kcal > 0).map(p => ({ name: sn(p.m.name), q: f.stock / NdF * p.share }));
+        const rows = people.filter(p => p.plan > 0).map(p => ({ name: sn(p.m.name), q: K > 0 ? f.stock * (Kdp * fF / K) * p.share : 0 }));
         const lines = shareLines(f.item, rows);
         if (!lines.length) return '';
-        return `<div class="rc-share"><div class="rc-share-h">${FOOD_ICON[f.item.id] || '🍽️'} ${esc(short(f.item.name).split(' ')[0])} วันละ ~${rcFmt(f.stock / NdF)} ${unitOf(f.item)} (มี ${rcFmt(f.stock)} ${unitOf(f.item)})</div>${lines.map(l => `<div class="rc-line">${l}</div>`).join('')}</div>`;
+        return `<div class="rc-share"><div class="rc-share-h">${FOOD_ICON[f.item.id] || '🍽️'} ${esc(short(f.item.name).split(' ')[0])} วันละ ~${rcFmt(K > 0 ? f.stock * Kdp * fF / K : 0)} ${unitOf(f.item)} (มี ${rcFmt(f.stock)} ${unitOf(f.item)})</div>${lines.map(l => `<div class="rc-line">${l}</div>`).join('')}</div>`;
       }).join('');
 
-      // ของใช้อื่นต่อวัน
+      // ---- ของใช้อื่นต่อวัน ----
       const others = R.res.filter(r => !['water', 'food'].includes(r.key)).map(r => {
         const ok = r.days >= target, allow = ok ? r.use : r.stock / target;
         return `<span class="rc-chip ${ok ? 'ok' : 'low'}">${r.icon} ${esc(r.name.split(' (')[0])} <b>${rcFmt(allow)}</b> ${r.unit}/วัน ${ok ? '✅' : '⚠️ ต้องลด'}</span>`;
       }).join('');
 
-      const foodLastFull = isFinite(fullDaysF) ? Math.floor(fullDaysF) : target, waterLastFull = isFinite(fullDaysW) ? Math.floor(fullDaysW) : target;
-      const verdict = K <= 0 ? '⚠️ ยังไม่มีอาหารในสต๊อก — กรอกจำนวนที่มีในหัวข้อ 4' : (ratioF >= 0.95 ? `✅ อาหารพอครบ ${target} วันตามโควตา (เหลือสำรอง ~${r1(Math.max(0, fullDaysF - target))} วัน)` : `⚠️ อาหารแบ่งให้ครบ ${target} วันได้เพียง <b>${pct(ratioF)}%</b> ของที่ต้องการ — ${ratioF < 0.5 ? 'ต่ำกว่าเกณฑ์อันตราย ควรหาของเพิ่มหรือลดจำนวนวัน/คน' : 'เริ่มกินน้อยลงตั้งแต่วันแรก'}`);
-      const wverdict = S <= 0 ? '⚠️ ยังไม่มีน้ำขวดในสต๊อก' : (dRatio >= 0.99 && eRatio >= 0.99 ? `✅ น้ำพอครบ ${target} วัน` : (dRatio >= 0.99 ? `⚠️ น้ำดื่มพอ แต่น้ำใช้เหลือ ${pct(eRatio)}% — ใช้ น้ำฝน/น้ำก๊อกต้มหรือกรองแทน` : `🔴 น้ำดื่มแบ่งได้เพียง ${pct(dRatio)}% ของที่ต้องการ — น้ำคือคอขวดชีวิต หาเพิ่มก่อนสิ่งอื่น`));
+      const foodLast = isFinite(daysF) ? Math.floor(daysF + 1e-9) : target, waterLast = isFinite(daysW) ? Math.floor(daysW + 1e-9) : target;
+      const lackF = Math.max(0, Kdp * target - K);
+      const verdict = K <= 0 ? '⚠️ ยังไม่มีอาหารในสต๊อก — กรอกจำนวนที่มีในหัวข้อ 4'
+        : (daysF >= target ? `✅ อาหารพอครบ ${target} วันตามแผนโหมด${sevName(t)} (เหลือสำรอง ~${r1(daysF - target)} วัน)`
+          : `⚠️ อาหารตามแผนโหมด${sevName(t)} อยู่ได้ ${r1(daysF)} วัน จากเป้า ${target} วัน — ขาดอีก ~${Math.round(lackF).toLocaleString()} kcal (~${Math.round(lackF / target).toLocaleString()} kcal/วัน)${fit ? ` · ยืดให้ครบโดยลดส่วนแบ่งทุกคนเหลือ <b>${pct(fF)}%</b> ของแผน` : ' · ลองโหมดประหยัดขึ้น หรือเปิด “ยืดให้ครบ” ด้านบน'}`);
+      const wverdict = S <= 0 ? '⚠️ ยังไม่มีน้ำขวดในสต๊อก'
+        : (daysW >= target ? `✅ น้ำพอครบ ${target} วันตามแผน`
+          : `🔴 น้ำตามแผนโหมด${sevName(t)} อยู่ได้ ${r1(daysW)} วัน จากเป้า ${target} วัน — น้ำคือคอขวดชีวิต หาเพิ่มก่อนสิ่งอื่น${fit ? ` · ยืดให้ครบ: น้ำดื่มเหลือ ${pct(dRatio)}% ของแผน` : ''}`);
 
       el.innerHTML = `<div class="rc-wrap">
-        <div class="rc-title">🍽️ สรุปการใช้ทรัพยากรแต่ละวัน — แบ่งจากของที่มีทั้งหมด ÷ ${target} วัน แล้วแจกตามความต้องการของแต่ละคน</div>
-        <div class="rc-note">หลักคิด: อาหาร = ของกินทั้งหมดที่มี ÷ จำนวนวันตามแผน (ถ้าของพอมากกว่านั้นก็กินตามโควตาปกติ) แบ่งตามพลังงานที่แต่ละคนต้องการ · น้ำ = แบ่งน้ำดื่มก่อน เหลือจึงเป็นน้ำใช้ · เลือกระดับประหยัดได้ด้านล่าง (ผูกกับแถบเลื่อนด้านบน)</div>
+        <div class="rc-title">🍽️ สรุปการใช้ทรัพยากรแต่ละวัน — ตั้งต้นจากความต้องการจริงรายคน (kcal ในหัวข้อ 2) แล้วปรับตามโหมดประหยัด</div>
+        <div class="rc-note">อ่านยังไง: <b>“% ของที่ควรได้” = kcal ที่แผนให้ ÷ kcal จริงของคนนั้นในหัวข้อ 2</b> (คนละตัวหารกัน ไม่ใช่เลขเดียวทุกคน) · เลื่อนแถบความประหยัดด้านบน (หรือกดโหมดด้านล่าง) แล้วแต่ละคนจะขึ้น/ลงตามแผนของตัวเอง · อาหารแบ่งตามสัดส่วนของที่มีในสต๊อก · น้ำ = แบ่งน้ำดื่มก่อน เหลือจึงเป็นน้ำใช้</div>
+        <label class="rc-toggle"><input type="checkbox" ${state.protectKids ? 'checked' : ''} onchange="toggleProtectKids()"> 🧒 ปกป้องเด็ก 4–12 ปี (โหมดประหยัดลดน้อยกว่าผู้ใหญ่ครึ่งหนึ่ง) — ปิดอยู่ = ลดสัดส่วนเท่าผู้ใหญ่ · <span class="rc-dim">ทารก/เด็กเล็กต่ำกว่า 4 ปี ผู้ตั้งครรภ์ และผู้มีโรคประจำตัวลดน้อยกว่าเสมอ</span></label>
+        <label class="rc-toggle"><input type="checkbox" ${fit ? 'checked' : ''} onchange="toggleRationFit()"> 📏 ยืดให้ครบ ${target} วัน — ถ้าของไม่พอ ลดส่วนแบ่งของทุกคนลงเท่าๆ กัน · <span class="rc-dim">ปิดอยู่ = แสดงแผนตามโหมดตรงๆ แล้วบอกว่าของพอกี่วัน/ขาดเท่าไร</span></label>
         <div class="rc-modes">${modeHtml}</div>
         <div class="rc-sum"><div>${verdict}</div><div>${wverdict}</div></div>
         <div class="rc-strips">
-          <div><span class="rc-lab">🍚 อาหาร — กินเต็มโควตา</span>${rcStrip(target, foodLastFull, target)}<span class="rc-dim">หมดวันที่ ${isFinite(fullDaysF) ? Math.floor(fullDaysF) + 1 : '—'} ${foodLastFull < target ? '→ ต้องแบ่งกินตามแผนด้านล่าง' : ''}</span></div>
-          <div><span class="rc-lab">💧 น้ำ — ใช้เต็มโควตา</span>${rcStrip(target, waterLastFull, target)}<span class="rc-dim">หมดวันที่ ${isFinite(fullDaysW) ? Math.floor(fullDaysW) + 1 : '—'} ${waterLastFull < target ? '→ ต้องแบ่งตามแผนด้านล่าง' : ''}</span></div>
+          <div><span class="rc-lab">🍚 อาหาร — กินตามแผนโหมด${sevName(t)}</span>${rcStrip(target, foodLast, target)}<span class="rc-dim">${isFinite(daysF) ? `พอถึงวันที่ ${Math.max(0, foodLast)}` : '—'} ${foodLast < target ? '→ วันที่เหลือไม่มีอาหาร' : ''}</span></div>
+          <div><span class="rc-lab">💧 น้ำ — ใช้ตามแผน</span>${rcStrip(target, waterLast, target)}<span class="rc-dim">${isFinite(daysW) ? `พอถึงวันที่ ${Math.max(0, waterLast)}` : '—'} ${waterLast < target ? '→ วันที่เหลือไม่มีน้ำ' : ''}</span></div>
         </div>
         <div class="rc-people">${peopleHtml}</div>
         ${shareHtml ? `<div class="rc-sec-h">🤝 ใครกินกับใคร (ซอง/กระป๋อง/กล่องที่ต้องแบ่งกัน) — เฉลี่ยต่อวัน</div><div class="rc-shares">${shareHtml}</div>` : ''}
@@ -4603,6 +4623,8 @@
         </div>`);
     }
 
+    function toggleRationFit() { state.rationFit = !state.rationFit; saveState(); renderReport(); }
+    function toggleProtectKids() { state.protectKids = !state.protectKids; saveState(); renderReport(); }
     function setSeverity(v) {
       state.severity = Math.max(0, Math.min(100, parseInt(v) || 0));
       saveState();
