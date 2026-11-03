@@ -1462,13 +1462,175 @@
     @media print { .rc-mode:not(.on) { display: none; } .rc-wrap, .rc-person, .rc-share, .rc-sum { background: #fff !important; border: 1px solid #bbb !important; color: #111 !important; } .store-ex .undo-btn { display: none !important; } }
     .crisis-pill { position: relative; }
     .crisis-check { position: absolute; top: 6px; right: 9px; font-size: 14px; font-weight: 700; color: var(--cyan); }
+
+    /* ===== V14: ตัวเลือกข้าวสาร ↔ ข้าวพร้อมทาน ===== */
+    .food-opt-box { margin: 14px 0; padding: 12px 14px; border: 1px solid var(--card-border); border-radius: 12px; background: var(--input-bg); }
+    .food-opt-sub { font-weight: 400; font-size: 12px; color: var(--text-sub); }
+    .food-opt-row { display: flex; align-items: center; gap: 10px; margin: 8px 0 6px; }
+    .food-opt-row input[type="range"] { flex: 1; accent-color: var(--primary); }
+    .food-opt-end { font-size: 12.5px; color: var(--text-muted); white-space: nowrap; }
+    .food-opt-val { min-width: 42px; text-align: right; color: var(--amber); }
+    .food-opt-chk { display: block; font-size: 12.5px; margin: 6px 0; cursor: pointer; }
+    .food-opt-info { font-size: 12.5px; line-height: 1.6; color: var(--text-muted); }
+    body.print-mode .food-opt-box input[type="range"], body.print-mode .food-opt-chk { display: none !important; }
+    body.print-mode .food-opt-box { padding: 2mm; margin: 2mm 0; border-color: #c4c4c4 !important; background: #fff !important; }
+
+    /* ---- โหมดพิมพ์: รายการด่วนย่อเป็น 2 คอลัมน์ ---- */
+    body.print-mode #urgent-items-list { columns: 2; column-gap: 5mm; }
+    body.print-mode .critical-item-row { break-inside: avoid; padding: 1mm 0 !important; font-size: 11px; border-bottom: 1px dotted #bbb !important; gap: 4px; }
+    body.print-mode:not(.pm-desc) .critical-item-row > div:first-child > div:nth-child(2), body.print-mode:not(.pm-desc) .critical-item-row > div:last-child > div { display: none; }
+    body.print-mode .critical-item-row span { font-size: 11.5px !important; }
     .pk-sec { margin-bottom: 10px; }
     .pk-sec-h { font-size: 12.5px; font-weight: 700; color: var(--cyan); margin: 6px 0 4px; padding-bottom: 3px; border-bottom: 1px solid var(--card-border); }
     @media print { .device-badge { display: none !important; } }
 
+    /* =====================================================================
+       V13 — โหมดพิมพ์ A4 แนวตั้ง (ใช้ชุดกฎเดียวกันทั้งตัวอย่างบนจอและตอนสั่งพิมพ์)
+       ===================================================================== */
+    @page { size: A4 portrait; margin: 10mm; }
+    .pm-switch { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: var(--text-main); padding: 7px 14px; border: 1px solid var(--card-border); border-radius: 8px; background: var(--input-bg); }
+    .pm-switch input { position: absolute; opacity: 0; pointer-events: none; }
+    .pm-track { width: 38px; height: 20px; border-radius: 999px; background: #4a433c; position: relative; flex: none; transition: background .15s; }
+    .pm-track i { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #f2ebe2; transition: transform .15s; }
+    .pm-switch input:checked + .pm-track { background: var(--primary); }
+    .pm-switch input:checked + .pm-track i { transform: translateX(18px); }
+    .print-bar { display: none; }
+    .print-title { display: none; }
+    @media screen and (max-width: 900px) { header .pm-switch { display: none; } }
+
+    body.print-mode {
+      --bg: #fff; --card-bg: #fff; --card-border: #cfcfcf; --card-hover: #fff; --input-bg: #fff; --input-border: #bdbdbd;
+      --primary: #b4481f; --primary-dim: rgba(180,72,31,.08); --green: #2f6b1e; --green-dim: rgba(47,107,30,.08);
+      --cyan: #0b6b82; --cyan-dim: rgba(11,107,130,.08); --amber: #8a5a00; --amber-dim: rgba(138,90,0,.08);
+      --red: #b3261e; --red-dim: rgba(179,38,30,.08); --purple: #5b3aa0;
+      --text-main: #111; --text-muted: #444; --text-sub: #555;
+      background: #7b8088; color: #111; font-size: 12.5px; line-height: 1.4; min-height: 0; padding: 0 0 20px;
+    }
+    body.print-mode .print-bar { display: flex; position: fixed; top: 0; left: 0; right: 0; z-index: 500; gap: 14px; align-items: center; justify-content: center; flex-wrap: wrap; padding: 8px 12px; background: #1a1816; color: #f2ebe2; border-bottom: 1px solid #3d3732; font-size: 13px; }
+    body.print-mode .print-bar select { background: #272421; color: #f2ebe2; border: 1px solid #443c35; border-radius: 6px; padding: 4px 8px; font-family: inherit; font-size: 13px; }
+    body.print-mode .pm-opt { display: inline-flex; align-items: center; gap: 6px; }
+    body.print-mode .pm-pages { color: #d9a043; font-weight: 700; }
+    body.print-mode .pm-print { background: #d8653c; color: #fff; border: none; border-radius: 8px; padding: 8px 16px; font-family: inherit; font-weight: 700; cursor: pointer; }
+    body.print-mode .print-title { display: block; font-size: 11px; border-bottom: 2px solid #111; padding-bottom: 2mm; margin-bottom: 2mm; color: #111; }
+
+    body.print-mode .main-container { position: relative; width: 190mm; max-width: 190mm; margin: 64px auto 40px; padding: 0; gap: 3mm; background: #fff; box-shadow: 0 0 0 1px #555, 0 6px 24px rgba(0,0,0,.4); }
+    body.print-mode .main-container::after { content: ''; position: absolute; left: -14px; right: -14px; top: 0; bottom: 0; pointer-events: none; z-index: 30;
+      background: repeating-linear-gradient(to bottom, transparent 0, transparent 277mm, #7b8088 277mm, #7b8088 287mm); }
+
+    /* ซ่อนของที่ไม่ต้องพิมพ์ */
+    body.print-mode header.top-header, body.print-mode .crisis-desc-banner, body.print-mode .filter-tabs-row, body.print-mode .store-filter-bar,
+    body.print-mode .action-btn-group, body.print-mode .btn-add-member, body.print-mode .qty-btn, body.print-mode .print-menu-dropdown,
+    body.print-mode .header-quick-bar, body.print-mode .modal-overlay, body.print-mode .sw, body.print-mode .undo-btn, body.print-mode .cons-undo,
+    body.print-mode .btn-action-mini, body.print-mode .card-desc, body.print-mode .rc-note, body.print-mode .rc-toggle, body.print-mode .hero-banner,
+    body.print-mode .sev-quick, body.print-mode #sev-slider, body.print-mode .device-badge, body.print-mode .item-progress-bar,
+    body.print-mode .crisis-pill:not(.active), body.print-mode .plan-btn:not(.active), body.print-mode .dur-pill:not(.active), body.print-mode .rc-mode:not(.on),
+    body.print-mode .members-table th:last-child, body.print-mode .members-table td:last-child, body.print-mode .row-excluded,
+    body.print-mode .custom-day-box, body.print-mode .crisis-check { display: none !important; }
+    body.print-mode .print-check-box { display: inline-block !important; width: 12px; height: 12px; border: 1.5px solid #000; margin-right: 6px; vertical-align: middle; }
+    body.print-mode .qty-input { border: none !important; background: transparent !important; width: auto !important; padding: 0 !important; color: #111 !important; }
+
+    /* การ์ด/กรอบ: ขาว เส้นบาง ระยะห่างน้อย */
+    body.print-mode .card, body.print-mode .sub-panel, body.print-mode .kpi-card { background: #fff !important; border: 1px solid #cfcfcf !important; box-shadow: none !important; border-radius: 2.5mm !important; padding: 4mm !important; color: #111 !important; break-inside: auto !important; page-break-inside: auto !important; }
+    body.print-mode .unit-card, body.print-mode .pcard, body.print-mode .runway-hero, body.print-mode .use-cell, body.print-mode .pk-chip, body.print-mode .rc-wrap, body.print-mode .rc-person, body.print-mode .rc-share, body.print-mode .rc-sum, body.print-mode .rc-mode, body.print-mode .summary-stats-box, body.print-mode .pc-ex, body.print-mode .pc-cons, body.print-mode .crisis-pill { background: #fff !important; border: 1px solid #c4c4c4 !important; color: #111 !important; box-shadow: none !important; }
+    body.print-mode .pcard, body.print-mode .unit-card { padding: 3mm !important; border-radius: 2mm !important; }
+    body.print-mode .rc-wrap { padding: 3mm; margin-top: 3mm; }
+    body.print-mode .card-title { font-size: 14px; margin-bottom: 2mm; color: #000 !important; padding-bottom: 1.5mm; }
+    body.print-mode .pcard-art { background: #f5f0ea !important; border-color: #ddd !important; }
+    body.print-mode .pcard-art svg { max-height: 26mm; }
+    body.print-mode .pk-warn { background: #fdecea !important; color: #7a1a12 !important; border-color: #d98880 !important; }
+    body.print-mode .pk-warn b { color: #b3261e !important; }
+    body.print-mode .rc-cell.ok { background: #d8ecc8; color: #1f4d12; }
+    body.print-mode .rc-cell.out { background: #f6d2cd; color: #7a1a12; }
+    body.print-mode .rc-water.low, body.print-mode .rc-chip.low { color: #7a1a12; border-color: #d98880; }
+    body.print-mode .btn-header, body.print-mode .btn-save { color: #111; }
+
+    /* เลย์เอาต์กระชับสำหรับกว้าง 190 มม. */
+    body.print-mode .crisis-grid { grid-template-columns: repeat(3, 1fr) !important; margin-top: 2mm; }
+    body.print-mode .plan-selector-grid { grid-template-columns: repeat(2, 1fr) !important; margin-bottom: 2mm; }
+    body.print-mode .summary-stats-box { grid-template-columns: repeat(4, 1fr) !important; margin-top: 2mm; padding: 2mm !important; }
+    body.print-mode .pcard.h { grid-template-columns: 36mm 1fr !important; grid-template-areas: "id bag" "list list" "use use" "ex ex" "cons cons" !important; gap: 2mm 4mm !important; }
+    body.print-mode .pcard.petcard { grid-template-columns: 36mm 1fr !important; grid-template-areas: "id use" !important; }
+    body.print-mode .pc-id .pcard-art { width: 26mm; }
+    body.print-mode .pk-cols { columns: 2 60mm; column-gap: 5mm; }
+    body.print-mode .use-grid { grid-template-columns: repeat(4, 1fr) !important; }
+    body.print-mode .unit-grid, body.print-mode .person-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 3mm !important; }
+    body.print-mode .store-grid, body.print-mode .report-sections-grid, body.print-mode .grid-2col { grid-template-columns: 1fr 1fr !important; gap: 4mm !important; }
+    body.print-mode .rc-people, body.print-mode .rc-shares, body.print-mode .rc-strips { grid-template-columns: repeat(2, 1fr) !important; gap: 2.5mm; }
+    body.print-mode .rc-modes { grid-template-columns: 1fr !important; }
+    body.print-mode .inventory-table td, body.print-mode .inventory-table th, body.print-mode .members-table td, body.print-mode .members-table th, body.print-mode .rw-table td, body.print-mode .rw-table th { padding: 1.2mm 1.5mm !important; border-bottom: 1px solid #ccc !important; color: #000 !important; font-size: 12px; }
+    body.print-mode .pk-row { padding: 1px 0; font-size: 12px; }
+
+    /* ไม่ให้การ์ด/แถวเล็กคร่อมขอบหน้า — หัวข้อไม่อยู่ท้ายหน้าตามลำพัง */
+    body.print-mode :is(.pcard, .unit-card, .rc-person, .rc-share, .rc-sum, .rc-strips > div, .pc-ex, .pc-cons, .plan-step, .cons-row, .use-cell, .crisis-pill, .summary-stats-box, .runway-hero, .veh-warn, tr, .pk-row, .pk-grp, .pk-sec) { break-inside: avoid; page-break-inside: avoid; }
+    body.print-mode :is(.card-title, .rc-title, .rc-sec-h, .pk-title, .pk-sec-h) { break-after: avoid; page-break-after: avoid; }
+
+    /* โซน: ค่าเริ่มต้นไหลต่อเนื่อง (ประหยัดกระดาษ) — ติ๊ก "แยกหน้าตามโซน" เพื่อบังคับขึ้นหน้าใหม่ */
+    body.print-mode:not(.pm-zone) .print-zone-1, body.print-mode:not(.pm-zone) .print-zone-2 { break-after: auto !important; page-break-after: auto !important; padding: 0 !important; }
+    body.print-mode.pm-zone .print-zone-1, body.print-mode.pm-zone .print-zone-2 { break-after: page !important; page-break-after: always !important; }
+    body.print-mode .print-zone-1, body.print-mode .print-zone-2, body.print-mode .print-zone-3 { display: flex; flex-direction: column; gap: 3mm; }
+    body.print-mode.print-only-zone-1 .print-zone-2, body.print-mode.print-only-zone-1 .print-zone-3,
+    body.print-mode.print-only-zone-2 .print-zone-1, body.print-mode.print-only-zone-2 .print-zone-3,
+    body.print-mode.print-only-zone-3 .print-zone-1, body.print-mode.print-only-zone-3 .print-zone-2 { display: none !important; }
+
+
+    /* ---- บีบพื้นที่ให้ประหยัดกระดาษ ---- */
+    body.print-mode .item-desc-text { display: none; }
+    body.print-mode.pm-desc .item-desc-text { display: block; font-size: 10.5px; line-height: 1.3; color: #444; }
+    body.print-mode .store-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 1px; }
+    body.print-mode .store-tags > * { font-size: 9.5px !important; padding: 0 4px !important; }
+    body.print-mode .item-primary-name { font-size: 12.5px; line-height: 1.3; }
+    body.print-mode .qty-stepper { display: inline-flex; }
+    body.print-mode .status-badge, body.print-mode .req-qty-badge { font-size: 11.5px; padding: 1px 6px !important; }
+    body.print-mode .inventory-table td { vertical-align: top; }
+    body.print-mode label:has(#only-short-toggle), body.print-mode .rc-mode:not(.on), body.print-mode .sev-desc-extra { display: none !important; }
+    body.print-mode .pk-cols { columns: 3 55mm; column-gap: 4mm; }
+    body.print-mode .pk-row { font-size: 11px; line-height: 1.25; }
+    body.print-mode .pk-grp-h { font-size: 10.5px; }
+    body.print-mode .rc-people { grid-template-columns: repeat(3, 1fr) !important; }
+    body.print-mode .rc-person { padding: 2mm; }
+    body.print-mode .rc-row, body.print-mode .rc-line { font-size: 11px; }
+    body.print-mode .rc-shares { grid-template-columns: repeat(3, 1fr) !important; }
+    body.print-mode .rc-ico { font-size: 20px; }
+    body.print-mode .rc-title { font-size: 12.5px; }
+    body.print-mode .rc-chip { font-size: 10.5px; padding: 1px 6px; }
+    body.print-mode .rc-cell { min-width: 15px; height: 15px; line-height: 15px; font-size: 9px; }
+    body.print-mode .pc-ex, body.print-mode .pc-cons { padding: 2mm !important; margin-top: 1mm; }
+    body.print-mode .cons-row { font-size: 11px; padding: 2px 0; }
+    body.print-mode .use-cell { padding: 1.5mm !important; }
+    /* กล่องคำแนะนำ/กลยุทธ์ที่เป็นสีเข้ม → ขาว */
+    body.print-mode .report-sections-grid *, body.print-mode .tip-box, body.print-mode [class*="tip"], body.print-mode [class*="strategy"] { background-color: transparent; }
+    body.print-mode .report-sections-grid > div, body.print-mode .report-sections-grid > section { background: #fff !important; border: 1px solid #c4c4c4 !important; box-shadow: none !important; color: #111 !important; padding: 2.5mm !important; border-radius: 2mm !important; }
+    body.print-mode .report-sections-grid li, body.print-mode .report-sections-grid p, body.print-mode .report-sections-grid span, body.print-mode .report-sections-grid b { color: #111; }
+
+    @media print {
+      .print-bar { display: none !important; }
+      body.print-mode { background: #fff !important; font-size: 12px !important; }
+      body.print-mode .main-container { margin: 0 !important; width: auto !important; max-width: none !important; box-shadow: none !important; }
+      body.print-mode .main-container::after { display: none !important; }
+      .pm-switch { display: none !important; }
+    }
+
+
   </style>
 </head>
 <body>
+
+  <!-- แถบควบคุมโหมดพิมพ์ (แสดงเฉพาะตอนเปิดโหมดพิมพ์ ไม่ถูกพิมพ์) -->
+  <div class="print-bar" id="print-bar">
+    <label class="pm-switch"><input type="checkbox" id="pm-toggle-bar" checked onchange="setPrintMode(this.checked)"><span class="pm-track"><i></i></span><b>🖨️ โหมดพิมพ์ A4 แนวตั้ง</b></label>
+    <label class="pm-opt">พิมพ์:
+      <select id="pm-scope" onchange="setPmScope(this.value)">
+        <option value="all">ทั้งหมด</option>
+        <option value="1">โซน 1 แผน &amp; สมาชิก</option>
+        <option value="2">โซน 2 ใบซื้อของ</option>
+        <option value="3">โซน 3 วิเคราะห์ &amp; การ์ดรายคน</option>
+      </select>
+    </label>
+    <label class="pm-opt"><input type="checkbox" id="pm-zone" onchange="setPmZone(this.checked)"> แยกหน้าตามโซน</label>
+    <label class="pm-opt"><input type="checkbox" id="pm-desc" onchange="setPmDesc(this.checked)"> แสดงคำอธิบายของ</label>
+    <span class="pm-pages" id="pm-pages">—</span>
+    <button type="button" class="pm-print" onclick="pmPrint()">🖨️ พิมพ์ / บันทึก PDF</button>
+  </div>
 
   <!-- Top Navigation Bar - CENTERED TITLE -->
   <header class="top-header">
@@ -1479,6 +1641,7 @@
       <div class="header-quick-bar">
         <div class="date-badge" id="current-date-badge">30/10/2026</div>
         <div class="device-badge" id="device-badge" title="ปรับหน้าตาอัตโนมัติตามอุปกรณ์">💻 คอมพิวเตอร์</div>
+        <label class="pm-switch" title="เปิดแล้วหน้าจอจะเป็นตัวอย่างแผ่น A4 แนวตั้ง จัดช่องไม่ให้การ์ดคร่อมขอบหน้า และสั่งพิมพ์ได้ตรงตามที่เห็น"><input type="checkbox" id="pm-toggle" onchange="setPrintMode(this.checked)"><span class="pm-track"><i></i></span><b>🖨️ โหมดพิมพ์ A4</b></label>
         
         <!-- Print Zone Dropdown Menu -->
         <div class="print-menu-dropdown">
@@ -1523,6 +1686,7 @@
   </header>
 
   <main class="main-container">
+      <div class="print-title" id="print-title"></div>
 
     <!-- ========================================== -->
     <!-- PRINT ZONE 1: DETAILS & SETUP (แผน & สมาชิก) -->
@@ -1638,6 +1802,19 @@
             <span style="font-size: 13.5px; color: var(--text-muted);">ระบุจำนวนวันที่ต้องการ:</span>
             <input type="number" id="custom-days-input" min="1" max="180" value="10" onchange="applyCustomDays()">
             <span style="font-size: 13.5px; color: var(--text-muted);">วัน</span>
+          </div>
+
+          <!-- ข้าวสาร ↔ ข้าวสำเร็จรูป -->
+          <div class="food-opt-box" id="food-opt-box">
+            <div class="option-group-title">🍚 ข้าวสาร ↔ ข้าวสำเร็จรูปพร้อมทาน <span class="food-opt-sub">(กระทบน้ำหุงต้ม + แก๊ส + น้ำหนัก)</span></div>
+            <div class="food-opt-row">
+              <span class="food-opt-end">ข้าวสาร</span>
+              <input type="range" id="rice-mix" min="0" max="100" step="10" value="0" oninput="previewRiceMix(this.value)" onchange="setRiceMix(this.value)">
+              <span class="food-opt-end">ข้าวพร้อมทาน</span>
+              <b id="rice-mix-val" class="food-opt-val">0%</b>
+            </div>
+            <label class="food-opt-chk"><input type="checkbox" id="broth-chk" checked onchange="setCountBroth(this.checked)"> นับน้ำซุปมาม่า/โจ๊กที่กินเข้าไปเป็นน้ำดื่ม (ลดน้ำดื่มที่ต้องสต๊อก)</label>
+            <div class="food-opt-info" id="food-opt-info"></div>
           </div>
 
           <!-- Aggregate Calculated Targets Box -->
@@ -2067,10 +2244,36 @@
     const planKey = a => isFoot(a) ? 'foot' : (isLight(a) ? 'bike' : 'home');
 
     // อาหารคำนวณจาก "แคลอรี่" × สัดส่วนต่อรายการ (ตรงกับ KPI วันที่อาหารพอ)
+    // สัดส่วนข้าวสาร ↔ ข้าวสำเร็จรูปพร้อมทาน (state.riceMix = % ของพลังงานข้าวที่ย้ายไปเป็นข้าวพร้อมทาน)
+    const RICE_SHARE = { home: 0.32, bike: 0.15, foot: 0.10 };
+    function foodShare(o, key, mixOpt) {
+      const mix = Math.max(0, Math.min(1, (mixOpt != null ? mixOpt : (state.riceMix || 0)) / 100));
+      const base = (o.share && o.share[key]) || 0;
+      if (o.id === 'jasmine_rice') return base * (1 - mix);
+      if (o.id === 'instant_rice') return RICE_SHARE[key] * mix;
+      return base;
+    }
+    // น้ำหุงต้ม (ลิตร) / น้ำซุปที่กินได้ (ลิตร) ต่อ 1 kcal ของอาหารทั้งหมด + สัดส่วนอาหารที่ต้องใช้ความร้อน
+    function cookPerKcal(key, mixOpt) {
+      let cook = 0, broth = 0, heat = 0;
+      BASE_ITEMS.forEach(i => {
+        if (!i.share) return;
+        const s = foodShare(i, key, mixOpt); if (!s) return;
+        cook += (s / i.kcal) * (i.cookL || 0);
+        broth += (s / i.kcal) * (i.broth || 0);
+        heat += s * (i.cookF || 0);
+      });
+      return { cook, broth, heat };
+    }
+    // แก๊สหุงต้ม: ส่วนหนึ่งคงที่ (ต้มน้ำ/ชงเครื่องดื่ม) อีกส่วนแปรตามสัดส่วนอาหารที่ต้องหุงต้ม
+    function gasFactor(key) {
+      const h0 = cookPerKcal(key, 0).heat, h1 = cookPerKcal(key).heat;
+      return h0 > 0 ? 0.25 + 0.75 * (h1 / h0) : 1;
+    }
     function food(o) {
       return Object.assign({ cat: 'food', pri: 2, wt: 0 }, o, {
         calc: a => {
-          const k = o.share[planKey(a)];
+          const k = foodShare(o, planKey(a));
           if (!k || a.foodKcalDay <= 0) return 0;
           const raw = (a.foodKcalDay * a.days * a.foodMultEff * k) / o.kcal;
           const v = o.round === 'half' ? Math.ceil(raw * 2) / 2 : Math.ceil(raw);
@@ -2117,14 +2320,15 @@
 
       // 🍚 FOOD (คำนวณจากแคลอรี่ตามสัดส่วน)
       food({
-        id: 'jasmine_rice', pri: 3, wt: 1, kcal: 3600, round: 'half', step: 0.5,
+        id: 'jasmine_rice', cookL: 2.0, cookF: 1, pri: 3, wt: 1, kcal: 3600, round: 'half', step: 0.5,
         name: 'ข้าวสารหอมมะลิ / ข้าวเสาไห้ (นับเป็น กก.)',
         desc: 'พลังงานหลักที่คุ้มที่สุด (~3,600 kcal/กก.) — ต้องมีเชื้อเพลิงหุงต้มและน้ำ จึงลดสัดส่วนในแผนเดินเท้า/มอไซค์',
         stores: ['makro', 'lotus', 'bigc', '711'], unit: 'กก.',
         share: { home: 0.32, bike: 0.15, foot: 0.10 }
       }),
+      food({ id: 'instant_rice', pri: 2, wt: 0.2, kcal: 290, name: 'ข้าวสำเร็จรูปพร้อมทาน (ถ้วย/ซองไมโครเวฟ — ข้าวหอมมะลิพร้อมทาน)', desc: 'กินได้ทันที ไม่ใช้น้ำหุง ไม่ใช้แก๊ส (กินเย็นหรืออุ่นในน้ำร้อนได้) — หนักและแพงกว่าข้าวสารราว 2.5 เท่าต่อพลังงาน เหมาะ 1–3 วันแรก/น้ำน้อย/เด็กและผู้สูงอายุ (ประมาณ 290 kcal ต่อถ้วย 200 ก. — ตรวจฉลากจริงและวันหมดอายุ)', stores: ['711', 'lotus', 'makro', 'bigc'], unit: 'ถ้วย', share: { home: 0, bike: 0, foot: 0 } }),
       food({
-        id: 'instant_noodles', pri: 2, wt: 0.08, kcal: 320,
+        id: 'instant_noodles', cookL: 0.45, broth: 0.35, cookF: 1, pri: 2, wt: 0.08, kcal: 320,
         name: 'บะหมี่กึ่งสำเร็จรูป (มาม่า / ไวไว / ยำยำ)',
         desc: 'พร้อมทานเร็ว ใช้น้ำน้อย (แช่น้ำเย็นได้) เหมาะกับแผนพกพา',
         stores: ['711', 'lotus', 'makro', 'bigc'], unit: 'ซอง',
@@ -2138,7 +2342,7 @@
         share: { home: 0.14, bike: 0.15, foot: 0.15 }
       }),
       food({
-        id: 'instant_porridge', pri: 1, wt: 0.08, kcal: 180,
+        id: 'instant_porridge', cookL: 0.3, broth: 0.25, cookF: 1, pri: 1, wt: 0.08, kcal: 180,
         name: 'โจ๊กกึ่งสำเร็จรูป / ข้าวต้มซอง (คนอร์ / มาม่า)',
         desc: 'ย่อยง่าย เหมาะสำหรับเด็ก ผู้สูงอายุ หรือเวลาป่วย',
         stores: ['711', 'lotus', 'bigc'], unit: 'ซอง',
@@ -2302,9 +2506,10 @@
         desc: '1 กระป๋องหุงต้มได้ ~2-3 วัน/ครอบครัว (ไฟดับ/พายุ/ขาดแคลนเพิ่มตามตัวคูณสถานการณ์)',
         stores: ['mrdiy', 'lotus', 'makro', 'bigc', '711'], unit: 'กระป๋อง',
         calc: a => {
-          if (isFoot(a)) return Math.max(1, Math.ceil(a.days / 5));
-          if (isLight(a)) return Math.max(1, Math.ceil(a.days / 3.5));
-          return Math.max(2, Math.ceil((a.days / 2.5) * a.crisis.fuelMult));
+          const gf = gasFactor(planKey(a));
+          if (isFoot(a)) return Math.max(1, Math.ceil(a.days / 5 * gf));
+          if (isLight(a)) return Math.max(1, Math.ceil(a.days / 3.5 * gf));
+          return Math.max(2, Math.ceil((a.days / 2.5) * a.crisis.fuelMult * gf));
         }
       },
       {
@@ -2322,10 +2527,10 @@
         calc: a => Math.max(4, Math.ceil(a.days * 1.5 * (inSc(a, 'blackout', 'storm') ? 1.5 : 1)))
       },
       {
-        id: 'lighter_matches', cat: 'energy', pri: 1, wt: 0.02,
-        name: 'ไฟแช็ก / ไม้ขีดไฟกันน้ำ',
-        desc: 'จุดเตาแก๊ส เทียนไข ไล่ยุง เก็บในถุงกันน้ำ',
-        stores: ['711', 'mrdiy', 'lotus'], unit: 'อัน',
+        id: 'lighter_matches', cat: 'energy', pri: 1, wt: 0.06,
+        name: 'ไฟแช็ก / ไม้ขีดไฟกันน้ำ / แท่งจุดประกายไฟ (Ferro rod ขูดสะเก็ดไฟแบบแคมป์ปิ้ง)',
+        desc: 'จุดเตาแก๊ส เทียนไข ไล่ยุง · ชุดละ 1 ไฟแช็ก + ไม้ขีดกันน้ำ + แท่งเฟอโรเซอเรียม (Ferro rod) ที่ขูดด้วยสันมีด/ที่ขูดแล้วเกิดสะเก็ดไฟร้อนจัด ใช้ได้แม้เปียกชื้นและไม่มีวันหมดแก๊ส (ใช้คู่กับสำลี/ใยไฟเบอร์/เชื้อไฟ) · แบ่งเก็บ 2 ที่ในถุงกันน้ำ',
+        stores: ['711', 'mrdiy', 'lotus', 'central'], unit: 'ชุด',
         calc: () => 3
       },
       {
@@ -2693,6 +2898,8 @@
       severity: 0,
       protectKids: false,   // true = เด็ก 4–12 ปีลดน้อยกว่าผู้ใหญ่ครึ่งหนึ่งในโหมดประหยัด
       rationFit: false,   // true = ถ้าของไม่พอ ลดส่วนแบ่งทุกคนเท่าๆ กันให้ครบจำนวนวัน
+      riceMix: 0,   // % ของข้าวที่ใช้ข้าวสำเร็จรูปพร้อมทานแทนข้าวสาร
+      countBroth: true,   // นับน้ำซุปมาม่า/โจ๊กเป็นน้ำดื่ม
       excl: { items: {}, packs: {}, store: {} },
       capOverride: {},
       members: [
@@ -2831,13 +3038,17 @@
       const extraLiters = Math.ceil((extraDay + pets * 0.7) * days);
       const dailyWater = drinkDay + extraDay + pets * 0.7;
       const foodMultEff = light ? 1 : crisis.foodMult;
+      const ck = cookPerKcal(planKey({ plan }));
+      const cookDay = foodKcalDay * foodMultEff * ck.cook;                                        // น้ำหุงต้ม (ลิตร/วัน)
+      const brothDay = state.countBroth !== false ? foodKcalDay * foodMultEff * ck.broth : 0;       // น้ำซุปที่ดื่มได้
+      const cookLiters = Math.ceil(cookDay * days), brothLiters = Math.floor(Math.min(brothDay * days, drinkLiters * 0.4));
 
       return {
         crisis, plan, people, days, adultEquiv, vulnerable, chronicCount, chronicNames, infants, diaperKids,
         women, bedridden, pets: state.pets, light, carryDays,
-        drinkLiters, extraLiters, dailyWater,
-        totalWaterLiters: drinkLiters + extraLiters,
-        totalBottles15L: Math.ceil((drinkLiters + extraLiters) / 1.5),
+        drinkLiters, extraLiters, cookDay, cookLiters, brothLiters, dailyWater: dailyWater + cookDay - Math.min(brothDay, drinkDay * 0.4),
+        totalWaterLiters: drinkLiters + extraLiters + cookLiters - brothLiters,
+        totalBottles15L: Math.ceil((drinkLiters + extraLiters + cookLiters - brothLiters) / 1.5),
         waterTargetDays: light ? carryDays : days,
         foodKcalDay, foodMultEff,
         totalCalories: Math.round(foodKcalDay * days * foodMultEff),
@@ -2990,6 +3201,7 @@
 
       const agg = computeAggregates();
       updateDurationUI(agg);
+      updateFoodOptUI(agg);
       const waterEl = document.getElementById('agg-water-val');
       waterEl.textContent = agg.totalWaterLiters.toFixed(1);
       waterEl.nextElementSibling.textContent = agg.light
@@ -3879,17 +4091,22 @@
     function personUse(m, a, t) {
       const P = PLANS[a.plan] || PLANS['bug-in'];
       const protectedP = (m.age < 4 || m.health === 'pregnant' || m.health === 'chronic' || m.health === 'bedridden') ? 0.25 : (m.age < 13 ? (state.protectKids ? 0.5 : 1) : 1);
-      const drink = personDrinkBase(m) * (P.drink / 2) * a.crisis.waterMult * (1 - 0.25 * t * protectedP);
+      const drinkRaw = personDrinkBase(m) * (P.drink / 2) * a.crisis.waterMult * (1 - 0.25 * t * protectedP);
       const extra = (a.light ? 0 : personExtraBase(m)) * a.crisis.waterMult * (1 - 0.7 * t);
       const kcal = m.age >= 1 ? memberKcal(m, a.plan) * (1 - 0.25 * t * protectedP) : 0;
       const foods = [];
       if (kcal > 0) BASE_ITEMS.filter(i => i.share).forEach(i => {
-        const sh = i.share[planKey(a)];
+        const sh = foodShare(i, planKey(a));
         if (sh) foods.push({ item: i, qty: kcal * sh / i.kcal });
       });
+      // น้ำหุงต้มตามอาหารที่กินจริง และน้ำซุป (มาม่า/โจ๊ก) ที่ดื่มเข้าไปนับเป็นน้ำดื่มได้
+      let cook = 0, broth = 0;
+      foods.forEach(f => { cook += f.qty * (f.item.cookL || 0); broth += f.qty * (f.item.broth || 0); });
+      const credit = state.countBroth !== false ? broth : 0;
+      const drink = Math.max(drinkRaw * 0.6, drinkRaw - credit);
       const maskRate = hasSc(a, 'pandemic') ? 1 : (hasSc(a, 'air_toxic') ? 0.5 : (hasSc(a, ALL) ? 0.4 : 0));
       return {
-        drink, extra, kcal, foods,
+        drink, drinkRaw, extra, cook, broth: credit, kcal, foods,
         tp: m.age >= 3 ? (0.4 - 0.15 * t) : 0,
         wipes: m.age >= 3 ? (15 - 7 * t) : 5,
         charge: m.age >= 10 ? (1 - 0.6 * t) : 0,
@@ -3907,9 +4124,10 @@
       const gasBase = isFoot(a) ? 1 / 5 : (isLight(a) ? 1 / 3.5 : a.crisis.fuelMult / 2.5);
       return {
         per,
-        water: sum('drink') + sum('extra') + pets * 0.7,
+        water: sum('drink') + sum('extra') + sum('cook') + pets * 0.7,
+        cook: sum('cook'), broth: sum('broth'),
         kcal: sum('kcal'),
-        gas: gasBase * (1 - 0.45 * t),
+        gas: gasBase * (1 - 0.45 * t) * gasFactor(planKey(a)),
         batt: 1.5 * (inSc(a, 'blackout', 'storm') ? 1.5 : 1) * (1 - 0.4 * t),
         charges: sum('charge'), tp: sum('tp'), wipes: sum('wipes'), diapers: sum('diapers'),
         adultDiapers: sum('adultDiapers'), pads: sum('pads'), formula: sum('formula'), mask: sum('mask'),
@@ -3921,7 +4139,7 @@
       const inv = id => parseFloat(state.currentInventory[id]) || 0;
       const res = [];
       const add = o => { o.days = o.use > 1e-9 ? o.stock / o.use : Infinity; res.push(o); };
-      add({ key: 'water', icon: '💧', name: 'น้ำ (ดื่ม + ใช้) — ขวด 1.5L', stock: inv('water_15l') * 1.5, unit: 'ลิตร', use: U.water, critical: true });
+      add({ key: 'water', icon: '💧', name: 'น้ำ (ดื่ม + หุงต้ม + ใช้) — ขวด 1.5L', stock: inv('water_15l') * 1.5, unit: 'ลิตร', use: U.water, critical: true });
       const kcalStock = BASE_ITEMS.reduce((s, it) => s + (it.kcal ? inv(it.id) * it.kcal : 0), 0);
       add({ key: 'food', icon: '🍚', name: 'อาหาร (พลังงานรวม)', stock: kcalStock, unit: 'kcal', use: U.kcal, critical: true });
       if (a.chronicCount > 0) add({ key: 'meds', icon: '💊', name: 'ยาประจำตัว (ไม่ลดการใช้)', stock: inv('chronic_meds'), unit: 'วัน', use: 1, critical: true });
@@ -4082,7 +4300,7 @@
     // ---- รายงาน 5.1: อยู่ได้กี่วัน + อัตราใช้ ----
 
     // ============ V10: สรุปการใช้ทรัพยากรแต่ละวัน (แบ่งจากของที่มีทั้งหมด) ============
-    const FOOD_ICON = { jasmine_rice: '🍚', instant_noodles: '🍜', canned_fish: '🐟', instant_porridge: '🥣', uht_milk: '🥛', energy_snacks: '🍫', peanut_butter_nuts: '🥜', cooking_oil: '🧈' };
+    const FOOD_ICON = { jasmine_rice: '🍚', instant_rice: '🍱', instant_noodles: '🍜', canned_fish: '🐟', instant_porridge: '🥣', uht_milk: '🥛', energy_snacks: '🍫', peanut_butter_nuts: '🥜', cooking_oil: '🧈' };
     const GRAM_ITEMS = new Set(['jasmine_rice', 'peanut_butter_nuts', 'cooking_oil']);
     function qFrac(q) {
       if (q < 0.125) return '';
@@ -4165,7 +4383,7 @@
         const plan = u.kcal, got = plan * fF;
         return { m, u, share, need0: u0.kcal, plan, got, drink0: u0.drink,
           items: foods.map(f => ({ item: f.item, q: K > 0 ? f.stock * (Kdp * fF / K) * share : 0 })),
-          drink: u.drink * dRatio, use: u.extra * eRatio };
+          drink: u.drink * dRatio, use: (u.extra + u.cook) * eRatio, cookL: u.cook };
       });
 
       // ---- 4 โหมด: แผนต่อวัน (kcal/คน, % ของที่ควรได้) + ของอยู่ได้กี่วัน ----
@@ -4197,7 +4415,7 @@
           ${Math.abs(p.plan - p.need0) > 1 ? `<div class="rc-dim">แผนโหมด${sevName(t)}: ${Math.round(p.plan).toLocaleString()} kcal (${pct(p.plan / Math.max(1, p.need0))}% ของที่ควรได้)</div>` : ''}
           ${fF < 0.999 && p.plan > 0 ? `<div class="rc-dim rw-red">⚠️ ของไม่พอ: ได้กินจริง ${pct(fF)}% ของแผน${fit ? ' (ยืดให้ครบ ' + target + ' วัน)' : ''}</div>` : ''}
           ${foodRows || '<div class="rc-dim">ไม่มีอาหารในสต๊อก</div>'}` : `<div class="rc-kcal">🍼 นมผง ~${u.formula} กระป๋อง/วัน <small>(ไม่ลดการใช้)</small></div>`}
-          <div class="rc-water ${lowW ? 'low' : ''}">💧 ดื่ม <b>${r2(p.drink)} ลิตร</b> <small>(${pct(p.drink / Math.max(0.01, p.drink0))}% ของปกติ ${r2(p.drink0)})</small> (≈ ${cups} แก้ว 250 มล. · ${r1(p.drink / 1.5)} ขวด)${lowW ? ' ⚠️ ต่ำกว่าเกณฑ์' : ''}${p.use > 0.01 ? `<br>🧼 น้ำใช้ ${r2(p.use)} ลิตร` : ''}</div>
+          <div class="rc-water ${lowW ? 'low' : ''}">💧 ดื่ม <b>${r2(p.drink)} ลิตร</b> <small>(${pct(p.drink / Math.max(0.01, p.drink0))}% ของปกติ ${r2(p.drink0)})</small> (≈ ${cups} แก้ว 250 มล. · ${r1(p.drink / 1.5)} ขวด)${lowW ? ' ⚠️ ต่ำกว่าเกณฑ์' : ''}${p.use > 0.01 ? `<br>🧼 น้ำใช้+หุงต้ม ${r2(p.use)} ลิตร${p.cookL > 0.01 ? ` <small>(หุงต้ม ${r2(p.cookL)})</small>` : ''}` : ''}</div>
         </div>`;
       }).join('');
 
@@ -4623,6 +4841,22 @@
         </div>`);
     }
 
+
+    // ============ V14: ข้าวสาร ↔ ข้าวสำเร็จรูป + น้ำหุงต้ม ============
+    function previewRiceMix(v) { const e = document.getElementById('rice-mix-val'); if (e) e.textContent = v + '%'; }
+    function setRiceMix(v) { state.riceMix = Math.max(0, Math.min(100, parseInt(v, 10) || 0)); saveState(); renderAll(); }
+    function setCountBroth(on) { state.countBroth = !!on; saveState(); renderAll(); }
+    function updateFoodOptUI(a) {
+      const sl = document.getElementById('rice-mix'); if (!sl) return;
+      sl.value = state.riceMix || 0; previewRiceMix(sl.value);
+      const ck = document.getElementById('broth-chk'); if (ck) ck.checked = state.countBroth !== false;
+      const info = document.getElementById('food-opt-info'); if (!info) return;
+      const U = computeUsage(a, 0), tot = {};
+      U.per.forEach(p => p.foods.forEach(f => { tot[f.item.id] = (tot[f.item.id] || 0) + f.qty; }));
+      const gf = gasFactor(planKey(a)), mix = state.riceMix || 0;
+      const hint = a.light ? 'แผนพกพา: ข้าวพร้อมทานหนักกว่าข้าวสารราว 2.5 เท่าต่อพลังงาน — ใช้เป็นส่วนน้อย' : (mix === 0 ? 'ถ้าน้ำเป็นข้อจำกัด/อาจไม่มีแก๊ส ลองเลื่อนไป 30–50%' : 'ข้าวพร้อมทานแพงกว่าและเก็บได้สั้นกว่า ตรวจวันหมดอายุตามฉลาก');
+      info.innerHTML = `วันละทั้งบ้าน: ข้าวสาร <b>${r2(tot.jasmine_rice || 0)}</b> กก. · ข้าวพร้อมทาน <b>${r1(tot.instant_rice || 0)}</b> ถ้วย · น้ำหุงต้ม <b>${r1(U.cook)}</b> ลิตร${state.countBroth !== false && U.broth > 0 ? ` (ดื่มน้ำซุปได้ ~${r1(U.broth)} ลิตร)` : ''} · แก๊ส <b>${Math.round(gf * 100)}%</b> ของแบบหุงข้าวทั้งหมด<br><span class="rc-dim">${hint}</span>`;
+    }
     function toggleRationFit() { state.rationFit = !state.rationFit; saveState(); renderReport(); }
     function toggleProtectKids() { state.protectKids = !state.protectKids; saveState(); renderReport(); }
     function setSeverity(v) {
@@ -4821,9 +5055,91 @@
       }
     };
 
+
+    // ============ V13: โหมดพิมพ์ A4 แนวตั้ง (ตัวอย่างหน้ากระดาษ + จัดช่องไม่ให้คร่อมขอบหน้า) ============
+    const PM_PAGE = 277 * 96 / 25.4, PM_GAP = 10 * 96 / 25.4, PM_PITCH = PM_PAGE + PM_GAP;   // เนื้อหาต่อหน้า = 297−20 มม.
+    const PM_BLOCKS = '.print-zone-2, .print-zone-3, .pcard, .unit-card, .rc-person, .rc-share, .rc-sum, .rc-strips, .rc-modes, .rc-chips, .summary-stats-box, .runway-hero, .pc-ex, .pc-cons, .plan-step, .cons-row, .crisis-grid, .card-title, .rc-title, .rc-sec-h, .pk-title, .members-table tr, .inventory-table tr, .rw-table tr, .sub-panel, .veh-warn, .use-grid, .plan-selector-grid, .hero-banner';
+    const PM_TITLES = '.card-title, .rc-title, .rc-sec-h, .pk-title';
+    let pmTimer = null;
+    function pmClear() {
+      document.querySelectorAll('[data-pm]').forEach(c => {
+        const s = c.getAttribute('data-pm');
+        if (s === '~') c.removeAttribute('style'); else c.setAttribute('style', s);
+        c.removeAttribute('data-pm');
+      });
+    }
+    function pmPush(el, sp) {
+      const cells = el.tagName === 'TR' ? Array.from(el.cells) : [el];
+      cells.forEach(c => {
+        if (!c.hasAttribute('data-pm')) c.setAttribute('data-pm', c.getAttribute('style') || '~');
+        const cs = getComputedStyle(c);
+        if (el.tagName === 'TR') c.style.paddingTop = (parseFloat(cs.paddingTop) + sp) + 'px';
+        else c.style.marginTop = (parseFloat(cs.marginTop) + sp) + 'px';
+      });
+    }
+    function pmFill() {
+      const t = document.getElementById('print-title'); if (!t) return;
+      const c = getCrisis(), act = document.querySelector('.plan-btn.active');
+      const dateTxt = (document.getElementById('current-date-badge') || {}).textContent || '';
+      t.innerHTML = `<b>Crisis Survival Stockpile</b> — แผนเตรียมรับวิกฤติ · ${esc(c.icon)} ${esc(c.name)} · ${state.members.length} คน · ${state.days} วัน${act ? ' · ' + esc(act.textContent.trim().replace(/\s+/g, ' ').slice(0, 40)) : ''} · ${esc(dateTxt)}`;
+    }
+    function paginatePreview() {
+      pmClear();
+      if (!document.body.classList.contains('print-mode')) return;
+      const root = document.querySelector('.main-container'); if (!root) return;
+      const zoneBreak = document.body.classList.contains('pm-zone');
+      const origin = root.getBoundingClientRect().top + window.scrollY;
+      const vis = el => el.offsetParent !== null || el.tagName === 'TR';
+      Array.from(root.querySelectorAll(PM_BLOCKS)).forEach(el => {
+        if (!vis(el)) return;
+        let r = el.getBoundingClientRect(); if (r.height <= 0) return;
+        const top = r.top + window.scrollY - origin;
+        const pageIdx = Math.max(0, Math.floor(top / PM_PITCH + 1e-6)), pageEnd = pageIdx * PM_PITCH + PM_PAGE, next = (pageIdx + 1) * PM_PITCH;
+        if (el.matches('.print-zone-2, .print-zone-3')) {
+          if (zoneBreak && top - pageIdx * PM_PITCH > 2) pmPush(el, next - top);
+          return;
+        }
+        let h = r.height;
+        if (el.matches(PM_TITLES)) {   // หัวข้อต้องไม่อยู่ท้ายหน้าตามลำพัง: นับรวมบล็อกถัดไป
+          let sib = el.nextElementSibling;
+          while (sib && sib.getBoundingClientRect().height <= 0) sib = sib.nextElementSibling;
+          if (sib) h += Math.min(sib.getBoundingClientRect().height, 110);
+        }
+        if (h > PM_PAGE * 0.95) return;   // ใหญ่กว่าหน้า: ให้ไหลต่อข้ามหน้าไปตามธรรมชาติ
+        if (top + h > pageEnd + 0.5) pmPush(el, next - top);
+      });
+      const total = root.scrollHeight;
+      const pages = Math.max(1, Math.floor((total - 1) / PM_PITCH) + 1);
+      const pg = document.getElementById('pm-pages'); if (pg) pg.textContent = `≈ ${pages} หน้า A4`;
+    }
+    function schedulePaginate(ms) { clearTimeout(pmTimer); pmTimer = setTimeout(paginatePreview, ms == null ? 80 : ms); }
+    function setPrintMode(on) {
+      document.body.classList.toggle('print-mode', !!on);
+      ['pm-toggle', 'pm-toggle-bar'].forEach(id => { const e = document.getElementById(id); if (e) e.checked = !!on; });
+      if (on) { pmFill(); window.scrollTo(0, 0); schedulePaginate(30); if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => schedulePaginate(30)); }
+      else { pmClear(); document.body.classList.remove('print-only-zone-1', 'print-only-zone-2', 'print-only-zone-3'); const s = document.getElementById('pm-scope'); if (s) s.value = 'all'; }
+    }
+    function setPmDesc(on) { document.body.classList.toggle('pm-desc', !!on); schedulePaginate(10); }
+    function setPmZone(on) { document.body.classList.toggle('pm-zone', !!on); schedulePaginate(10); }
+    function setPmScope(v) {
+      document.body.classList.remove('print-only-zone-1', 'print-only-zone-2', 'print-only-zone-3');
+      if (v !== 'all') document.body.classList.add('print-only-zone-' + v);
+      schedulePaginate(10);
+    }
+    function pmPrint() { pmClear(); setTimeout(() => window.print(), 60); }
+    window.addEventListener('beforeprint', () => { if (document.body.classList.contains('print-mode')) { pmClear(); pmFill(); } });
+    window.addEventListener('afterprint', () => { if (document.body.classList.contains('print-mode')) schedulePaginate(60); });
+    (function hookRenderAll() {
+      const base = renderAll;
+      renderAll = function () { base(); if (document.body.classList.contains('print-mode')) { pmFill(); schedulePaginate(80); } };
+    })();
+
     function triggerPrint(mode) {
       document.getElementById('print-dropdown').classList.remove('show');
       
+      // ใช้เลย์เอาต์ A4 แบบกระชับเสมอ (ถ้ายังไม่ได้เปิดโหมดพิมพ์ จะเปิดให้ชั่วคราวระหว่างพิมพ์)
+      const wasPm = document.body.classList.contains('print-mode'), wasZone = document.body.classList.contains('pm-zone');
+      if (!wasPm) { document.body.classList.add('print-mode'); pmFill(); if (mode === 'all') document.body.classList.add('pm-zone'); }
       // Clean previous print classes
       document.body.classList.remove('print-only-zone-1', 'print-only-zone-2', 'print-only-zone-3');
 
@@ -4840,6 +5156,7 @@
         // Reset after printing dialog closes
         setTimeout(() => {
           document.body.classList.remove('print-only-zone-1', 'print-only-zone-2', 'print-only-zone-3');
+          if (!wasPm) { document.body.classList.remove('print-mode'); document.body.classList.toggle('pm-zone', wasZone); pmClear(); }
         }, 1000);
       }, 150);
     }
