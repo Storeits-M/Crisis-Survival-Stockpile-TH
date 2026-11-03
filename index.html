@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#1a1816">
-  <title>Crisis Survival Stockpile V15 - ระบบวางแผนและบริหารคลังเสบียงเอาตัวรอด</title>
+  <title>Crisis Survival Stockpile V16 - ระบบวางแผนและบริหารคลังเสบียงเอาตัวรอด</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Noto+Serif+Thai:wght@400;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -1501,7 +1501,7 @@
   <header class="top-header">
     <div class="header-inner">
       <div class="brand-title">Crisis Survival Stockpile</div>
-      <div class="brand-sub">ระบบวางแผนและบริหารคลังเสบียงเอาตัวรอดในวิกฤติสำหรับคนไทย · V15</div>
+      <div class="brand-sub">ระบบวางแผนและบริหารคลังเสบียงเอาตัวรอดในวิกฤติสำหรับคนไทย · V16</div>
       
       <div class="header-quick-bar">
         <div class="date-badge" id="current-date-badge">30/10/2026</div>
@@ -2599,9 +2599,9 @@
         calc: a => a.people
       },
       {
-        id: 'dry_bag', cat: 'safety', pri: 2, wt: 0.3, sc: ['flood'], plans: ['bug-out-foot', 'bicycle', 'motorbike', 'boat'],
+        id: 'dry_bag', cat: 'safety', pri: 2, wt: 0.3, sc: ['flood', 'storm'], plans: ['bug-out-foot', 'bicycle', 'motorbike', 'boat'],
         name: 'ถุงกันน้ำ (Dry bag) ใส่เอกสาร/มือถือ/เสื้อผ้า',
-        desc: 'กันน้ำตอนอพยพ ลุยน้ำ หรือท่ามกลางพายุ',
+        desc: 'กันน้ำตอนอพยพ ลุยน้ำ หรือฝนหนัก/พายุ (เอกสาร มือถือ ยา และเสื้อผ้า)',
         stores: ['central', 'mrdiy', 'lotus'], unit: 'ใบ',
         calc: a => (isLight(a) || a.plan === 'boat') ? a.people : Math.max(1, Math.ceil(a.people / 2))
       },
@@ -2793,7 +2793,7 @@
         { id: 2, name: 'คุณแม่', gender: 'female', age: 36, weight: 58, height: 160, health: 'normal', medication: '' },
         { id: 3, name: 'น้องภูมิ (ลูกชาย)', gender: 'male', age: 8, weight: 26, height: 125, health: 'normal', medication: '' }
       ],
-      itemLocations: {}, // ตำแหน่งจัดเก็บของที่มีจริง: home / bag / car
+      itemLocations: {}, // ตำแหน่งจัดเก็บของที่มีจริง: home / bag / car / motorbike / boat
       currentInventory: {
         'water_15l': 16, 'ors_powder': 4,
         'jasmine_rice': 5, 'instant_noodles': 15, 'canned_fish': 8, 'instant_porridge': 3, 'uht_milk': 6, 'energy_snacks': 2,
@@ -2846,6 +2846,8 @@
       state.itemLocations = state.itemLocations || {};
       state.excl = Object.assign({ items: {}, packs: {}, store: {} }, state.excl || {});
       state.excl.items = state.excl.items || {}; state.excl.packs = state.excl.packs || {}; state.excl.store = state.excl.store || {};
+      Object.keys(state.excl.items).forEach(id => { if (state.excl.items[id] && BASE_ITEMS.some(x => x.id === id)) state.currentInventory[id] = 0; });
+      state.excl.items = {};
       if (!CAR_TYPES[state.vehicle.carType]) state.vehicle.carType = 'sedan';
       if (!BOAT_TYPES[state.vehicle.boatType]) state.vehicle.boatType = 'small';
       state.vehicle.bikes = Math.max(0, parseInt(state.vehicle.bikes) || 0);
@@ -3141,8 +3143,7 @@
       rows.forEach(({ item, req, cur, pct, excluded, rawReq, cutPersons }) => {
         const step = item.step || 1;
         let statusClass = 'status-ok', statusText = '✓ ครบตามแผน', barClass = '';
-        if (excluded) { statusText = '⏸ ตัดออกแล้ว'; barClass = ''; }
-        else if (cur === 0) {
+        if (cur === 0) {
           statusClass = 'status-critical'; barClass = 'critical';
           statusText = `ขาดอีก ${fmt(req)} ${item.unit}`;
         } else if (cur < req) {
@@ -3163,7 +3164,7 @@
         tr.innerHTML = `
           <td>
             <div class="item-primary-name">
-              <label class="sw inv-sw" title="เปิด = ต้องมี / ปิด = ตัดออก (ซิงก์กับเป้ทุกคน)"><input type="checkbox" ${excluded ? '' : 'checked'} onchange="toggleItemExcluded('${item.id}')"><span></span></label>
+              <label class="sw inv-sw" title="เปิด = มีของจริง (เริ่มต้น 1 หน่วย ปรับจำนวนด้านข้างได้) / ปิด = จำนวนที่มีจริงเป็น 0"><input type="checkbox" ${(cur > 0) ? 'checked' : ''} onchange="toggleItemExcluded('${item.id}', this.checked)"><span></span></label>
               <span class="print-check-box"></span>
               <span>${item.name}</span>
             </div>
@@ -3217,18 +3218,21 @@
     const OWNED_LOCATIONS = {
       home: { title: '🏠 ของที่เก็บในบ้าน', key: 'home' },
       bag: { title: '🎒 ของที่จัดไว้ในเป้', key: 'bag' },
-      car: { title: '🚗 ของที่เก็บในรถ / พาหนะ', key: 'car' }
+      car: { title: '🚗 ของที่เก็บในรถ', key: 'car' },
+      motorbike: { title: '🛵 ของที่เก็บในมอเตอร์ไซค์', key: 'motorbike' },
+      boat: { title: '🛶 ของที่เก็บในเรือ', key: 'boat' }
     };
     function setItemLocation(itemId, location) {
-      if (!['home', 'bag', 'car'].includes(location)) return;
+      if (!['home', 'bag', 'car', 'motorbike', 'boat'].includes(location)) return;
       state.itemLocations[itemId] = location;
       saveState();
       renderOwnedInventory();
+      renderAllExtras();
     }
     function renderOwnedInventory() {
       const host = document.getElementById('owned-inventory-list');
       if (!host) return;
-      const groups = { home: [], bag: [], car: [] };
+      const groups = { home: [], bag: [], car: [], motorbike: [], boat: [] };
       BASE_ITEMS.forEach(item => {
         const qty = Math.max(0, parseFloat(state.currentInventory[item.id]) || 0);
         if (qty <= 0) return;
@@ -3238,7 +3242,7 @@
       host.innerHTML = Object.entries(groups).map(([key, rows]) => `
         <div class="owned-location-card">
           <div class="owned-location-title"><span>${OWNED_LOCATIONS[key].title}</span><span>${rows.length} รายการ</span></div>
-          ${rows.length ? rows.map(({item, qty}) => `<div class="owned-item"><span>${esc(item.name)}</span><div class="owned-item-controls"><input type="number" min="0" step="${item.step || 1}" value="${qty}" aria-label="จำนวน ${esc(item.name)}" onchange="setQty('${item.id}', this.value)"><b>${esc(item.unit)}</b><select class="item-location-select" style="margin:0" aria-label="ตำแหน่งจัดเก็บ ${esc(item.name)}" onchange="setItemLocation('${item.id}', this.value)"><option value="home" ${key === 'home' ? 'selected' : ''}>บ้าน</option><option value="bag" ${key === 'bag' ? 'selected' : ''}>เป้</option><option value="car" ${key === 'car' ? 'selected' : ''}>รถ</option></select></div></div>`).join('') : '<div class="owned-empty">ยังไม่มีรายการที่ระบุว่ามีอยู่ในตำแหน่งนี้</div>'}
+          ${rows.length ? rows.map(({item, qty}) => `<div class="owned-item"><span>${esc(item.name)}</span><div class="owned-item-controls"><input type="number" min="0" step="${item.step || 1}" value="${qty}" aria-label="จำนวน ${esc(item.name)}" onchange="setQty('${item.id}', this.value)"><b>${esc(item.unit)}</b><select class="item-location-select" style="margin:0" aria-label="ตำแหน่งจัดเก็บ ${esc(item.name)}" onchange="setItemLocation('${item.id}', this.value)"><option value="home" ${key === 'home' ? 'selected' : ''}>บ้าน</option><option value="bag" ${key === 'bag' ? 'selected' : ''}>เป้</option><option value="car" ${key === 'car' ? 'selected' : ''}>รถ</option><option value="motorbike" ${key === 'motorbike' ? 'selected' : ''}>มอเตอร์ไซค์</option><option value="boat" ${key === 'boat' ? 'selected' : ''}>เรือ</option></select></div></div>`).join('') : '<div class="owned-empty">ยังไม่มีรายการที่ระบุว่ามีอยู่ในตำแหน่งนี้</div>'}
         </div>`).join('');
     }
 
@@ -3749,7 +3753,7 @@
       // ของที่ถือให้คนอื่น: เช็คการตัดออกแบบไม่ผูกกับคนถือ (กันของย้ายคนถือแล้วสวิตช์หลุด)
       const isEx = (p, key, ref) => !ignoreExcl && (state.excl.items[ref || key] || (key.includes('@') ? packExAny(key) : (state.excl.packs[p.m.id] && state.excl.packs[p.m.id][key])));
       const putRef = (p, id, qty, opts) => {
-        const it = byId[id]; if (!it) return 0;
+        const it = byId[id]; if (!it || !isActive(it, a)) return 0;
         const key = (opts && opts.key) || id;
         if (isEx(p, key, id)) return 0;
         return put(p, short(it.name), it.unit, it.wt || 0, volOf(it), qty, id, opts);
@@ -3827,7 +3831,7 @@
 
       // ของจริงส่วนเกิน: เติมหลังจัดของจำเป็นแล้ว ให้คนที่ยังมีน้ำหนัก/พื้นที่เหลือมากที่สุด
       const extras = BASE_ITEMS
-        .filter(it => (remain[it.id] || 0) > 1e-9 && it.id !== 'fuel_full')
+        .filter(it => isActive(it, a) && (remain[it.id] || 0) > 1e-9 && it.id !== 'fuel_full')
         .sort((x, y) => (y.pri || 0) - (x.pri || 0) || ((x.wt || 0) - (y.wt || 0)));
       extras.forEach(it => {
         let left = remain[it.id] || 0;
@@ -3840,8 +3844,12 @@
         }
       });
 
-      const communal = BASE_ITEMS.filter(item => (remain[item.id] || 0) > 1e-9 && item.id !== 'fuel_full' && (ignoreExcl || state.excl.store[item.id] !== true))
-        .map(item => ({ item, qty: r2(remain[item.id]) }));
+      const communal = BASE_ITEMS.filter(item => isActive(item, a) && (remain[item.id] || 0) > 1e-9 && item.id !== 'fuel_full' && (ignoreExcl || (!state.excl.items[item.id] && !state.excl.store[item.id])))
+        .map(item => {
+          const raw = r2(remain[item.id]);
+          const cut = ignoreExcl ? 0 : (state.excl.store[item.id] === true ? raw : Math.min(raw, Math.max(0, Number(state.excl.store[item.id]) || 0)));
+          return { item, qty: r2(raw - cut) };
+        }).filter(x => x.qty > 1e-9);
       return { list, communal };
     }
 
@@ -3939,8 +3947,17 @@
       out.storeExcl = Object.values(storeCut);
       return out;
     }
-    function toggleItemExcluded(id) {
-      if (state.excl.items[id]) delete state.excl.items[id]; else state.excl.items[id] = true;
+    function toggleItemExcluded(id, hasStock) {
+      const item = BASE_ITEMS.find(x => x.id === id);
+      if (!item) return;
+      if (hasStock) {
+        const cur = Math.max(0, parseFloat(state.currentInventory[id]) || 0);
+        state.currentInventory[id] = cur > 0 ? cur : (item.step || 1);
+      } else {
+        state.currentInventory[id] = 0;
+        // ปิดสวิตช์คือไม่มีของจริง ไม่ใช่ตัดรายการออกจากแผนที่ควรมี
+        delete state.excl.items[id];
+      }
       saveState(); renderAll();
     }
     // ตัด/คืน ของส่วนรวม (ที่เก็บในบ้าน/รถ/เรือ/จักรยาน หรือของเพิ่มเติมที่แบกกระจาย)
