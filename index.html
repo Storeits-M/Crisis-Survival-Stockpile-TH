@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#1a1816">
-  <title>Crisis Survival Stockpile V16 - ระบบวางแผนและบริหารคลังเสบียงเอาตัวรอด</title>
+  <title>Crisis Survival Stockpile - ระบบวางแผนและบริหารคลังเสบียงเอาตัวรอด</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Noto+Serif+Thai:wght@400;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -1501,7 +1501,7 @@
   <header class="top-header">
     <div class="header-inner">
       <div class="brand-title">Crisis Survival Stockpile</div>
-      <div class="brand-sub">ระบบวางแผนและบริหารคลังเสบียงเอาตัวรอดในวิกฤติสำหรับคนไทย · V16</div>
+      <div class="brand-sub">ระบบวางแผนและบริหารคลังเสบียงเอาตัวรอดในวิกฤติสำหรับคนไทย</div>
       
       <div class="header-quick-bar">
         <div class="date-badge" id="current-date-badge">30/10/2026</div>
@@ -2189,50 +2189,50 @@
         name: 'ข้าวสารหอมมะลิ / ข้าวเสาไห้ (นับเป็น กก.)',
         desc: 'พลังงานหลักที่คุ้มที่สุด (~3,600 kcal/กก.) — ต้องมีเชื้อเพลิงหุงต้มและน้ำ จึงลดสัดส่วนในแผนเดินเท้า/มอไซค์',
         stores: ['makro', 'lotus', 'bigc', '711'], unit: 'กก.',
-        share: { home: 0.32, bike: 0.15, foot: 0.10 }
+        share: { home: 0.32, bike: 0.07, foot: 0.10 }
       }),
-      food({ id: 'instant_rice', pri: 2, wt: 0.2, kcal: 290, name: 'ข้าวสำเร็จรูปพร้อมทาน (ถ้วย/ซองไมโครเวฟ — ข้าวหอมมะลิพร้อมทาน)', desc: 'กินได้ทันที ไม่ใช้น้ำหุง ไม่ใช้แก๊ส (กินเย็นหรืออุ่นในน้ำร้อนได้) — หนักและแพงกว่าข้าวสารราว 2.5 เท่าต่อพลังงาน เหมาะ 1–3 วันแรก/น้ำน้อย/เด็กและผู้สูงอายุ (ประมาณ 290 kcal ต่อถ้วย 200 ก. — ตรวจฉลากจริงและวันหมดอายุ)', stores: ['711', 'lotus', 'makro', 'bigc'], unit: 'ถ้วย', share: { home: 0, bike: 0, foot: 0 } }),
+      food({ id: 'instant_rice', pri: 2, wt: 0.2, kcal: 290, name: 'ข้าวสำเร็จรูปพร้อมทาน (ถ้วย/ซองไมโครเวฟ — ข้าวหอมมะลิพร้อมทาน)', desc: 'กินได้ทันที ไม่ใช้น้ำหุง ไม่ใช้แก๊ส (กินเย็นหรืออุ่นในน้ำร้อนได้) — หนักและแพงกว่าข้าวสารราว 2.5 เท่าต่อพลังงาน เหมาะ 1–3 วันแรก/น้ำน้อย/เด็กและผู้สูงอายุ (ประมาณ 290 kcal ต่อถ้วย 200 ก. — ตรวจฉลากจริงและวันหมดอายุ)', stores: ['711', 'lotus', 'makro', 'bigc'], unit: 'ถ้วย', share: { home: 0, bike: 0.18, foot: 0.22 } }),
       food({
         id: 'instant_noodles', cookL: 0.45, broth: 0.35, cookF: 1, pri: 2, wt: 0.08, kcal: 320,
         name: 'บะหมี่กึ่งสำเร็จรูป (มาม่า / ไวไว / ยำยำ)',
         desc: 'พร้อมทานเร็ว ใช้น้ำน้อย (แช่น้ำเย็นได้) เหมาะกับแผนพกพา',
         stores: ['711', 'lotus', 'makro', 'bigc'], unit: 'ซอง',
-        share: { home: 0.15, bike: 0.25, foot: 0.25 }
+        share: { home: 0.15, bike: 0.10, foot: 0.08 }
       }),
       food({
         id: 'canned_fish', pri: 3, wt: 0.15, kcal: 200,
         name: 'ปลากระป๋องในซอสมะเขือเทศ (สามแม่ครัว / โรซ่า / ซีเล็ค)',
         desc: 'โปรตีนและไขมัน เก็บได้นาน เปิดทานได้ทันที (อย่าลืมที่เปิดกระป๋อง)',
         stores: ['711', 'lotus', 'makro', 'bigc'], unit: 'กระป๋อง',
-        share: { home: 0.14, bike: 0.15, foot: 0.15 }
+        share: { home: 0.14, bike: 0.25, foot: 0.25 }
       }),
       food({
         id: 'instant_porridge', cookL: 0.3, broth: 0.25, cookF: 1, pri: 1, wt: 0.08, kcal: 180,
         name: 'โจ๊กกึ่งสำเร็จรูป / ข้าวต้มซอง (คนอร์ / มาม่า)',
         desc: 'ย่อยง่าย เหมาะสำหรับเด็ก ผู้สูงอายุ หรือเวลาป่วย',
         stores: ['711', 'lotus', 'bigc'], unit: 'ซอง',
-        share: { home: 0.05, bike: 0.08, foot: 0.10 }
+        share: { home: 0.05, bike: 0.02, foot: 0.02 }
       }),
       food({
         id: 'uht_milk', pri: 1, wt: 0.22, kcal: 160,
         name: 'นมกล่อง UHT / นมถั่วเหลือง',
         desc: 'พลังงานพร้อมดื่ม โปรตีนสูง ไม่ต้องแช่เย็น — หนักเกินไปสำหรับแผนเดินเท้า',
         stores: ['711', 'lotus', 'makro', 'bigc'], unit: 'กล่อง',
-        share: { home: 0.10, bike: 0.05, foot: 0 }
+        share: { home: 0.10, bike: 0.03, foot: 0.02 }
       }),
       food({
         id: 'energy_snacks', pri: 2, wt: 0.1, kcal: 400,
         name: 'หมูหยอง / กุนเชียง / ปลากรอบ / ช็อกโกแลต / บิสกิต',
-        desc: 'พลังงานเข้มข้น พกง่าย เป็นอาหารหลักของแผนเดินเท้า/มอไซค์',
+        desc: 'พลังงานเข้มข้น พกง่าย เป็นอาหารเสริมระหว่างเดินทาง ไม่ใช้แทนมื้อหลัก',
         stores: ['lotus', 'makro', '711', 'bigc'], unit: 'ชิ้น',
-        share: { home: 0.12, bike: 0.22, foot: 0.30 }
+        share: { home: 0.12, bike: 0.07, foot: 0.06 }
       }),
       food({
         id: 'peanut_butter_nuts', pri: 1, wt: 0.4, kcal: 1900,
         name: 'เนยถั่ว / ถั่วอบ / ธัญพืชอัดแท่ง',
-        desc: 'ไขมันดีและพลังงานสูงต่อน้ำหนัก ไม่ต้องปรุง (1 กระปุกประมาณ 1,900 kcal)',
+        desc: 'ไขมันดี โปรตีน และพลังงานสูงต่อน้ำหนัก ไม่ต้องปรุง เหมาะเป็นอาหารเสริมความอิ่ม (1 กระปุกประมาณ 1,900 kcal)',
         stores: ['lotus', 'makro', 'bigc', '711'], unit: 'กระปุก',
-        share: { home: 0.08, bike: 0.10, foot: 0.10 }
+        share: { home: 0.08, bike: 0.28, foot: 0.25 }
       }),
       food({
         id: 'cooking_oil', pri: 1, wt: 0.92, kcal: 8000, min: 1,
@@ -3662,11 +3662,11 @@
       { ref: 'whistle',            want: m => m.age >= 3 ? 1 : 0 },
       { ref: 'raincoat_711',       want: m => m.age >= 3 ? 1 : 0 },
       { ref: 'space_blanket',      want: m => m.age >= 3 ? 1 : 0 },
+      // อาหารเป้: จัดอาหารพร้อมกินก่อน อาหารที่ต้องเตรียมน้ำ/ความร้อนเป็นลำดับถัดไป
       { ref: 'energy_snacks',      want: m => m.age >= 13 ? 6 : (m.age >= 7 ? 4 : (m.age >= 3 ? 3 : 0)) },
       { ref: 'canned_fish',        want: m => m.age >= 13 ? 4 : (m.age >= 7 ? 2 : 0) },
-      { ref: 'instant_noodles',    want: m => m.age >= 13 ? 5 : (m.age >= 7 ? 3 : 0) },
       { ref: 'peanut_butter_nuts', want: m => m.age >= 7 ? 1 : 0 },
-      { ref: 'instant_porridge',   want: m => ((m.age >= 3 && m.age < 13) || m.age >= 60) ? 3 : 0 },
+      { ref: 'instant_rice',       want: m => m.age >= 13 ? 2 : (m.age >= 7 ? 1 : 0) },
       { ref: 'uht_milk',           want: m => (m.age >= 3 && m.age < 13) ? 2 : 0 },
       { ref: 'paracetamol',        want: m => m.age >= 13 ? 6 : 0 },
       { ref: 'power_bank',         want: m => m.age >= 13 ? 1 : 0 },
@@ -3689,7 +3689,10 @@
       { ref: 'toothbrush',         want: m => m.age >= 3 ? 1 : 0 },
       { ref: 'toothpaste',         want: m => m.age >= 13 ? 1 : 0 },
       { ref: 'soap_bar',           want: m => m.age >= 13 ? 1 : 0 },
-      { ref: 'sanitary_pads',      want: m => (m.gender === 'female' && m.age >= 12 && m.age <= 50) ? 8 : 0 }
+      { ref: 'sanitary_pads',      want: m => (m.gender === 'female' && m.age >= 12 && m.age <= 50) ? 8 : 0 },
+      // อาหารสำรองที่ต้องใช้น้ำ/เตรียมก่อนกิน: เติมท้ายสุดเมื่อของจำเป็นและอาหารพร้อมกินมีครบแล้ว
+      { ref: 'instant_noodles',    want: m => m.age >= 13 ? 5 : (m.age >= 7 ? 3 : 0) },
+      { ref: 'instant_porridge',   want: m => ((m.age >= 3 && m.age < 13) || m.age >= 60) ? 3 : 0 }
     ];
     function ownList(m) {
       const sc = m.age >= 13 ? 1 : (m.age >= 7 ? 0.7 : 0.5), o = [];
@@ -3830,9 +3833,13 @@
       });
 
       // ของจริงส่วนเกิน: เติมหลังจัดของจำเป็นแล้ว ให้คนที่ยังมีน้ำหนัก/พื้นที่เหลือมากที่สุด
+      // ของจริงส่วนเกิน: อาหารพร้อมกินมาก่อน อาหารที่ต้องเตรียมไว้ท้ายสุด
+      const READY_TO_EAT_FOOD = new Set(['energy_snacks', 'canned_fish', 'peanut_butter_nuts', 'instant_rice', 'uht_milk']);
+      const FOOD_NEEDS_PREP = new Set(['jasmine_rice', 'instant_noodles', 'instant_porridge', 'cooking_oil', 'salt_sugar_seasoning']);
+      const extraRank = it => READY_TO_EAT_FOOD.has(it.id) ? 0 : (FOOD_NEEDS_PREP.has(it.id) ? 2 : 1);
       const extras = BASE_ITEMS
         .filter(it => isActive(it, a) && (remain[it.id] || 0) > 1e-9 && it.id !== 'fuel_full')
-        .sort((x, y) => (y.pri || 0) - (x.pri || 0) || ((x.wt || 0) - (y.wt || 0)));
+        .sort((x, y) => extraRank(x) - extraRank(y) || (y.pri || 0) - (x.pri || 0) || ((x.wt || 0) - (y.wt || 0)));
       extras.forEach(it => {
         let left = remain[it.id] || 0;
         const pool = list.filter(p => p.cap && p.m.age >= 13 && p.m.health !== 'bedridden')
@@ -4048,10 +4055,14 @@
       const extra = (a.light ? 0 : personExtraBase(m)) * a.crisis.waterMult * (1 - 0.7 * t);
       const kcal = m.age >= 1 ? memberKcal(m, a.plan) * (1 - 0.25 * t * protectedP) : 0;
       const foods = [];
+      // ค่าประมาณโปรตีนต่อหน่วย (กรัม) ใช้เพื่อเทียบความสมดุล ไม่ใช่ค่าฉลากของทุกยี่ห้อ
+      const proteinPerUnit = { jasmine_rice: 70, instant_rice: 5, instant_noodles: 7, canned_fish: 20, instant_porridge: 4, uht_milk: 8, energy_snacks: 8, peanut_butter_nuts: 75 };
+      let protein = 0;
       if (kcal > 0) BASE_ITEMS.filter(i => i.share).forEach(i => {
         const sh = foodShare(i, planKey(a));
-        if (sh) foods.push({ item: i, qty: kcal * sh / i.kcal });
+        if (sh) { const qty = kcal * sh / i.kcal; const pro = qty * (proteinPerUnit[i.id] || 0); protein += pro; foods.push({ item: i, qty, protein: pro }); }
       });
+      const proteinTarget = m.age < 18 ? m.weight * 1.2 : m.weight * 1.2;
       // น้ำหุงต้มตามอาหารที่กินจริง และน้ำซุป (มาม่า/โจ๊ก) ที่ดื่มเข้าไปนับเป็นน้ำดื่มได้
       let cook = 0, broth = 0;
       foods.forEach(f => { cook += f.qty * (f.item.cookL || 0); broth += f.qty * (f.item.broth || 0); });
@@ -4059,7 +4070,7 @@
       const drink = Math.max(drinkRaw * 0.6, drinkRaw - credit);
       const maskRate = hasSc(a, 'pandemic') ? 1 : (hasSc(a, 'air_toxic') ? 0.5 : (hasSc(a, ALL) ? 0.4 : 0));
       return {
-        drink, drinkRaw, extra, cook, broth: credit, kcal, foods,
+        drink, drinkRaw, extra, cook, broth: credit, kcal, foods, protein, proteinTarget,
         tp: m.age >= 3 ? (0.4 - 0.15 * t) : 0,
         wipes: m.age >= 3 ? (15 - 7 * t) : 5,
         charge: m.age >= 10 ? (1 - 0.6 * t) : 0,
@@ -4672,7 +4683,8 @@
             <div class="use-grid">
               <div class="use-cell"><span>💧 น้ำดื่ม</span><b>${r1(u.drink)} ลิตร</b><i>≈ ${r1(u.drink / 1.5)} ขวด 1.5L</i></div>
               <div class="use-cell"><span>🚿 น้ำใช้</span><b>${r1(u.extra)} ลิตร</b><i>≈ ${r1(u.extra / 1.5)} ขวด</i></div>
-              <div class="use-cell"><span>🍚 พลังงาน</span><b>${Math.round(u.kcal).toLocaleString()} kcal</b><i>${m.age < 1 ? 'นมผงเป็นหลัก' : 'อาหารแห้ง/กระป๋อง'}</i></div>
+              <div class="use-cell"><span>🍚 พลังงาน</span><b>${Math.round(u.kcal).toLocaleString()} kcal</b><i>${m.age < 1 ? 'นมผงเป็นหลัก' : 'อาหารพร้อมกินก่อน'}</i></div>
+              <div class="use-cell"><span>🥜 โปรตีนโดยประมาณ</span><b>${Math.round(u.protein)} / ${Math.round(u.proteinTarget)} กรัม</b><i>${u.protein >= u.proteinTarget ? 'ใกล้เป้าหมาย' : 'ยังต่ำกว่าเป้าหมาย · ตรวจฉลากอาหารจริง'}</i></div>
               <div class="use-cell"><span>📱 ชาร์จมือถือ</span><b>${r1(u.charge)} ครั้ง</b><i>${u.charge ? '' : 'ไม่ใช้'}</i></div>
             </div>
             ${foodLine ? `<div class="pk-stat">🍽️ อาหารต่อวัน: ${esc(foodLine)}</div>` : ''}
