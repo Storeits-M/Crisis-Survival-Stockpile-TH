@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#1a1816">
-  <title>Crisis Survival Stockpile - ระบบวางแผนและบริหารคลังเสบียงเอาตัวรอด</title>
+  <title>Crisis Survival Stockpile V14 - ระบบวางแผนและบริหารคลังเสบียงเอาตัวรอด</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Noto+Serif+Thai:wght@400;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -1493,7 +1493,126 @@
     .owned-empty { color:var(--text-sub); font-size:13px; padding:10px 0; }
     @media(max-width:720px) { .owned-location-grid { grid-template-columns:1fr; } }
 
-  </style>
+
+    /* ===== TABS ===== */
+    .tabbar { display: flex; gap: 8px; margin-top: 14px; justify-content: center; flex-wrap: wrap; width: 100%; }
+    .tab-btn { flex: 0 1 auto; display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-muted); font-family: var(--font-sans); font-size: 15px; cursor: pointer; transition: all .15s; }
+    .tab-btn:hover { color: var(--text-main); border-color: var(--input-border); }
+    .tab-btn.active { background: var(--primary-dim); border-color: var(--primary); color: var(--text-main); font-weight: 700; }
+    .tab-no { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--card-border); font-size: 12px; font-weight: 700; }
+    .tab-btn.active .tab-no { background: var(--primary); color: #fff; }
+    .tab-hidden { display: none !important; }
+    @media screen and (max-width: 720px) { .tabbar { gap: 6px; } .tab-btn { flex: 1 1 30%; justify-content: center; padding: 9px 6px; font-size: 13px; flex-direction: column; gap: 2px; text-align: center; } }
+    @media print { .tabbar { display: none !important; } .tab-hidden { display: block !important; } }
+
+    /* ===== DAY PLAN ===== */
+    .dp-sec-h { font-size: 15px; font-weight: 700; color: var(--text-main); margin: 6px 0 8px; }
+    .dp-gantt { display: grid; gap: 8px; margin-bottom: 18px; }
+    .dp-grp { font-size: 12.5px; color: var(--text-sub); margin-top: 6px; }
+    .dp-row { display: grid; grid-template-columns: minmax(150px, 230px) 1fr; gap: 10px; align-items: center; padding: 8px 10px; border: 1px solid var(--card-border); border-radius: 10px; background: var(--input-bg); }
+    .dp-row-l { font-size: 13px; line-height: 1.35; }
+    .dp-row-l small { display: block; color: var(--text-sub); font-size: 11.5px; }
+    .dp-row .rc-strip { margin-bottom: 2px; }
+    .dp-cap { font-size: 11.5px; color: var(--text-muted); }
+    .dp-days { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-bottom: 8px; }
+    .dp-day { border: 1px solid var(--card-border); border-radius: 14px; background: var(--input-bg); overflow: hidden; display: flex; flex-direction: column; }
+    .dp-day.warn { border-color: var(--amber); }
+    .dp-day.bad { border-color: var(--red); }
+    .dp-dh { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 9px 12px; background: rgba(0,0,0,.18); font-weight: 700; }
+    .dp-dh small { font-weight: 400; font-size: 11.5px; color: var(--text-muted); }
+    .dp-badge { font-size: 11.5px; padding: 2px 8px; border-radius: 999px; font-weight: 700; }
+    .dp-badge.ok { background: var(--green-dim); color: var(--green); }
+    .dp-badge.warn { background: var(--amber-dim); color: var(--amber); }
+    .dp-badge.bad { background: var(--red-dim); color: var(--red); }
+    .dp-tot { display: flex; flex-wrap: wrap; gap: 6px 12px; padding: 8px 12px 0; font-size: 12.5px; color: var(--text-muted); }
+    .dp-tot b { color: var(--text-main); }
+    .dp-pp { padding: 8px 12px; display: grid; gap: 7px; }
+    .dp-p { font-size: 12.5px; line-height: 1.5; border-top: 1px dashed var(--card-border); padding-top: 6px; }
+    .dp-p:first-child { border-top: none; padding-top: 0; }
+    .dp-p > b { font-size: 13px; }
+    .dp-p .dp-i { display: inline-block; margin-right: 8px; white-space: nowrap; }
+    .dp-p .dp-w { color: var(--cyan); }
+    .dp-p .dp-none { color: var(--red); }
+    .dp-alert { margin: 0 12px 10px; padding: 6px 9px; border-radius: 8px; font-size: 12px; background: var(--red-dim); color: var(--red); }
+    .dp-alert.warn { background: var(--amber-dim); color: var(--amber); }
+    .dp-menu { padding: 8px 12px 2px; display: grid; gap: 5px; }
+    .dp-menu-h { font-size: 12px; color: var(--text-sub); }
+    .dp-m { display: flex; flex-wrap: wrap; gap: 2px 10px; align-items: baseline; font-size: 13.5px; }
+    .dp-m b { color: var(--text-main); }
+    .dp-split { flex-basis: 100%; font-size: 11.5px; color: var(--text-muted); padding-left: 22px; }
+    /* ===== FOLD (details) ===== */
+    details.fold > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 8px; }
+    details.fold > summary::-webkit-details-marker { display: none; }
+    details.fold > summary::after { content: '▾'; margin-left: auto; color: var(--text-muted); transition: transform .15s; }
+    details.fold[open] > summary::after { transform: rotate(180deg); }
+    details.fold > summary .fold-hint { margin-left: auto; font-size: 11.5px; font-weight: 400; color: var(--text-muted); }
+    details.fold > summary .fold-hint + * { }
+
+    /* CTA folds (v15) */
+    details.cta-fold > summary { padding: 13px 15px; border: 1px solid var(--primary); border-radius: 12px; background: var(--primary-dim); color: var(--text-main); box-shadow: 0 0 0 0 rgba(216,101,60,.45); animation: ctaPulse 2.6s ease-out infinite; transition: background .15s; }
+    details.cta-fold > summary:hover { background: rgba(216,101,60,.24); border-color: var(--primary-hover); }
+    details.cta-fold > summary::after { content: '▼'; color: var(--primary); font-size: 14px; transform: none; }
+    details.cta-fold[open] > summary::after { content: '▲'; transform: none; }
+    details.cta-fold[open] > summary { animation: none; margin-bottom: 12px; }
+    .cta-pill { margin-left: auto; font-size: 12px; font-weight: 700; color: #fff; background: var(--primary); border-radius: 999px; padding: 4px 11px; white-space: nowrap; }
+    @keyframes ctaPulse { 0% { box-shadow: 0 0 0 0 rgba(216,101,60,.45); } 70%,100% { box-shadow: 0 0 0 9px rgba(216,101,60,0); } }
+    .dp-pcard { padding: 8px 12px; border-top: 1px dashed var(--card-border); display: grid; gap: 4px; }
+    .dp-pn { font-weight: 700; font-size: 14px; }
+    .dp-pm { font-size: 13px; line-height: 1.5; }
+    .dp-sum { padding: 8px 12px; border-top: 1px dashed var(--card-border); font-size: 13px; line-height: 1.6; }
+    .dp-sum h6 { margin: 0 0 3px; font-size: 13px; }
+    @media print { details.cta-fold > summary { animation: none; } .cta-pill { display: none; } }
+    details.fold > summary:hover { color: var(--text-main); }
+    details.fold:not([open]) > summary { margin-bottom: 0 !important; }
+    .dp-fold { border: 1px solid var(--card-border); border-radius: 12px; padding: 12px 14px; background: rgba(0,0,0,.08); margin-top: 6px; }
+    .dp-fold > summary.dp-sec-h { margin: 0; padding: 12px 14px; border: 1px solid var(--primary); border-radius: 10px; background: var(--primary-dim); color: var(--text-main); transition: background .15s, border-color .15s; }
+    .dp-fold > summary.dp-sec-h:hover { background: rgba(216,101,60,.22); border-color: var(--primary-hover); }
+    .dp-fold > summary.dp-sec-h::after { content: '▼'; color: var(--primary); font-size: 13px; }
+    .dp-fold[open] > summary.dp-sec-h::after { content: '▲'; transform: none; }
+    .dp-fold .dp-open-cta { color: var(--primary); font-weight: 700; margin-left: 4px; }
+    .dp-fold-top { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin: 4px 0 10px; }
+    .dp-reset-top { background:var(--input-bg); border:1px solid var(--green); color:var(--green); border-radius:9px; padding:7px 12px; font:600 12.5px var(--font-sans); cursor:pointer; }
+    .dp-reset-top:hover { background:var(--green-dim); }
+    .dp-fold[open] > summary.dp-sec-h { margin-bottom: 10px; }
+    .rc-quick { border: 1px solid var(--primary); border-radius: 14px; padding: 12px 14px; margin-bottom: 16px; }
+    .rc-quick-h { font-weight: 700; margin-bottom: 8px; }
+    .dp-meals { padding: 8px 12px 0; display: grid; gap: 8px; }
+    .dp-meal { border-left: 3px solid var(--card-border); padding-left: 9px; }
+    .dp-meal-h { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+    .dp-meal-h small { font-weight: 400; color: var(--text-muted); }
+    .dp-mode { font-style: normal; font-size: 11px; padding: 1px 7px; border-radius: 999px; background: var(--card-border); color: var(--text-muted); }
+    .dp-cook { font-size: 12px; color: var(--cyan); margin-top: 3px; }
+    .dp-wsub { font-size: 11.5px; color: var(--text-muted); padding-left: 20px; }
+    .dp-wtot { margin: 4px 12px 12px; padding: 7px 10px; border-radius: 8px; background: rgba(34,211,238,.08); font-size: 12px; color: var(--text-muted); }
+    .dp-wtot b { color: var(--text-main); }
+    .dp-end { margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: var(--red-dim); color: var(--red); font-size: 13.5px; }
+    .dp-none { font-size: 12.5px; color: var(--red); }
+    @media print { details.fold > summary::after { display: none; } .rc-quick { border-color: #999; } }
+    .dp-step { display: inline-flex; align-items: center; gap: 4px; }
+    .dp-step button { width: 24px; height: 24px; border-radius: 7px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-main); cursor: pointer; font-size: 15px; line-height: 1; padding: 0; }
+    .dp-step button:hover { border-color: var(--primary); color: var(--primary); }
+    .dp-step b { min-width: 52px; text-align: center; }
+    .dp-add { margin-top: 4px; font-size: 12px; padding: 3px 6px; border-radius: 7px; border: 1px dashed var(--input-border); background: transparent; color: var(--text-muted); cursor: pointer; font-family: var(--font-sans); }
+    .dp-act { display: flex; gap: 6px; flex-wrap: wrap; padding: 4px 12px 12px; margin-top: auto; }
+    .dp-btn { font-family: var(--font-sans); font-size: 12px; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-muted); cursor: pointer; }
+    .dp-btn:hover { color: var(--text-main); border-color: var(--primary); }
+    .dp-btn.ok { border-color: var(--green); color: var(--green); }
+    .dp-tags { display: inline-flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .dp-badge.manual { background: var(--primary-dim); color: var(--primary); }
+    .dp-clamp { margin: 8px 12px 0; padding: 5px 9px; border-radius: 8px; background: var(--amber-dim); color: var(--amber); font-size: 12px; }
+    .dp-day.done { opacity: .42; filter: grayscale(.5); }
+    .dp-day.done .dp-act { opacity: 1; }
+    @media print { .dp-step button, .dp-add, .dp-act { display: none !important; } .dp-day.done { opacity: .6; } }
+    .dp-note { font-size: 12px; color: var(--text-sub); margin: 4px 0 14px; }
+    @media screen and (max-width: 720px) { .dp-row { grid-template-columns: 1fr; } .dp-days { grid-template-columns: 1fr; } }
+    @media print { .dp-day, .dp-row { background: #fff !important; border: 1px solid #bbb !important; color: #111 !important; break-inside: avoid; } .dp-dh { background: #eee !important; } .dp-days { grid-template-columns: repeat(2, 1fr); } }
+  
+    .dp-item-reset, .dp-share-btn { margin-left: 4px; font-size: 10.5px; padding: 2px 6px; white-space: nowrap; }
+    .dp-m { flex-wrap: wrap; }
+    .dp-split { flex-basis: 100%; }
+    .dp-person-part { display: inline-flex; align-items: center; gap: 3px; margin: 2px 5px 2px 0; }
+    .dp-person-part .dp-share-btn { margin: 0; }
+</style>
 </head>
 <body>
 
@@ -1516,8 +1635,8 @@
             <div class="dropdown-item" onclick="triggerPrint('all')">
               <span>📑</span>
               <div>
-                <b>พิมพ์ครบ 3 โซน (แบ่งหน้าอัตโนมัติ)</b>
-                <div style="font-size: 11px; color: var(--text-muted);">หน้า 1: แผน & สมาชิก | หน้า 2: ใบซื้อของ | หน้า 3: วิเคราะห์</div>
+                <b>พิมพ์ครบทุกแท็บ (แบ่งหน้าอัตโนมัติ)</b>
+                <div style="font-size: 11px; color: var(--text-muted);">หน้า 1: ข้อมูล | หน้า 2: ใบซื้อของ | หน้า 3: รายงาน + แผนรายวัน</div>
               </div>
             </div>
             <div class="dropdown-item" onclick="triggerPrint('zone2')">
@@ -1537,7 +1656,7 @@
             <div class="dropdown-item" onclick="triggerPrint('zone3')">
               <span>💡</span>
               <div>
-                <b>พิมพ์เฉพาะโซน 3: รายงาน อยู่ได้กี่วัน ผังพาหนะ การ์ดรายบุคคล & กลยุทธ์</b>
+                <b>พิมพ์เฉพาะรายงาน: ทรัพยากร อยู่ได้กี่วัน การ์ดรายบุคคล แผนรายวัน & กลยุทธ์</b>
                 <div style="font-size: 11px; color: var(--text-muted);">วิธีกินจิบน้ำให้อยู่ได้นานที่สุด</div>
               </div>
             </div>
@@ -1546,6 +1665,12 @@
 
         <button class="btn-header" onclick="resetDefaults()">รีเซ็ตค่าเริ่มต้น</button>
       </div>
+      <nav class="tabbar" id="tabbar" role="tablist">
+        <button type="button" class="tab-btn" data-tab-btn="input" onclick="showTab('input')"><span class="tab-no">1</span> ✍️ กรอกข้อมูล</button>
+        <button type="button" class="tab-btn" data-tab-btn="report" onclick="showTab('report')"><span class="tab-no">2</span> 📊 รายงานทรัพยากร</button>
+        <button type="button" class="tab-btn" data-tab-btn="daily" onclick="showTab('daily')"><span class="tab-no">3</span> 📅 แผนรายวัน</button>
+      </nav>
+
     </div>
   </header>
 
@@ -1555,7 +1680,7 @@
     <!-- ========================================== -->
     <!-- PRINT ZONE 1: DETAILS & SETUP (แผน & สมาชิก) -->
     <!-- ========================================== -->
-    <div class="print-zone-1" id="zone-1-container">
+    <div class="print-zone-1" id="zone-1-container" data-tab="input">
       
       <!-- SECTION 1: CRISIS SCENARIOS (ภัยพิบัติในไทย) -->
       <section class="card" style="margin-bottom: 24px;">
@@ -1633,11 +1758,11 @@
             </div>
             <div class="plan-btn" data-plan="bicycle" onclick="selectPlan('bicycle')">
               <div class="plan-title">🚲 จักรยาน</div>
-              <div class="plan-sub">ปั่นคนละคัน (เด็กเล็กนั่งเบาะเด็ก) สูงสุด 2 คน/คัน ตะกร้าหน้า + เป้รัด 2 ใบ ~60 กม./วัน ระยะเวลาคำนวณจากความจุจริง</div>
+              <div class="plan-sub">ปั่นคนละคัน (เด็กเล็กนั่งเบาะเด็ก) สูงสุด 2 คน/คัน ตะกร้าหน้า + เป้สะพายหลัง 1 ใบ (ผู้ปั่น/คนซ้อน) + เป้รัดโครงหน้า 1 ใบ ~60 กม./วัน ระยะเวลาคำนวณจากความจุจริง</div>
             </div>
             <div class="plan-btn" data-plan="motorbike" onclick="selectPlan('motorbike')">
               <div class="plan-title">🛵 มอเตอร์ไซค์</div>
-              <div class="plan-sub">สูงสุด 3 คน/คัน (ผู้ใหญ่ 2 + เด็ก 1) ตะกร้าหน้า + เป้รัด 2 ใบ พิกัด ~160 กก. ระยะเวลาคำนวณจากความจุจริง</div>
+              <div class="plan-sub">สูงสุด 3 คน/คัน (ผู้ใหญ่ 2 + เด็ก 1) เป้ซอกวางขาหน้า 2 ใบ + ตะกร้าหน้า + เป้สะพายหลัง 1 ใบ (ผู้ขับ/คนซ้อน) พิกัด ~160 กก. ระยะเวลาคำนวณจากความจุจริง</div>
             </div>
             <div class="plan-btn" data-plan="car" onclick="selectPlan('car')">
               <div class="plan-title">🚗 รถยนต์ (เก๋ง / SUV / กระบะ / MPV / ตู้)</div>
@@ -1666,19 +1791,6 @@
             <span style="font-size: 13.5px; color: var(--text-muted);">ระบุจำนวนวันที่ต้องการ:</span>
             <input type="number" id="custom-days-input" min="1" max="180" value="10" onchange="applyCustomDays()">
             <span style="font-size: 13.5px; color: var(--text-muted);">วัน</span>
-          </div>
-
-          <!-- ข้าวสาร ↔ ข้าวสำเร็จรูป -->
-          <div class="food-opt-box" id="food-opt-box">
-            <div class="option-group-title">🍚 ข้าวสาร ↔ ข้าวสำเร็จรูปพร้อมทาน <span class="food-opt-sub">(กระทบน้ำหุงต้ม + แก๊ส + น้ำหนัก)</span></div>
-            <div class="food-opt-row">
-              <span class="food-opt-end">ข้าวสาร</span>
-              <input type="range" id="rice-mix" min="0" max="100" step="10" value="0" oninput="previewRiceMix(this.value)" onchange="setRiceMix(this.value)">
-              <span class="food-opt-end">ข้าวพร้อมทาน</span>
-              <b id="rice-mix-val" class="food-opt-val">0%</b>
-            </div>
-            <label class="food-opt-chk"><input type="checkbox" id="broth-chk" checked onchange="setCountBroth(this.checked)"> นับน้ำซุปมาม่า/โจ๊กที่กินเข้าไปเป็นน้ำดื่ม (ลดน้ำดื่มที่ต้องสต๊อก)</label>
-            <div class="food-opt-info" id="food-opt-info"></div>
           </div>
 
           <!-- Aggregate Calculated Targets Box -->
@@ -1712,7 +1824,7 @@
     <!-- ========================================== -->
     <!-- PRINT ZONE 2: SHOPPING & INVENTORY CHECKLIST -->
     <!-- ========================================== -->
-    <div class="print-zone-2" id="zone-2-container">
+    <div class="print-zone-2" id="zone-2-container" data-tab="input">
       <section class="card">
         <div class="card-title">
           <span>4. รายการสิ่งของที่ต้องจัดหา (Shopping & Stockpile Checklist)</span>
@@ -1770,15 +1882,18 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- PRINT ZONE 3: REPORT & RATIONING TACTICS   -->
+    <!-- PRINT ZONE 3: REPORTS (แท็บ 2 รายงานทรัพยากร + แท็บ 3 แผนรายวัน) -->
     <!-- ========================================== -->
     <div class="print-zone-3" id="zone-3-container">
+
+      <!-- ===== แท็บ 2: รายงานบริหารทรัพยากร ===== -->
+      <div data-tab="report" id="tab-report">
       <section class="card">
         <div class="card-title">
-          <span>5. รายงานวิเคราะห์ความพร้อม & ยุทธวิธีบริหารเสบียง (Survival Analysis & Tactics)</span>
+          <span>5. รายงานบริหารทรัพยากร — มีอะไรเท่าไหร่ อยู่ได้กี่วัน ต้องหาอะไรมาเติม</span>
           <span style="font-size: 14px; font-family: var(--font-serif); color: var(--primary);" id="readiness-score-header">ความพร้อม 42%</span>
         </div>
-        <div class="card-desc">วิเคราะห์ว่าเสบียงที่มีอยู่ได้กี่วัน อะไรขาดแคลนวิกฤติ และวิธีกินใช้อย่างไรเพื่อยืดอายุให้อยู่รอดได้นานที่สุด</div>
+        <div class="card-desc">สรุปจากจำนวนที่มีจริงในหัวข้อ 4 เทียบกับที่ต้องใช้ตามแผน — เลื่อนแถบระดับความประหยัดเพื่อดูว่าของอยู่ได้นานขึ้นแค่ไหน</div>
 
         <!-- KPI Summary Cards -->
         <div class="report-kpi-grid">
@@ -1806,7 +1921,7 @@
 
         <!-- 5.1 RUNWAY -->
         <div class="sub-panel wide" id="runway-panel">
-          <div class="sub-panel-title"><span>⏳</span><span>5.1 ของที่มีในมืออยู่ได้กี่วัน & อัตราใช้ทรัพยากร (เลื่อนระดับ ปกติ ↔ ลดการใช้สูงสุด)</span></div>
+          <div class="sub-panel-title"><span>⏳</span><span>5.1 ของที่มีอยู่ตอนนี้ อยู่ได้กี่วัน & อัตราใช้ทรัพยากร (เลื่อนระดับ ปกติ ↔ ลดการใช้สูงสุด)</span></div>
           <div class="sev-wrap">
             <span class="sev-end l">🟢 ปกติ (หาของมาเติมได้)</span>
             <input type="range" id="sev-slider" min="0" max="100" step="5" value="0" oninput="setSeverity(this.value)">
@@ -1822,12 +1937,23 @@
           <div id="sev-desc"></div>
           <div id="runway-summary"></div>
           <div id="runway-table"></div>
-          <div id="ration-card"></div>
         </div>
 
-        <!-- 5.2 PERSON CARDS -->
+        <!-- Urgent Shortage Checklist -->
+          <details class="sub-panel wide fold cta-fold" id="urgent-panel">
+            <summary class="sub-panel-title">
+              <span style="color: var(--red);">⚠️</span>
+              <span>5.2 ของที่ต้องหามาเติม — เรียงตามความเร่งด่วน (Shopping Priority)</span>
+              <span class="cta-pill">👆 คลิกเพื่อดูรายการ</span>
+            </summary>
+            <div id="urgent-items-list">
+              <!-- Urgent items injected by JS -->
+            </div>
+          </details>
+
+          <!-- 5.2 PERSON CARDS -->
         <div class="sub-panel wide" id="person-panel">
-          <div class="sub-panel-title"><span>🎒</span><span>5.2 แผนจัดเป้ฉุกเฉินรายบุคคล — ใช้ของที่มีจริงและจัดสรรตามน้ำหนักที่แต่ละคนแบกไหว</span></div>
+          <div class="sub-panel-title"><span>🎒</span><span>5.3 แผนจัดเป้ฉุกเฉินรายบุคคล — ใช้ของที่มีจริงและจัดสรรตามน้ำหนักที่แต่ละคนแบกไหว</span></div>
           <img class="hero-banner" alt="ภาพประกอบการปฐมพยาบาล" src="data:image/jpeg;base64,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">
           <div class="veh-note" style="margin-bottom:12px;">ทุกคนมีเป้ฉุกเฉิน (72 ชม.) ไม่ว่าจะเลือกแผนไหน — ขนาดเป้ตามเป้ที่ขายจริงตามอายุ (อนุบาล 8L · เด็กเล็ก 10L · ประถม 15-20L · วัยรุ่น 28L · ผู้ใหญ่ 45L · ผู้สูงอายุ 25L) น้ำหนักที่แบกใช้เกณฑ์ที่แนะนำกันทั่วไปโดยเลือกค่าต่ำสุด: ผู้ใหญ่ไม่เกิน 20% ของน้ำหนักตัว (สูงสุด 15 กก.) เด็ก/วัยรุ่นไม่เกิน 10% (เด็กอนุบาล 8%) ผู้สูงอายุ/ตั้งครรภ์ 10% และลดลงอีกถ้ามีโรคประจำตัว — ใครแบกได้เท่าไหร่ก็เท่านั้น ที่เหลือเก็บที่บ้านหรือโหลดลงพาหนะ</div>
           <div class="veh-note" style="margin-bottom:12px;">ระบบจัดของจำเป็นฉุกเฉิน 72 ชั่วโมงก่อน โดยใช้จำนวนที่มีจริงจากหัวข้อ 4 เท่านั้น: ของที่ไม่มีหรือจำนวนเป็นศูนย์จะไม่แสดงในเป้ จากนั้นจึงกระจายของจริงส่วนเกินให้คนที่ยังมีน้ำหนักและพื้นที่เหลือ ตามเพดานแบกของแต่ละคน ของที่จัดลงเป้ไม่ไหวจะคงเป็นของส่วนรวม/คงเหลือ ไม่สมมติว่ามีของเพิ่ม</div>
@@ -1835,26 +1961,25 @@
           <div id="storage-card"></div>
         </div>
 
-        <!-- 2 Panels: Urgent Shortage List & Rationing Tactics -->
-        <div class="report-sections-grid">
-          
-          <!-- Urgent Shortage Checklist -->
-          <div class="sub-panel">
-            <div class="sub-panel-title">
-              <span style="color: var(--red);">⚠️</span>
-              <span>ของที่ต้องจัดหาเพิ่มด่วน (Shopping Priority)</span>
-            </div>
-            <div id="urgent-items-list">
-              <!-- Urgent items injected by JS -->
-            </div>
-          </div>
+        
+      </section>
+      </div>
 
-          <!-- Survival Rationing & Eating Guide -->
-          <div class="sub-panel">
-            <div class="sub-panel-title">
+      <!-- ===== แท็บ 3: แผนรายวัน ===== -->
+      <div data-tab="daily" id="tab-daily">
+      <section class="card">
+        <div class="card-title">
+          <span>6. แผนรายวัน — วันที่ 1, 2, 3 … ใครกินอะไร ใช้น้ำเท่าไหร่ ของแต่ละอย่างอยู่ได้ถึงวันไหน</span>
+        </div>
+        <div class="card-desc">ใช้ตัวเลขชุดเดียวกับรายงานทรัพยากร แค่คลี่ออกเป็นรายวันให้เห็นภาพ · เปลี่ยนระดับความประหยัดได้จากปุ่มโหมดด้านล่าง</div>
+
+        <!-- Survival Rationing & Eating Guide -->
+          <details class="sub-panel wide fold cta-fold" id="tactics-panel">
+            <summary class="sub-panel-title">
               <span style="color: var(--amber);">💡</span>
               <span>ยุทธวิธีกินและบริหารเสบียงให้อยู่ได้นานขึ้น (Survival Rationing)</span>
-            </div>
+              <span class="cta-pill">👆 คลิกเพื่ออ่านยุทธวิธี</span>
+            </summary>
             
             <div id="scenario-tips"><!-- Scenario tips injected by JS --></div>
 
@@ -1878,11 +2003,14 @@
               • <b>ปิดฝาหม้อทุกครั้ง:</b> ประหยัดแก๊สกระป๋องได้มากกว่า 30% และป้องกันฝุ่น/แมลงตกลงไป</p>
             </div>
 
-          </div>
+          </details>
+        <div id="ration-card"></div>
+        <div id="day-plan"></div>
 
-        </div>
 
       </section>
+      </div>
+
     </div>
 
   </main>
@@ -2782,6 +2910,7 @@
       pets: 0,
       vehicle: { carType: 'sedan', boatType: 'small', bikes: 0, cars: 0, boats: 0, bicycles: 0, distanceKm: 0 },  // 0 = อัตโนมัติ
       severity: 0,
+      dayPlan: { edits: {}, done: {} },   // แผนรายวันที่ผู้ใช้ปรับเอง + วันที่ผ่านพ้นไปแล้ว
       protectKids: false,   // true = เด็ก 4–12 ปีลดน้อยกว่าผู้ใหญ่ครึ่งหนึ่งในโหมดประหยัด
       rationFit: false,   // true = ถ้าของไม่พอ ลดส่วนแบ่งทุกคนเท่าๆ กันให้ครบจำนวนวัน
       riceMix: 0,   // % ของข้าวที่ใช้ข้าวสำเร็จรูปพร้อมทานแทนข้าวสาร
@@ -2856,6 +2985,9 @@
       state.vehicle.bicycles = Math.max(0, parseInt(state.vehicle.bicycles) || 0);
       state.capOverride = state.capOverride || {};
       state.pets = Math.max(0, parseInt(state.pets) || 0);
+      state.riceMix = 0; state.countBroth = true; state.rationFit = false;
+      state.dayPlan = state.dayPlan || { edits: {}, done: {} }; state.dayPlan.edits = state.dayPlan.edits || {}; state.dayPlan.done = state.dayPlan.done || {};                        // ปรับอัตโนมัติ ไม่ให้ผู้ใช้ตั้งเอง
+      if (!['input', 'report', 'daily'].includes(state.activeTab)) state.activeTab = 'input';
     }
 
     function saveState() {
@@ -3092,7 +3224,6 @@
 
       const agg = computeAggregates();
       updateDurationUI(agg);
-      updateFoodOptUI(agg);
       const waterEl = document.getElementById('agg-water-val');
       waterEl.textContent = agg.totalWaterLiters.toFixed(1);
       waterEl.nextElementSibling.textContent = agg.light
@@ -3475,13 +3606,14 @@
         T0.units.forEach(u => {
           const Wu = u.people.reduce((q, m) => q + m.weight, 0);
           const worn = u.people.reduce((q, m) => q + (packSpec(m).maxKg || 0), 0);
-          if (p === 'motorbike') { ck += Math.max(0, Math.min(MOTO_PAYLOAD - Wu - worn, 29)); cl += 110; }
-          else { const sm = u.driver && u.driver.age < 13; ck += Math.max(0, Math.min(BIKE_PAYLOAD - Wu - worn, sm ? 2 : 23)); cl += sm ? 8 : 70; }
+          // มอไซค์: เป้ใหญ่ 3 ใบ (ซอกวางขา 2 + สะพายหลัง/รัดเบาะคนซ้อน 1) + ตะกร้าหน้า | จักรยาน: เป้ 2 ใบ (สะพายหลัง/รัดเบาะซ้อน 1 + รัดโครงหน้า 1) + ตะกร้าหน้า
+          if (p === 'motorbike') { ck += Math.max(0, Math.min(MOTO_PAYLOAD - Wu, 3 * 15 + 5)); cl += 3 * 45 + 20; }
+          else { const sm = u.driver && u.driver.age < 13; ck += Math.max(0, Math.min(BIKE_PAYLOAD - Wu, sm ? 2 : 2 * 12 + 4)); cl += sm ? 8 : 2 * 45 + 15; }
         });
-        kg = pk.kg + ck; L = pk.L + cl;
+        kg = ck; L = cl;
         label = p === 'motorbike'
-          ? `เป้ที่สะพายของแต่ละคน + ตะกร้าหน้า/เป้รัดท้าย 2 ใบต่อคัน (พิกัดรวมคน+ของ ~${MOTO_PAYLOAD} กก./คัน หักน้ำหนักคนแล้ว)`
-          : `เป้ที่สะพายของแต่ละคน + ตะกร้าหน้า (ไม่แข็งแรง) + เป้รัดท้าย 2 ใบต่อคัน (พิกัดรวมคน+ของ ~${BIKE_PAYLOAD} กก./คัน หักน้ำหนักคนแล้ว)`;
+          ? `ต่อคัน: เป้ซอกวางขาหน้า 2 ใบ + ตะกร้าหน้า + เป้ 1 ใบ (สะพายหลังผู้ขับ ถ้ามีคนซ้อนให้คนซ้อนสะพาย/รัดเบาะซ้อน) · พิกัดรวมคน+ของ ~${MOTO_PAYLOAD} กก./คัน หักน้ำหนักคนแล้ว`
+          : `ต่อคัน: ตะกร้าหน้า (ไม่แข็งแรง) + เป้ 1 ใบสะพายหลัง (ผู้ปั่น หรือคนซ้อนถ้ามี / รัดเบาะซ้อน) + เป้ 1 ใบรัดโครงจักรยานด้านหน้า · พิกัดรวมคน+ของ ~${BIKE_PAYLOAD} กก./คัน หักน้ำหนักคนแล้ว`;
       } else if (p === 'car') {
         const t = CAR_TYPES[v.carType], n = carsCount();
         kg = Math.max(0, t.payload * n - W); L = t.L * n;
@@ -4212,8 +4344,8 @@
         <label>จำนวน <input type="number" min="1" max="10" value="${carsCount()}" onchange="setVehicle('cars', this.value)"> คัน</label>`;
       if (p === 'boat') selectors = `<label>ชนิดเรือ <select onchange="setVehicle('boatType', this.value)">${opts(BOAT_TYPES, v.boatType)}</select></label>
         <label>จำนวน <input type="number" min="1" max="10" value="${boatsCount()}" onchange="setVehicle('boats', this.value)"> ลำ</label>`;
-      if (p === 'motorbike') selectors = `<label>จำนวนมอเตอร์ไซค์ <input type="number" min="1" max="20" value="${bikesCount()}" onchange="setVehicle('bikes', this.value)"> คัน</label><span>สูงสุด 3 คน/คัน (ผู้ใหญ่ 2 + เด็ก 1) · ตะกร้าหน้า + เป้รัดท้าย 2 ใบ · พิกัด ~160 กก.</span>`;
-      if (p === 'bicycle') selectors = `<label>จำนวนจักรยาน <input type="number" min="1" max="20" value="${bicyclesCount()}" onchange="setVehicle('bicycles', this.value)"> คัน</label><span>คนปั่นอายุ 6 ปีขึ้นไป · คนที่ไม่มีจักรยานต้องซ้อน (1 คน/คัน, เด็กเล็ก 1-5 ปีนั่งเบาะเด็ก) = สูงสุด 2 คน/คัน · ตะกร้าหน้าไม่แข็งแรง + เป้รัดท้าย 2 ใบ · พิกัด ~120 กก.</span>`;
+      if (p === 'motorbike') selectors = `<label>จำนวนมอเตอร์ไซค์ <input type="number" min="1" max="20" value="${bikesCount()}" onchange="setVehicle('bikes', this.value)"> คัน</label><span>สูงสุด 3 คน/คัน (ผู้ใหญ่ 2 + เด็ก 1) · เป้ซอกวางขา 2 ใบ + ตะกร้าหน้า + เป้สะพายหลัง 1 ใบ · พิกัด ~160 กก.</span>`;
+      if (p === 'bicycle') selectors = `<label>จำนวนจักรยาน <input type="number" min="1" max="20" value="${bicyclesCount()}" onchange="setVehicle('bicycles', this.value)"> คัน</label><span>คนปั่นอายุ 6 ปีขึ้นไป · คนที่ไม่มีจักรยานต้องซ้อน (1 คน/คัน, เด็กเล็ก 1-5 ปีนั่งเบาะเด็ก) = สูงสุด 2 คน/คัน · ตะกร้าหน้า (ไม่แข็งแรง) + เป้สะพายหลัง 1 ใบ + เป้รัดโครงหน้า 1 ใบ · พิกัด ~120 กก.</span>`;
             if (p === 'bug-out-foot') selectors = `<span>🥾 ทุกคนเดินเอง · เด็กอายุต่ำกว่า 3 ปีต้องมีผู้ใหญ่อุ้ม</span>`;
 
       const over = load.kg > cap.kg || load.L > cap.L;
@@ -4401,26 +4533,315 @@
       const lackF = Math.max(0, Kdp * target - K);
       const verdict = K <= 0 ? '⚠️ ยังไม่มีอาหารในสต๊อก — กรอกจำนวนที่มีในหัวข้อ 4'
         : (daysF >= target ? `✅ อาหารพอครบ ${target} วันตามแผนโหมด${sevName(t)} (เหลือสำรอง ~${r1(daysF - target)} วัน)`
-          : `⚠️ อาหารตามแผนโหมด${sevName(t)} อยู่ได้ ${r1(daysF)} วัน จากเป้า ${target} วัน — ขาดอีก ~${Math.round(lackF).toLocaleString()} kcal (~${Math.round(lackF / target).toLocaleString()} kcal/วัน)${fit ? ` · ยืดให้ครบโดยลดส่วนแบ่งทุกคนเหลือ <b>${pct(fF)}%</b> ของแผน` : ' · ลองโหมดประหยัดขึ้น หรือเปิด “ยืดให้ครบ” ด้านบน'}`);
+          : `⚠️ อาหารตามแผนโหมด${sevName(t)} อยู่ได้ ${r1(daysF)} วัน จากเป้า ${target} วัน — ขาดอีก ~${Math.round(lackF).toLocaleString()} kcal (~${Math.round(lackF / target).toLocaleString()} kcal/วัน)${fit ? ` · ยืดให้ครบโดยลดส่วนแบ่งทุกคนเหลือ <b>${pct(fF)}%</b> ของแผน` : ' · ถ้าอยากให้อยู่ได้นานขึ้น เลือกโหมดประหยัดด้านล่าง หรือหาอาหารมาเพิ่ม'}`);
       const wverdict = S <= 0 ? '⚠️ ยังไม่มีน้ำขวดในสต๊อก'
         : (daysW >= target ? `✅ น้ำพอครบ ${target} วันตามแผน`
           : `🔴 น้ำตามแผนโหมด${sevName(t)} อยู่ได้ ${r1(daysW)} วัน จากเป้า ${target} วัน — น้ำคือคอขวดชีวิต หาเพิ่มก่อนสิ่งอื่น${fit ? ` · ยืดให้ครบ: น้ำดื่มเหลือ ${pct(dRatio)}% ของแผน` : ''}`);
 
-      el.innerHTML = `<div class="rc-wrap">
-        <div class="rc-title">🍽️ สรุปการใช้ทรัพยากรแต่ละวัน — ตั้งต้นจากความต้องการจริงรายคน (kcal ในหัวข้อ 2) แล้วปรับตามโหมดประหยัด</div>
-        <div class="rc-note">อ่านยังไง: <b>“% ของที่ควรได้” = kcal ที่แผนให้ ÷ kcal จริงของคนนั้นในหัวข้อ 2</b> (คนละตัวหารกัน ไม่ใช่เลขเดียวทุกคน) · เลื่อนแถบความประหยัดด้านบน (หรือกดโหมดด้านล่าง) แล้วแต่ละคนจะขึ้น/ลงตามแผนของตัวเอง · อาหารแบ่งตามสัดส่วนของที่มีในสต๊อก · น้ำ = แบ่งน้ำดื่มก่อน เหลือจึงเป็นน้ำใช้</div>
+      el.innerHTML = `<div class="rc-wrap rc-quick">
+        <div class="rc-quick-h">⚡ ปรับด่วน — โหมดประหยัด & ตัวเลือก (เปลี่ยนแล้วแผนรายวันด้านล่างคำนวณใหม่ทันที)</div>
         <label class="rc-toggle"><input type="checkbox" ${state.protectKids ? 'checked' : ''} onchange="toggleProtectKids()"> 🧒 ปกป้องเด็ก 4–12 ปี (โหมดประหยัดลดน้อยกว่าผู้ใหญ่ครึ่งหนึ่ง) — ปิดอยู่ = ลดสัดส่วนเท่าผู้ใหญ่ · <span class="rc-dim">ทารก/เด็กเล็กต่ำกว่า 4 ปี ผู้ตั้งครรภ์ และผู้มีโรคประจำตัวลดน้อยกว่าเสมอ</span></label>
-        <label class="rc-toggle"><input type="checkbox" ${fit ? 'checked' : ''} onchange="toggleRationFit()"> 📏 ยืดให้ครบ ${target} วัน — ถ้าของไม่พอ ลดส่วนแบ่งของทุกคนลงเท่าๆ กัน · <span class="rc-dim">ปิดอยู่ = แสดงแผนตามโหมดตรงๆ แล้วบอกว่าของพอกี่วัน/ขาดเท่าไร</span></label>
         <div class="rc-modes">${modeHtml}</div>
         <div class="rc-sum"><div>${verdict}</div><div>${wverdict}</div></div>
-        <div class="rc-strips">
-          <div><span class="rc-lab">🍚 อาหาร — กินตามแผนโหมด${sevName(t)}</span>${rcStrip(target, foodLast, target)}<span class="rc-dim">${isFinite(daysF) ? `พอถึงวันที่ ${Math.max(0, foodLast)}` : '—'} ${foodLast < target ? '→ วันที่เหลือไม่มีอาหาร' : ''}</span></div>
-          <div><span class="rc-lab">💧 น้ำ — ใช้ตามแผน</span>${rcStrip(target, waterLast, target)}<span class="rc-dim">${isFinite(daysW) ? `พอถึงวันที่ ${Math.max(0, waterLast)}` : '—'} ${waterLast < target ? '→ วันที่เหลือไม่มีน้ำ' : ''}</span></div>
-        </div>
-        <div class="rc-people">${peopleHtml}</div>
-        ${shareHtml ? `<div class="rc-sec-h">🤝 ใครกินกับใคร (ซอง/กระป๋อง/กล่องที่ต้องแบ่งกัน) — เฉลี่ยต่อวัน</div><div class="rc-shares">${shareHtml}</div>` : ''}
-        <div class="rc-sec-h">🧰 ของใช้อื่นต่อวัน (แบ่งให้ครบ ${target} วัน)</div><div class="rc-chips">${others}</div>
       </div>`;
+    }
+
+
+    // =====================================================================
+    //  แท็บ + แผนรายวัน (คลี่ตัวเลขชุดเดิมออกเป็นวันที่ 1, 2, 3 …)
+    // =====================================================================
+    function showTab(id) {
+      if (!['input', 'report', 'daily'].includes(id)) id = 'input';
+      state.activeTab = id; saveState();
+      document.querySelectorAll('[data-tab]').forEach(el => el.classList.toggle('tab-hidden', el.getAttribute('data-tab') !== id));
+      document.querySelectorAll('[data-tab-btn]').forEach(b => b.classList.toggle('active', b.getAttribute('data-tab-btn') === id));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function applyTabs() {
+      const id = ['input', 'report', 'daily'].includes(state.activeTab) ? state.activeTab : 'input';
+      document.querySelectorAll('[data-tab]').forEach(el => el.classList.toggle('tab-hidden', el.getAttribute('data-tab') !== id));
+      document.querySelectorAll('[data-tab-btn]').forEach(b => b.classList.toggle('active', b.getAttribute('data-tab-btn') === id));
+    }
+
+    function dpEnsure(d) {
+      const dp = (state.dayPlan = state.dayPlan || { edits: {}, done: {}, shareMode: {} }); dp.edits = dp.edits || {}; dp.done = dp.done || {}; dp.shareMode = dp.shareMode || {};
+      if (!dp.edits[d]) { const src = (window._dpMeals || {})[d]; if (!src) return null; dp.edits[d] = [0, 1, 2].map(i => Object.assign({}, src[i] || {})); }
+      return dp.edits[d];
+    }
+    function dpAdj(d, mi, id, dir) {
+      if (state.dayPlan && state.dayPlan.done && state.dayPlan.done[d]) return;
+      const e = dpEnsure(d); if (!e) return;
+      const step = (window._dpStep || {})[id] || 1;
+      e[mi][id] = Math.max(0, Math.round(((e[mi][id] || 0) + dir * step) * 1000) / 1000);
+      saveState(); renderAll();
+    }
+    function dpAdd(d, mi, id) {
+      if (!id) return; const e = dpEnsure(d); if (!e) return;
+      e[mi][id] = (e[mi][id] || 0) + ((window._dpStep || {})[id] || 1);
+      saveState(); renderAll();
+    }
+    function dpReset(d) { const dp = state.dayPlan; if (dp && dp.edits && !dp.done[d]) { delete dp.edits[d]; saveState(); renderAll(); } }
+    function dpResetAll() { const dp = state.dayPlan; if (!dp) return; Object.keys(dp.edits || {}).forEach(k => { if (!dp.done[k]) delete dp.edits[k]; }); ['personShares','shareMode'].forEach(key => { if (!dp[key]) return; Object.keys(dp[key]).forEach(k => { if (!dp.done[k]) delete dp[key][k]; }); }); saveState(); renderAll(); }
+    // คืนเฉพาะรายการนี้ให้ตรงกับแผนอัตโนมัติ โดยไม่กระทบรายการอื่นในมื้อ
+    function dpResetItem(d, mi, id) {
+      const dp = state.dayPlan; if (!dp || (dp.done && dp.done[d])) return;
+      const e = dp.edits && dp.edits[d]; if (!e) return;
+      const auto = window._dpAutoMeals && window._dpAutoMeals[d] && window._dpAutoMeals[d][mi];
+      if (auto && Object.prototype.hasOwnProperty.call(auto, id)) e[mi][id] = auto[id];
+      else delete e[mi][id];
+      if (e.every((meal, i) => Object.keys(meal).every(k => Math.abs((meal[k] || 0) - (((window._dpAutoMeals || {})[d] || [])[i] || {})[k] || 0) < 1e-9))) delete dp.edits[d];
+      saveState(); renderAll();
+    }
+    function dpToggleShare(d, mi, id) {
+      const dp = (state.dayPlan = state.dayPlan || { edits: {}, done: {}, shareMode: {} });
+      dp.shareMode = dp.shareMode || {};
+      dp.shareMode[d] = dp.shareMode[d] || {};
+      const cur = dp.shareMode[d][mi + ':' + id] || 'auto';
+      dp.shareMode[d][mi + ':' + id] = cur === 'shared' ? 'individual' : (cur === 'individual' ? 'auto' : 'shared');
+      saveState(); renderAll();
+    }
+    function dpPersonShare(d, mi, itemId, memberId, dir) {
+      const dp = (state.dayPlan = state.dayPlan || { edits: {}, done: {}, shareMode: {}, personShares: {} });
+      dp.personShares = dp.personShares || {}; dp.personShares[d] = dp.personShares[d] || {};
+      const key = mi + ':' + itemId, members = state.members || [];
+      const current = dp.personShares[d][key] || Object.fromEntries(members.map(m => [m.id, 1 / Math.max(1, members.length)]));
+      if (members.length < 2) return;
+      const step = 0.05, old = Math.max(0, Math.min(1, Number(current[memberId] ?? 0)));
+      const next = Math.max(0, Math.min(1, old + dir * step)), delta = next - old;
+      const others = members.filter(m => m.id !== memberId), otherTotal = others.reduce((sum, m) => sum + Math.max(0, Number(current[m.id] || 0)), 0);
+      current[memberId] = next;
+      if (otherTotal > 1e-9) others.forEach(m => { current[m.id] = Math.max(0, Number(current[m.id] || 0)) * (1 - next) / otherTotal; });
+      else others.forEach(m => { current[m.id] = (1 - next) / others.length; });
+      dp.personShares[d][key] = current; saveState(); renderAll();
+    }
+    function dpPersonShareReset(d, mi, itemId) {
+      const dp = state.dayPlan; if (!dp || !dp.personShares || !dp.personShares[d]) return;
+      delete dp.personShares[d][mi + ':' + itemId];
+      saveState(); renderAll();
+    }
+    function dpDone(d) {
+      const dp = state.dayPlan; if (!dp) return;
+      if (dp.done[d]) delete dp.done[d]; else { if (!dpEnsure(d)) return; dp.done[d] = true; }
+      saveState(); renderAll();
+    }
+
+    function renderDayPlan(a, t, R) {
+      const el = document.getElementById('day-plan'); if (!el) return;
+      const U = R.U, target = Math.max(1, Math.round(a.days));
+      const inv = id => parseFloat(state.currentInventory[id]) || 0;
+      const fit = !!state.rationFit;
+      const sn = nm => String(nm).replace(/\s*\(.*\)/, '');
+      const icon = m => m.age < 1 ? '👶' : m.age < 13 ? '🧒' : m.age >= 60 ? (m.gender === 'female' ? '👵' : '👴') : (m.gender === 'female' ? '👩' : '👨');
+      const foods = BASE_ITEMS.filter(i => i.kcal && inv(i.id) > 0).map(i => ({ item: i, stock: inv(i.id) }));
+      const K = foods.reduce((s, f) => s + f.stock * f.item.kcal, 0);
+      const Kdp = U.kcal, S = inv('water_15l') * 1.5;
+      const drinkNeed = U.per.reduce((s, x) => s + x.drink, 0), extraNeed = Math.max(0, U.water - drinkNeed);
+      const daysF = Kdp > 0 ? K / Kdp : Infinity, daysW = U.water > 0 ? S / U.water : Infinity;
+      const nShow = target;
+
+      // ส่วนที่ได้ของวันที่ d (0..1) — โหมดยืดให้ครบ = เฉลี่ยเท่ากันทุกวัน / ไม่ยืด = กินเต็มส่วนจนของหมด
+      const fracFood = d => K <= 0 || Kdp <= 0 ? 0 : (fit ? Math.min(1, K / (Kdp * target)) : Math.max(0, Math.min(1, daysF - (d - 1))));
+      const waterDay = d => U.water <= 0 ? 0 : (fit ? Math.min(U.water, S / target) : Math.max(0, Math.min(U.water, S - (d - 1) * U.water)));
+
+      // ---- A) ทรัพยากรอยู่ได้ถึงวันไหน ----
+      const rowHtml = r => {
+        const last = isFinite(r.days) ? Math.floor(r.days + 1e-9) : target;
+        const ok = last >= target;
+        const txt = !(r.use > 1e-9) ? 'ไม่ได้ใช้ในแผนนี้' : (ok ? `✅ พอตลอด ${target} วัน` : (last <= 0 ? '🔴 ไม่มีของ — หาเพิ่มก่อนวันที่ 1' : `⚠️ ใช้ได้ถึงวันที่ ${last} แล้วหมด · ขาดอีก ${target - last} วัน`));
+        return `<div class="dp-row"><div class="dp-row-l">${r.icon} <b>${esc(r.name.split(' (')[0])}</b><small>มี ${rcFmt(r.stock)} ${r.unit} · ใช้ ~${rcFmt(r.use)} ${r.unit}/วัน</small></div>
+          <div>${rcStrip(target, last, target)}<div class="dp-cap">${txt}</div></div></div>`;
+      };
+      const crit = R.res.filter(r => r.critical), lux = R.res.filter(r => !r.critical);
+      const ganttHtml = `<div class="dp-sec-h">⏳ ของแต่ละอย่างอยู่ได้ถึงวันไหน <span class="rc-dim">(ช่องเขียว = ยังมีใช้ · ช่องแดง = หมดแล้ว)</span></div>
+        <div class="dp-gantt"><div class="dp-grp">🩺 ของจำเป็นต่อชีวิต</div>${crit.map(rowHtml).join('')}
+        ${lux.length ? `<div class="dp-grp">🧰 ของใช้เสริม / ของฟุ่มเฟือย — ใช้ได้ไม่เกินวันไหน</div>${lux.map(rowHtml).join('')}` : ''}</div>`;
+
+      // ---- B) การ์ดรายวัน — เมนูทั้งบ้านเป็นหน่วยเต็ม แล้วจัดลงมื้อ เช้า/กลางวัน/เย็น ----
+      const U0 = computeUsage(a, 0);
+      const dayCards = [];
+      const left0 = {}; foods.forEach(f => { left0[f.item.id] = f.stock; });
+      const pk = planKey(a);
+      const divis = foods.filter(f => GRAM_ITEMS.has(f.item.id));
+      const unitF = foods.filter(f => !GRAM_ITEMS.has(f.item.id)).sort((x, y) => foodShare(y.item, pk) - foodShare(x.item, pk));
+      const MEALS = [{ ico: '🌅', nm: 'เช้า', tm: '~07:00', w: 0.25, dw: 0.30 }, { ico: '☀️', nm: 'กลางวัน', tm: '~12:00', w: 0.40, dw: 0.35 }, { ico: '🌙', nm: 'เย็น', tm: '~18:00', w: 0.35, dw: 0.35 }];
+      const BREAKFAST = new Set(['instant_porridge', 'uht_milk', 'peanut_butter_nuts']);
+      const ANYMEAL = new Set(['energy_snacks']);
+      const planMeals = (menu, eaten) => {
+        const tgt = MEALS.map(m => m.w * eaten), got = [0, 0, 0], meals = MEALS.map(() => ({}));
+        const list = foods.filter(f => menu[f.item.id] > 1e-9).map(f => ({ it: f.item, q: menu[f.item.id] })).sort((x, y) => y.q * y.it.kcal - x.q * x.it.kcal);
+        list.forEach(({ it, q }) => {
+          const allowed = (BREAKFAST.has(it.id) || ANYMEAL.has(it.id)) ? [0, 1, 2] : [1, 2];
+          const step = GRAM_ITEMS.has(it.id) ? q / 4 : (it.round === 'half' ? 0.5 : 1);
+          const nCh = Math.max(1, Math.round(q / step)), ch = q / nCh;
+          for (let c = 0; c < nCh; c++) {
+            let best = allowed[0], bd = -1e18;
+            allowed.forEach(mi => { const def = tgt[mi] - got[mi] + (BREAKFAST.has(it.id) && mi === 0 ? 400 : 0); if (def > bd + 1e-6) { bd = def; best = mi; } });
+            got[best] += ch * it.kcal; meals[best][it.id] = (meals[best][it.id] || 0) + ch;
+          }
+        });
+        return meals;
+      };
+      // สร้างแผนอัตโนมัติจำลองจากสต๊อกก่อนเริ่มวัน เพื่อให้ปุ่มคืนรายการกลับไปตามแผนได้ แม้วันนั้นจะถูก custom แล้ว
+      const autoPlanMenu = (stockIn, accIn, budget, dayNo) => {
+        const stock = Object.assign({}, stockIn), carryAcc = Object.assign({}, accIn), menu = {}; let eaten = 0;
+        const takeLocal = (it, q) => { q = Math.min(q, stock[it.id] || 0); if (q <= 1e-9) return 0; stock[it.id] -= q; menu[it.id] = (menu[it.id] || 0) + q; eaten += q * it.kcal; return q; };
+        divis.forEach(f => { const sh = foodShare(f.item, pk); if (sh > 0) takeLocal(f.item, budget * sh / f.item.kcal); });
+        const n = unitF.length;
+        if (n) {
+          unitF.forEach(f => { const it = f.item; carryAcc[it.id] = (carryAcc[it.id] || 0) + budget * foodShare(it, pk) / it.kcal; });
+          const order = unitF.map((_, i) => unitF[(i + dayNo - 1) % n]);
+          order.forEach(f => { const it = f.item, step = it.round === 'half' ? 0.5 : 1; const q = Math.floor((carryAcc[it.id] || 0) / step + 0.5) * step; if (q <= 0) return; carryAcc[it.id] -= takeLocal(it, q); });
+          for (let pass = 0; pass < 3; pass++) order.forEach(f => { const it = f.item, step = it.round === 'half' ? 0.5 : 1; if (budget - eaten < 0.5 * it.kcal * step || (stock[it.id] || 0) <= 1e-9) return; takeLocal(it, step); });
+        }
+        divis.forEach(f => { const rem = budget - eaten; if (rem > 1) takeLocal(f.item, rem / f.item.kcal); });
+        return { menu, eaten };
+      };
+      const dp = (state.dayPlan = state.dayPlan || { edits: {}, done: {}, shareMode: {} }); dp.edits = dp.edits || {}; dp.done = dp.done || {}; dp.shareMode = dp.shareMode || {};
+      const EDITABLE = id => !GRAM_ITEMS.has(id) || id === 'jasmine_rice';
+      const stepOf = it => it.id === 'jasmine_rice' ? 0.05 : (it.round === 'half' ? 0.5 : 1);
+      window._dpMeals = {}; window._dpStep = {}; foods.forEach(f => { window._dpStep[f.item.id] = stepOf(f.item); });
+      const fmtQ = (it, q) => it.id === 'jasmine_rice' ? Math.round(q * 1000) + ' ก.' : (qFrac(q) || '0') + ' ' + unitOf(it);
+      let carry = 0, acc = {}, waterLeft = S; const sim = [];
+      for (let d = 1; d <= nShow; d++) {
+        const ffd = 1, wAvail = waterDay(d);
+        const dGive = Math.min(drinkNeed, wAvail), eGive = Math.max(0, Math.min(extraNeed, wAvail - dGive));
+        const dRatio = drinkNeed > 0 ? dGive / drinkNeed : 1, eRatio = extraNeed > 0 ? eGive / extraNeed : 1;
+        // --- เมนูของวัน (หน่วยเต็ม สะสมสิทธิ์ตามสัดส่วนในแผน) ---
+        const raw = Kdp * ffd + carry, budget = Math.max(0, raw);
+        const menu = {}; let eaten = 0;
+        const manual = null; let mealsM = null, clamped = false;
+        const autoBase = autoPlanMenu(left0, acc, budget, d);
+        const autoMeals = planMeals(autoBase.menu, autoBase.eaten).map(mm => Object.assign({}, mm));
+        window._dpAutoMeals = window._dpAutoMeals || {}; window._dpAutoMeals[d] = autoMeals;
+        const take = (it, q) => { q = Math.min(q, left0[it.id] || 0); if (q <= 1e-9) return 0; left0[it.id] -= q; menu[it.id] = (menu[it.id] || 0) + q; eaten += q * it.kcal; return q; };
+        if (manual) {
+          // วันที่ผู้ใช้ปรับเอง/ผ่านไปแล้ว: ใช้ตามที่กำหนด (ไม่เกินของที่เหลือ) แล้วให้วันถัดไปปรับอัตโนมัติตามของที่เหลือ
+          mealsM = [0, 1, 2].map(mi => Object.assign({}, manual[mi] || {}));
+          foods.forEach(f => {
+            const id = f.item.id; let over = mealsM.reduce((s, mm) => s + (mm[id] || 0), 0) - (left0[id] || 0);
+            for (let mi = 2; mi >= 0 && over > 1e-9; mi--) { const cut = Math.min(over, mealsM[mi][id] || 0); if (cut > 0) { mealsM[mi][id] -= cut; over -= cut; clamped = true; } }
+          });
+          foods.forEach(f => { const id = f.item.id, q = mealsM.reduce((s, mm) => s + (mm[id] || 0), 0); if (q > 1e-9) { left0[id] -= q; menu[id] = q; eaten += q * f.item.kcal; } });
+          unitF.forEach(f => { const it = f.item; acc[it.id] = (acc[it.id] || 0) + budget * foodShare(it, pk) / it.kcal - (menu[it.id] || 0); });
+        } else {
+        divis.forEach(f => { const sh = foodShare(f.item, pk); if (sh > 0) take(f.item, budget * sh / f.item.kcal); });
+        const n = unitF.length;
+        if (n) {
+          unitF.forEach(f => { const it = f.item; acc[it.id] = (acc[it.id] || 0) + budget * foodShare(it, pk) / it.kcal; });
+          const order = unitF.map((_, i) => unitF[(i + d - 1) % n]);
+          order.forEach(f => {
+            const it = f.item, step = it.round === 'half' ? 0.5 : 1;
+            const q = Math.floor((acc[it.id] || 0) / step + 0.5) * step;
+            if (q <= 0) return;
+            acc[it.id] -= take(it, q);
+          });
+          for (let pass = 0; pass < 3; pass++) {
+            order.forEach(f => {
+              const it = f.item, step = it.round === 'half' ? 0.5 : 1;
+              if (budget - eaten < 0.5 * it.kcal * step || (left0[it.id] || 0) <= 1e-9) return;
+              take(it, step);
+            });
+          }
+        }
+        divis.forEach(f => { const rem = budget - eaten; if (rem > 1) take(f.item, rem / f.item.kcal); });
+        }
+        carry = Math.max(-0.6 * Kdp, Math.min(0.6 * Kdp, raw - eaten));
+        const noFoodToday = eaten <= 1e-6;
+
+        const people = state.members.map((m, i) => { const u = U.per[i]; return { m, u, share: Kdp > 0 ? u.kcal / Kdp : 0 }; });
+        const eatPeople = people.filter(p => p.share > 0);
+        // --- จัดลงมื้อ ---
+        const meals = mealsM || autoMeals;
+        window._dpMeals[d] = meals.map(m => Object.assign({}, m));
+        const isDone = !!dp.done[d];
+        let cookAll = 0;
+        const mealHtml = meals.map((mm, mi) => {
+          const ids = foods.filter(f => manual ? mm[f.item.id] !== undefined : mm[f.item.id] > 1e-9);
+          let mealK = 0, cook = 0;
+          const rows = ids.map(f => {
+            const it = f.item, q = mm[it.id]; mealK += q * it.kcal; cook += q * (it.cookL || 0);
+            const divisible = GRAM_ITEMS.has(it.id);
+            const total = EDITABLE(it.id) ? fmtQ(it, q) : (divisible ? portionText(it, q) : (qFrac(q) ? qFrac(q) + ' ' + unitOf(it) : ''));
+            if (!total) return '';
+            const ctrl = (!isDone && EDITABLE(it.id)) ? `<span class="dp-step"><button type="button" onclick="dpAdj(${d},${mi},'${it.id}',-1)">−</button><b>${total}</b><button type="button" onclick="dpAdj(${d},${mi},'${it.id}',1)">+</button></span>` : `<b>${total}</b>`;
+            let mode = '', split = '', shareBtn = '';
+            if (eatPeople.length > 1 && q > 1e-9) {
+              const savedShares = ((dp.personShares || {})[d] || {})[mi + ':' + it.id] || null;
+              const norm = eatPeople.reduce((sum, p) => sum + Math.max(0, Number(savedShares && savedShares[p.m.id] !== undefined ? savedShares[p.m.id] : p.share)), 0) || 1;
+              const personRows = eatPeople.map(p => {
+                const rawShare = Math.max(0, Number(savedShares && savedShares[p.m.id] !== undefined ? savedShares[p.m.id] : p.share));
+                const pct = rawShare / norm, pq = q * pct, tx = divisible ? portionText(it, pq).split(' (')[0] : qFrac(pq);
+                const adjust = !isDone ? `<button type="button" class="undo-btn dp-share-btn" onclick="dpPersonShare(${d},${mi},'${it.id}',${p.m.id},-1)">−</button><button type="button" class="undo-btn dp-share-btn" onclick="dpPersonShare(${d},${mi},'${it.id}',${p.m.id},1)">+</button>` : '';
+                return `<span class="dp-person-part">${esc(sn(p.m.name))} ${tx || '0'} (${Math.round(pct * 100)}%) ${adjust}</span>`;
+              });
+              const savedMode = (dp.shareMode[d] || {})[mi + ':' + it.id] || 'auto';
+              const shared = savedMode === 'shared' || (savedMode === 'auto' && !divisible && q < eatPeople.length - 0.001);
+              mode = shared ? '🤝 กินร่วมกัน' : '🍽️ แบ่งรายบุคคล';
+              split = `${shared ? 'กินร่วมกัน · ' : ''}${personRows.join(' · ')}${!isDone ? `<button type="button" class="undo-btn dp-share-btn" onclick="dpPersonShareReset(${d},${mi},'${it.id}')" title="คืนสัดส่วนตามแผนอัตโนมัติ">↶ สัดส่วนเดิม</button>` : ''}`;
+              if (!isDone) shareBtn = `<button type="button" class="undo-btn dp-share-btn" onclick="dpToggleShare(${d},${mi},'${it.id}')" title="สลับรูปแบบการกิน">↔ ${savedMode === 'auto' ? 'ตั้งเป็นกินร่วมกัน' : (savedMode === 'shared' ? 'แยกคน' : 'ตามระบบ')}</button>`;
+            }
+            const resetItem = (!isDone && manual) ? `<button type="button" class="undo-btn dp-item-reset" onclick="dpResetItem(${d},${mi},'${it.id}')" title="คืนรายการนี้ตามแผนอัตโนมัติ">↶ ตามแผน</button>` : '';
+            return `<div class="dp-m"><span>${FOOD_ICON[it.id] || '🍽️'} ${esc(short(it.name).split(' ')[0])}</span>${ctrl}${resetItem}${shareBtn}${mode ? `<em class="dp-mode">${mode}</em>` : ''}${split ? `<div class="dp-split">${split}</div>` : ''}</div>`;
+          }).filter(Boolean).join('');
+          cook *= eRatio; cookAll += cook;
+          const addOpts = foods.filter(f => EDITABLE(f.item.id) && mm[f.item.id] === undefined).map(f => `<option value="${f.item.id}">${esc(short(f.item.name).split(' ')[0])}</option>`).join('');
+          const addSel = (!isDone && addOpts) ? `<select class="dp-add" onchange="dpAdd(${d},${mi},this.value)"><option value="">＋ เพิ่มอาหารมื้อนี้</option>${addOpts}</select>` : '';
+          return `<div class="dp-meal"><div class="dp-meal-h">${MEALS[mi].ico} ${MEALS[mi].nm} <small>${MEALS[mi].tm}</small>${mealK > 0 ? `<span class="rc-dim"> · ≈ ${Math.round(mealK).toLocaleString()} kcal ทั้งบ้าน</span>` : ''}</div>${rows || '<div class="dp-none">งดอาหารมื้อนี้ (ดื่มน้ำอย่างเดียว)</div>'}${addSel}${cook > 0.005 ? `<div class="dp-cook">🍲 น้ำประกอบอาหารมื้อนี้ ${r2(cook)} ล. <small>(หักจากน้ำสต๊อก)</small></div>` : ''}</div>`;
+        }).join('');
+        // --- รายคน: kcal + น้ำดื่มแบ่งตามมื้อ ---
+        const peopleHtml = people.map(p => {
+          const m = p.m, u = p.u, dr = u.drink * dRatio;
+          const wsplit = MEALS.map(x => `${x.nm} ${r2(dr * x.dw)}`).join(' · ');
+          const need0 = U0.per[state.members.indexOf(m)] ? U0.per[state.members.indexOf(m)].kcal : 0, got = eaten * p.share, pc = need0 > 0 ? Math.round(got / need0 * 100) : 100;
+          const head = u.kcal <= 0 ? `🍼 นมผง ~${u.formula} กระป๋อง` : `<span class="rc-dim">${Math.round(got).toLocaleString()} kcal · <span class="rw-${pc >= 95 ? 'green' : pc >= 70 ? 'amber' : 'red'}">${pc}% ของที่ควรได้</span></span>`;
+          return `<div class="dp-p"><b>${icon(m)} ${esc(sn(m.name))}</b> <span class="rc-dim">${m.age} ปี</span> ${head}<br><span class="dp-w">💧 ดื่มได้ไม่เกิน <b>${r2(dr)}</b> ล./วัน (≈ ${Math.round(dr * 4 * 2) / 2} แก้ว)</span><br><span class="dp-wsub">${wsplit} ล.</span></div>`;
+        }).join('');
+        const used = dGive + eGive; waterLeft = Math.max(0, waterLeft - used);
+        const waterHtml = `<div class="dp-wtot">💧 น้ำวันนี้ใช้ <b>${r1(used)}</b> ล. = ดื่ม ${r1(dGive)} + ประกอบอาหาร/ใช้อื่น ${r1(eGive)} (ประกอบอาหาร ${cookAll > 0.005 ? r2(cookAll) : 0}) · เหลือในสต๊อก <b>${r1(waterLeft)}</b> ล.</div>`;
+        const fr3 = x => qFrac(x) || String(r2(x));
+        const u0 = p => p.u.kcal <= 0 ? `<div class="dp-pm">🍼 นมผง ~${p.u.formula} กระป๋อง</div>` : '';
+        const pBlock = people.map(p => { const m = p.m;
+          const rowsM = MEALS.map((ml, mi) => { const parts = [];
+            foods.forEach(f => { const it = f.item, q = meals[mi][it.id]; if (!(q > 1e-9)) return; const pq = q * p.share; if (pq < 0.005) return;
+              const gram = GRAM_ITEMS.has(it.id), shared = !gram && eatPeople.length > 1 && q < eatPeople.length - 0.001;
+              const tx = gram ? portionText(it, pq).split(' (')[0] : fr3(pq) + ' ' + unitOf(it);
+              parts.push(`${FOOD_ICON[it.id] || '🍽️'} ${esc(short(it.name).split(' ')[0])} ${tx}${shared ? ' <small class="rc-dim">(' + (pq < 0.95 ? 'ส่วนแบ่งของ 1 ' + unitOf(it) + ' · ' : '') + 'กินร่วมกัน)</small>' : ''}`); });
+            return `<div class="dp-pm"><b>${ml.ico} ${ml.nm}</b> — ${parts.length ? parts.join(' + ') : '<span class="rc-dim">งดมื้อนี้</span>'}</div>`; }).join('');
+          return `<div class="dp-pcard"><div class="dp-pn">${icon(m)} ${esc(sn(m.name))} <span class="rc-dim">${m.age} ปี</span></div>${u0(p)}${rowsM}</div>`; }).join('');
+        const drinkLine = people.map(p => `${esc(sn(p.m.name))} <b>${r2(p.u.drink * dRatio)}</b> ลิตร`).join('<br>');
+        const wB = Math.floor(waterLeft / 1.5 + 1e-6), wF = waterLeft / 1.5 - wB, wFt = wF > 0.05 ? (qFrac(wF) || '') : '';
+        const bottleTx = `<b>${wB}</b> ขวด${wFt ? ' กับอีก <b>' + wFt + '</b> ของขวด' : ''} <span class="rc-dim">(≈ ${r1(waterLeft)} ลิตร)</span>`;
+        const kcalLine = people.filter(p => p.u.kcal > 0).map(p => { const n0 = U0.per[state.members.indexOf(p.m)] ? U0.per[state.members.indexOf(p.m)].kcal : 0, got = eaten * p.share, pc = n0 > 0 ? Math.round(got / n0 * 100) : 100; return `${esc(sn(p.m.name))} <b>${Math.round(got).toLocaleString()}</b> kcal <span class="rw-${pc >= 95 ? 'green' : pc >= 70 ? 'amber' : 'red'}">(${pc}% ของที่ควรได้)</span>`; }).join('<br>');
+        const newBody = `<div class="dp-meals">${noFoodToday ? '<div class="dp-none">ไม่มีอาหารให้กิน</div>' : pBlock}</div><div class="dp-sum"><h6>💧 น้ำที่ต้องดื่ม</h6>${drinkLine}<h6 style="margin-top:8px;">🍲 น้ำที่ใช้ประกอบอาหารทั้งหมด</h6>ใช้ไป <b>${cookAll > 0.005 ? r2(cookAll) : 0}</b> ล.<h6 style="margin-top:8px;">🧴 คงเหลือน้ำ</h6>${bottleTx}</div><div class="dp-sum"><h6>🔥 สรุป kcal ที่ได้วันนี้</h6>${kcalLine || '<span class="rc-dim">—</span>'}</div>`;
+        sim.push({ d, noFoodToday, wAvail, manual: !!manual, done: isDone, clamped, body: newBody });
+      }
+      // ป้ายนับถอยหลัง 3 วันสุดท้าย (อิงจากการจำลองเมนูจริง)
+      const lastOk = sim.reduce((m, s) => (!s.noFoodToday && s.wAvail > 1e-6) ? s.d : m, 0);
+      const Lsim = (lastOk >= nShow && target > nShow) ? Infinity : lastOk;
+      const whatLow = lastOk === 0 || sim.find(s => s.d === lastOk + 1 && s.wAvail <= 1e-6) ? 'น้ำ' : 'อาหาร';
+      sim.forEach(s => {
+        if (s.noFoodToday && !s.manual) return;          // แจกแจงเฉพาะวันที่มีอาหารจริง (วันที่ปรับเองแสดงเสมอ)
+        const left = (!fit && isFinite(Lsim)) ? Lsim - s.d + 1 : null;
+        const level = left === null ? 'ok' : (left <= 0 ? 'bad' : (left <= 3 ? 'warn' : 'ok'));
+        const badge = left === null || left > 3 ? '' : (left <= 0 ? '<span class="dp-badge bad">🔴 ของหมดแล้ว</span>' : `<span class="dp-badge warn">⚠️ ${whatLow}เหลือ ${left} วัน${left === 1 ? ' (วันสุดท้าย)' : ''}</span>`);
+        const act = s.done
+          ? `<button type="button" class="dp-btn" onclick="dpDone(${s.d})">↩ ยกเลิก “ผ่านแล้ว”</button>`
+          : `<button type="button" class="dp-btn ok" onclick="dpDone(${s.d})">✅ ผ่านพ้นวันนี้แล้ว</button>${s.manual ? `<button type="button" class="dp-btn" onclick="dpReset(${s.d})">↺ ให้ระบบจัดใหม่</button>` : ''}`;
+        const tags = s.done ? '<span class="dp-badge ok">✅ ผ่านไปแล้ว</span>' : (s.manual ? '<span class="dp-badge manual">✏️ ปรับเอง</span>' : '');
+        dayCards.push(`<div class="dp-day ${level}${s.done ? ' done' : ''}"><div class="dp-dh"><span>วันที่ ${s.d}</span><span class="dp-tags">${tags}${s.done ? '' : badge}</span></div>${s.body}<div class="dp-act">${act}</div></div>`);
+      });
+      const foodDaysN = sim.filter(s => !s.noFoodToday).length;
+      const lackKcal = Math.max(0, Kdp * target - K);
+      let endNote = '';
+      if (foodDaysN < nShow || (foodDaysN === nShow && target <= nShow && daysF < target - 1e-9)) {
+        const from = foodDaysN + 1;
+        const waterTx = (isFinite(daysW) && Math.floor(daysW + 1e-9) >= from) ? ` · น้ำยังพอถึงวันที่ ${Math.min(target, Math.floor(daysW + 1e-9))}` : (S <= 0 ? ' · ยังไม่มีน้ำขวดในสต๊อก' : '');
+        endNote = `<div class="dp-end">🔴 ${foodDaysN === 0 ? 'ยังไม่มีอาหารในสต๊อก' : `วันที่ ${from}${target > from ? '–' + target : ''} ไม่มีอาหารเหลือ`} — ต้องหามาเพิ่มอีก ~${Math.round(lackKcal).toLocaleString()} kcal${waterTx}</div>`;
+      }
+      const more = (foodDaysN >= nShow && target > nShow) ? `<div class="dp-note">แสดง ${nShow} วันแรกจากแผนทั้งหมด ${target} วัน — แถบด้านบนแสดงครบทุกวัน</div>` : '';
+      const mode = `<div class="dp-note">คำนวณตามโหมด “${sevName(t)}” — แต่ละคนได้กินตามที่ร่างกายควรได้ในโหมดนี้ (ไม่ถูกลดส่วนเอง) ระบบจัดให้แต่ละคนได้ kcal ตามเป้าหมาย 100% ในแต่ละวันเท่าที่สต๊อกจริงรองรับ และจะจัดต่อเนื่องจนอาหารหมด; หากของไม่พอทั้งแผน วันท้าย ๆ จะแสดงปริมาณที่เหลือจริง · เวลาและสัดส่วนมื้อ (เช้า 25% · กลางวัน 40% · เย็น 35%) เป็นค่าแนะนำ<br>✏️ กด − / + ปรับจำนวนแต่ละมื้อได้เอง วันถัดไปจะจัดใหม่อัตโนมัติตามของที่เหลือจริง · กด “✅ ผ่านพ้นวันนี้แล้ว” เมื่อใช้ของวันนั้นไปจริง (การ์ดจะจางลงและล็อกไว้) </div>`;
+      const wasOpen = !!(document.getElementById('day-fold') && document.getElementById('day-fold').open);
+      el.innerHTML = ganttHtml + `<div class="dp-fold-top"><div class="rc-dim">ระบบจัดอาหารให้ครบตาม kcal เป้าหมายรายคนในแต่ละวัน และใช้สต๊อกจริงต่อเนื่องจนทรัพยากรหมด</div></div><details class="fold dp-fold" id="day-fold"${wasOpen ? ' open' : ''}><summary class="dp-sec-h">📆 <span>ดูแผนอาหารรายวัน <span class="dp-open-cta">คลิกเพื่อขยายรายละเอียด ▼</span><small style="display:block;color:var(--text-muted);font-weight:400;margin-top:3px;">${foodDaysN} วันที่มีอาหาร${Object.keys(dp.done).filter(k => dp.done[k]).length ? ' · ใช้ไปแล้ว ' + Object.keys(dp.done).filter(k => dp.done[k]).length + ' วัน' : ''} · แจกแจงรายมื้อ รายคน และปริมาณคงเหลือ</small></span></summary>${mode}<div class="dp-days">${dayCards.join('')}</div>${more}${endNote}</details>`;
     }
 
     function renderRunway() {
@@ -4461,6 +4882,7 @@
         </tbody></table></div>
         <div class="veh-note" style="margin-top:8px;">ผู้ใช้ทรัพยากรหลักต่อวัน (ทั้งกลุ่ม): น้ำ ${r1(R.U.water)} ลิตร (~${r1(R.U.water / 1.5)} ขวด 1.5L) · อาหาร ${Math.round(R.U.kcal).toLocaleString()} kcal · แก๊ส ${r2(R.U.gas)} กระป๋อง · ถ่าน ${r1(R.U.batt)} ก้อน</div>`;
       renderRation(a, t, R);
+      renderDayPlan(a, t, R);
     }
 
     // ---- เป้สะพายหลังแบบการ์ตูน (ขนาดตามลิตร / ระดับการบรรจุตามน้ำหนัก) ----
@@ -4650,7 +5072,7 @@
         if (p.sp.has) {
           listHtml = sec('🧍 ของส่วนตัวของ ' + nm(m), groupedList(mineItems, m.id));
           if (gearItems.length) listHtml += sec('🧰 ของจำเป็นส่วนกลางที่ได้รับมอบหมายให้ถือ', groupedList(gearItems, m.id));
-          if (surplusItems.length) listHtml += sec('➕ ของจริงส่วนเกินที่แบกเพิ่มได้ (หลังของจำเป็น)', groupedList(surplusItems, m.id));
+          if (surplusItems.length) listHtml += sec('➕ ของส่วนเกินที่แบกเพิ่มได้ (ของจำเป็น)', groupedList(surplusItems, m.id));
           Object.values(forMap).forEach(f => { listHtml += sec(`🤝 ถือให้ ${esc(f.name)} — ${esc(f.why)}`, groupedList(f.items, m.id)); });
           if (extra.length) listHtml += sec('📦 ของส่วนรวมที่แบกเพิ่ม (ไม่ใช่ของส่วนตัว)', groupedList(extra.map(x => ({ id: x.id, name: x.name, unit: x.unit, qty: x.qty })), undefined, 'store'));
         }
@@ -4810,20 +5232,7 @@
 
 
     // ============ V14: ข้าวสาร ↔ ข้าวสำเร็จรูป + น้ำหุงต้ม ============
-    function previewRiceMix(v) { const e = document.getElementById('rice-mix-val'); if (e) e.textContent = v + '%'; }
-    function setRiceMix(v) { state.riceMix = Math.max(0, Math.min(100, parseInt(v, 10) || 0)); saveState(); renderAll(); }
-    function setCountBroth(on) { state.countBroth = !!on; saveState(); renderAll(); }
-    function updateFoodOptUI(a) {
-      const sl = document.getElementById('rice-mix'); if (!sl) return;
-      sl.value = state.riceMix || 0; previewRiceMix(sl.value);
-      const ck = document.getElementById('broth-chk'); if (ck) ck.checked = state.countBroth !== false;
-      const info = document.getElementById('food-opt-info'); if (!info) return;
-      const U = computeUsage(a, 0), tot = {};
-      U.per.forEach(p => p.foods.forEach(f => { tot[f.item.id] = (tot[f.item.id] || 0) + f.qty; }));
-      const gf = gasFactor(planKey(a)), mix = state.riceMix || 0;
-      const hint = a.light ? 'แผนพกพา: ข้าวพร้อมทานหนักกว่าข้าวสารราว 2.5 เท่าต่อพลังงาน — ใช้เป็นส่วนน้อย' : (mix === 0 ? 'ถ้าน้ำเป็นข้อจำกัด/อาจไม่มีแก๊ส ลองเลื่อนไป 30–50%' : 'ข้าวพร้อมทานแพงกว่าและเก็บได้สั้นกว่า ตรวจวันหมดอายุตามฉลาก');
-      info.innerHTML = `วันละทั้งบ้าน: ข้าวสาร <b>${r2(tot.jasmine_rice || 0)}</b> กก. · ข้าวพร้อมทาน <b>${r1(tot.instant_rice || 0)}</b> ถ้วย · น้ำหุงต้ม <b>${r1(U.cook)}</b> ลิตร${state.countBroth !== false && U.broth > 0 ? ` (ดื่มน้ำซุปได้ ~${r1(U.broth)} ลิตร)` : ''} · แก๊ส <b>${Math.round(gf * 100)}%</b> ของแบบหุงข้าวทั้งหมด<br><span class="rc-dim">${hint}</span>`;
-    }
+    // ข้าวสาร/ข้าวพร้อมทาน: ระบบจัดเองอัตโนมัติ (ไม่มีแถบเลื่อนแล้ว) · น้ำซุปมาม่า/โจ๊กหักออกจากน้ำดื่มที่ต้องสต๊อกให้เสมอ
     function toggleRationFit() { state.rationFit = !state.rationFit; saveState(); renderReport(); }
     function toggleProtectKids() { state.protectKids = !state.protectKids; saveState(); renderReport(); }
     function setSeverity(v) {
@@ -5073,9 +5482,13 @@
     const dStr = today.toLocaleDateString('th-TH', { year: 'numeric', month: 'numeric', day: 'numeric' });
     document.getElementById('current-date-badge').textContent = dStr;
 
+    window.addEventListener('beforeprint', () => document.querySelectorAll('details.fold').forEach(d => { d.dataset.wasOpen = d.open ? '1' : ''; d.open = true; }));
+    window.addEventListener('afterprint', () => document.querySelectorAll('details.fold').forEach(d => { d.open = d.dataset.wasOpen === '1'; }));
+
     // Run on startup
     loadState();
     renderAll();
+    applyTabs();
   </script>
 </body>
 </html>
