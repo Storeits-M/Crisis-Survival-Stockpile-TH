@@ -1128,6 +1128,14 @@
     .veh-reset:hover { border-color: var(--primary); color: var(--primary); }
     .cap-row { display: flex; flex-direction: column; gap: 4px; }
     .cap-head { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 12.5px; color: var(--text-muted); }
+    .load-mini { display: none; width: 100%; max-width: 900px; margin-top: 10px; gap: 14px; }
+    .load-mini.on { display: flex; }
+    .load-mini.tab-hidden { display: none; }
+    .lm-item { flex: 1; min-width: 0; font-size: 12px; }
+    .lm-head { display: flex; justify-content: space-between; gap: 6px; margin-bottom: 3px; white-space: nowrap; }
+    .lm-head b { overflow: hidden; text-overflow: ellipsis; }
+    .lm-ok { color: var(--green, #8db36b); } .lm-near { color: #e0a23a; } .lm-over { color: #ff6b63; }
+    @media (max-width: 640px) { .load-mini.on { flex-direction: column; gap: 6px; } }
     .cap-bar { height: 8px; background: var(--bg); border-radius: 6px; overflow: hidden; }
     .cap-fill { height: 100%; border-radius: 6px; }
     .cap-fill.ok { background: var(--green); }
@@ -1671,6 +1679,7 @@
         <button type="button" class="tab-btn" data-tab-btn="report" onclick="showTab('report')"><span class="tab-no">2</span> 📊 รายงานทรัพยากร</button>
         <button type="button" class="tab-btn" data-tab-btn="daily" onclick="showTab('daily')"><span class="tab-no">3</span> 📅 แผนรายวัน</button>
       </nav>
+      <div id="load-mini" class="load-mini" data-tab="input"></div>
 
     </div>
   </header>
@@ -3123,6 +3132,14 @@
       return t;
     }
 
+    // น้ำหนัก/ปริมาตรของที่ "มีอยู่จริง" ตามจำนวนที่กรอกในตาราง (เฉพาะรายการที่เปิดใช้) — ใช้ตรวจว่าบรรทุกได้จริงไหม
+    function getLoadActual(reqs) {
+      const t = { kg: 0, L: 0 };
+      reqs.forEach(r => { const q = parseFloat(state.currentInventory[r.item.id]) || 0; t.kg += q * (r.item.wt || 0); t.L += q * volOf(r.item); });
+      return t;
+    }
+    function refreshVehicleBox() { try { const ag = computeAggregates(); renderVehicleOptions(ag, getRequirements(ag)); } catch (e) { } }
+
     function setVehicle(k, val) {
       if (k === 'bikes' || k === 'cars' || k === 'boats' || k === 'bicycles') state.vehicle[k] = Math.max(0, Math.min(20, parseInt(val) || 0));
       else if (k === 'distanceKm') state.vehicle.distanceKm = Math.max(0, parseFloat(val) || 0);
@@ -4337,6 +4354,7 @@
       const el = document.getElementById('vehicle-options');
       if (!el) return;
       const p = a.plan, v = state.vehicle, P = PLANS[p];
+      const miniEl = document.getElementById('load-mini'); if (miniEl) { miniEl.classList.remove('on'); miniEl.innerHTML = ''; }
       if (p === 'bug-in') {
         el.innerHTML = `<div class="veh-box"><div class="veh-note">🏠 โหมดอยู่บ้านไม่จำกัดความจุ — แต่ <b>ทุกคนควรมีเป้ฉุกเฉินคนละ 1 ใบ</b> วางใกล้ประตู (ดูรายการในรายงานข้อ 5.2) แล้วเปลี่ยนแผนด้านบนเพื่อดูว่าของทั้งหมดจุไหมและใครขับ/ซ้อน/แบกอะไร</div></div>`;
         return;
@@ -4352,6 +4370,15 @@
       if (p === 'bicycle') selectors = `<label>จำนวนจักรยาน <input type="number" min="1" max="20" value="${bicyclesCount()}" onchange="setVehicle('bicycles', this.value)"> คัน</label><span>คนปั่นอายุ 6 ปีขึ้นไป · คนที่ไม่มีจักรยานต้องซ้อน (1 คน/คัน, เด็กเล็ก 1-5 ปีนั่งเบาะเด็ก) = สูงสุด 2 คน/คัน · ตะกร้าหน้า (ไม่แข็งแรง) + เป้สะพายหลัง 1 ใบ + เป้รัดโครงหน้า 1 ใบ · พิกัด ~120 กก.</span>`;
             if (p === 'bug-out-foot') selectors = `<span>🥾 ทุกคนเดินเอง · เด็กอายุต่ำกว่า 3 ปีต้องมีผู้ใหญ่อุ้ม</span>`;
 
+      const act = getLoadActual(reqs);
+      { const mini = document.getElementById('load-mini');
+        if (mini) {
+          const mb = (lb, u, c, un) => { const pc = c > 0 ? u / c * 100 : 0, cl = pc > 100 ? 'over' : pc >= 80 ? 'near' : 'ok'; return `<div class="lm-item"><div class="lm-head"><b>${lb}</b><span class="lm-${cl}">${r1(u)} / ${r1(c)} ${un} (${Math.round(pc)}%)${pc > 100 ? ' · เกิน!' : ''}</span></div><div class="cap-bar"><div class="cap-fill ${cl}" style="width:${Math.min(100, pc)}%"></div></div></div>`; };
+          mini.innerHTML = mb('⚖️ น้ำหนักของที่มี', act.kg, cap.kg, 'กก.') + mb('📦 ปริมาตรของที่มี', act.L, cap.L, 'ลิตร');
+          mini.classList.add('on');
+        } }
+      const actOver = act.kg > cap.kg || act.L > cap.L;
+      const actWarn = actOver ? `<div class="veh-warn">🚫 ของที่มีอยู่ตอนนี้บรรทุกไม่ได้จริง — เกินความจุ${act.kg > cap.kg ? ' น้ำหนัก ' + r1(act.kg - cap.kg) + ' กก.' : ''}${act.L > cap.L ? ' ปริมาตร ' + r1(act.L - cap.L) + ' ลิตร' : ''} ต้องตัดของออกหรือเพิ่มพาหนะ/คนช่วยแบก</div>` : '';
       const over = load.kg > cap.kg || load.L > cap.L;
       let advice = '';
       if (over) {
@@ -4387,9 +4414,10 @@
             ${cap.custom ? `<button type="button" class="veh-reset" onclick="resetCapOverride()">คืนค่าเริ่มต้น</button>` : ''}
           </div>
           <div class="veh-note">${cap.label} · ค่าประมาณทั่วไป แก้ตัวเลขตามรุ่นรถ/เป้ของคุณได้</div>
-          ${capBar('น้ำหนักของที่ต้องบรรทุก', load.kg, cap.kg, 'กก.')}
-          ${capBar('ปริมาตรของที่ต้องบรรทุก', load.L, cap.L, 'ลิตร')}
-          ${advice}${warns}${summary}
+          ${capBar('⚖️ น้ำหนักของที่มีอยู่จริง (ตามจำนวนที่กรอก)', act.kg, cap.kg, 'กก.')}
+          ${capBar('📦 ปริมาตรของที่มีอยู่จริง (ตามจำนวนที่กรอก)', act.L, cap.L, 'ลิตร')}
+          <div class="veh-note">ตามแผนที่ต้องใช้: ${Math.round(load.kg)} กก. / ${Math.round(load.L)} ลิตร · ${act.kg > load.kg + 0.5 ? 'ของที่มี<b>มากกว่า</b>แผน' : act.kg < load.kg - 0.5 ? 'ของที่มี<b>น้อยกว่า</b>แผน (ยังขาดอยู่)' : 'ของที่มีเท่ากับแผน'}</div>
+          ${actWarn}${advice}${warns}${summary}
           <div class="veh-row">
             <label>ระยะทางที่ต้องเดินทาง (ไม่บังคับ) <input type="number" min="0" value="${km || ''}" placeholder="0" onchange="setVehicle('distanceKm', this.value)"> กม.</label>
           </div>
@@ -4651,9 +4679,9 @@
       const rowHtml = r => {
         const last = isFinite(r.days) ? Math.floor(r.days + 1e-9) : target;
         const ok = last >= target;
-        const txt = !(r.use > 1e-9) ? 'ไม่ได้ใช้ในแผนนี้' : (ok ? `✅ พอตลอด ${target} วัน` : (last <= 0 ? '🔴 ไม่มีของ — หาเพิ่มก่อนวันที่ 1' : `⚠️ ใช้ได้ถึงวันที่ ${last} แล้วหมด · ขาดอีก ${target - last} วัน`));
+        const txt = !(r.use > 1e-9) ? 'ไม่ได้ใช้ในแผนนี้' : (ok ? `✅ อยู่ได้ ${isFinite(r.days) ? last : target}${last > target ? ' วัน (เกินแผน ' + (last - target) + ' วัน)' : ' วัน (พอดีแผน)'}` : (last <= 0 ? '🔴 ไม่มีของ — หาเพิ่มก่อนวันที่ 1' : `⚠️ ใช้ได้ถึงวันที่ ${last} แล้วหมด · ขาดอีก ${target - last} วัน`));
         return `<div class="dp-row"><div class="dp-row-l">${r.icon} <b>${esc(r.name.split(' (')[0])}</b><small>มี ${rcFmt(r.stock)} ${r.unit} · ใช้ ~${rcFmt(r.use)} ${r.unit}/วัน</small></div>
-          <div>${rcStrip(target, last, target)}<div class="dp-cap">${txt}</div></div></div>`;
+          <div>${r.use > 1e-9 ? rcStrip(0, last, Math.max(last, target)) : ''}<div class="dp-cap">${txt}</div></div></div>`;
       };
       const crit = R.res.filter(r => r.critical), lux = R.res.filter(r => !r.critical);
       const ganttHtml = `<div class="dp-sec-h">⏳ ของแต่ละอย่างอยู่ได้ถึงวันไหน <span class="rc-dim">(ช่องเขียว = ยังมีใช้ · ช่องแดง = หมดแล้ว)</span></div>
@@ -4875,7 +4903,7 @@
           </div>
         </div>`;
       document.getElementById('runway-table').innerHTML = `
-        <div class="rw-wrap"><table class="rw-table"><thead><tr><th>ทรัพยากร</th><th>มีอยู่</th><th>ใช้/วัน (ตอนนี้)</th><th>อยู่ได้</th><th>ปกติ → ลดสูงสุด</th></tr></thead><tbody>
+        <div class="rw-wrap"><table class="rw-table"><thead><tr><th>ทรัพยากร</th><th>มีอยู่</th><th>อยู่ได้</th><th>ปกติ → ลดสูงสุด</th></tr></thead><tbody>
         ${R.res.map(r => {
           const pct = isFinite(r.days) ? Math.min(100, (r.days / target) * 100) : 100;
           const k = isFinite(r.days) ? tone(r.days) : 'green';
@@ -4883,7 +4911,6 @@
           return `<tr>
             <td><b>${r.icon} ${r.name}</b>${r.critical ? ' <span class="pri-chip pri-3">จำเป็นต่อชีวิต</span>' : ''}</td>
             <td>${fm(r.stock)} ${r.unit}</td>
-            <td>${r.use > 0 ? fm(r.use) + ' ' + r.unit : '—'}</td>
             <td><b class="rw-${k}">${dayTxt(r.days)} วัน</b><div class="cap-bar"><div class="cap-fill ${k === 'green' ? 'ok' : k === 'amber' ? 'near' : 'over'}" style="width:${pct}%"></div></div></td>
             <td style="color: var(--text-muted);">${dayTxt(R0.byKey[r.key].days)} → ${dayTxt(R1.byKey[r.key].days)} วัน</td></tr>`;
         }).join('')}
@@ -5323,6 +5350,7 @@
       saveState();
       renderInventory();
       renderReport();
+      refreshVehicleBox();
     }
 
     function setQty(itemId, val) {
@@ -5331,6 +5359,7 @@
       saveState();
       renderInventory();
       renderReport();
+      refreshVehicleBox();
     }
 
     function toggleOnlyShort(checked) {
