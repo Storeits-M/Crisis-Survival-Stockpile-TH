@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#1a1816">
-  <title>Crisis Survival Stockpile V14 - ระบบวางแผนและบริหารคลังเสบียงเอาตัวรอด</title>
+  <title>Crisis Survival Stockpile TH - ระบบวางแผนและบริหารคลังเสบียงเอาตัวรอด</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Noto+Serif+Thai:wght@400;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -1549,6 +1549,7 @@
     details.fold > summary .fold-hint + * { }
 
     /* CTA folds (v15) */
+    .dp-warn { margin: 8px 12px 0; padding: 7px 10px; border-radius: 8px; background: rgba(217,83,79,.14); border: 1px solid rgba(217,83,79,.5); color: #ff9a94; font-size: 13px; font-weight: 600; }
     details.cta-fold > summary { padding: 13px 15px; border: 1px solid var(--primary); border-radius: 12px; background: var(--primary-dim); color: var(--text-main); box-shadow: 0 0 0 0 rgba(216,101,60,.45); animation: ctaPulse 2.6s ease-out infinite; transition: background .15s; }
     details.cta-fold > summary:hover { background: rgba(216,101,60,.24); border-color: var(--primary-hover); }
     details.cta-fold > summary::after { content: '▼'; color: var(--primary); font-size: 14px; transform: none; }
@@ -1931,7 +1932,7 @@
           <div class="sev-quick">
             <button onclick="setSeverity(0); document.getElementById('sev-slider').value=0">ปกติ (หาของมาเติมได้)</button>
             <button onclick="setSeverity(40); document.getElementById('sev-slider').value=40">เริ่มประหยัด</button>
-            <button onclick="setSeverity(75); document.getElementById('sev-slider').value=75">ลดการใช้ระดับสูง</button>
+            <button onclick="setSeverity(70); document.getElementById('sev-slider').value=70">ลดการใช้ระดับสูง</button>
             <button onclick="setSeverity(100); document.getElementById('sev-slider').value=100">ลดการใช้สูงสุด (แทบไม่มีของ)</button>
           </div>
           <div id="sev-desc"></div>
@@ -3034,8 +3035,11 @@
       let vulnerable = 0, chronicCount = 0, infants = 0, diaperKids = 0, women = 0, bedridden = 0;
       const chronicNames = [];
 
+      // แผนเดินทาง/หนี: โหมดประหยัดลดปริมาณที่ต้องแบก (อาหารลดสูงสุด 50%, น้ำดื่มลดสูงสุด 25%) → อยู่ได้นานขึ้นในความจุเท่าเดิม
+      const sevBO = plan !== 'bug-in' ? Math.max(0, Math.min(1, (state.severity || 0) / 100)) : 0;
+      const sevProt = m => (m.age < 4 || m.health === 'pregnant' || m.health === 'chronic' || m.health === 'bedridden') ? 0.25 : (m.age < 13 ? (state.protectKids ? 0.5 : 1) : 1);
       state.members.forEach(m => {
-        const k = memberKcal(m, plan);
+        const k = memberKcal(m, plan) * (1 - 0.5 * sevBO * sevProt(m));
         totalKcal += k;
         if (m.age >= 1) foodKcalDay += k;                       // ทารกกินนมผง ไม่นับในอาหารแห้ง
         adultEquiv += m.age >= 12 ? 1.0 : (m.age >= 4 ? 0.7 : 0.5);
@@ -3054,7 +3058,7 @@
       const light = !!P.light;
       const carryDays = light ? Math.min(days, P.carry) : days;
       const pets = light ? 0 : state.pets;
-      const drinkDay = state.members.reduce((s, m) => s + personDrinkBase(m) * (P.drink / 2), 0) * crisis.waterMult;
+      const drinkDay = state.members.reduce((s, m) => s + personDrinkBase(m) * (P.drink / 2) * (1 - 0.25 * sevBO * sevProt(m)), 0) * crisis.waterMult;
       const extraDay = light ? 0 : state.members.reduce((s, m) => s + personExtraBase(m), 0) * crisis.waterMult;
 
       const drinkLiters = Math.ceil(drinkDay * carryDays);
@@ -3472,7 +3476,7 @@
     let DAYS_OVERRIDE = null;
     const _ad = { key: null, val: null };
     function autoDaysInfo() {
-      const key = JSON.stringify([state.members, state.plan, state.crisisIds, state.vehicle, state.capOverride, state.pets, state.excl]);
+      const key = JSON.stringify([state.members, state.plan, state.crisisIds, state.vehicle, state.capOverride, state.pets, state.excl, state.severity, state.protectKids]);
       if (_ad.key === key) return _ad.val;
       const prev = DAYS_OVERRIDE;
       const info = { days: 1, exact: 1, hours: null, plus: false, limit: '', cap: null };
@@ -4185,7 +4189,7 @@
       const protectedP = (m.age < 4 || m.health === 'pregnant' || m.health === 'chronic' || m.health === 'bedridden') ? 0.25 : (m.age < 13 ? (state.protectKids ? 0.5 : 1) : 1);
       const drinkRaw = personDrinkBase(m) * (P.drink / 2) * a.crisis.waterMult * (1 - 0.25 * t * protectedP);
       const extra = (a.light ? 0 : personExtraBase(m)) * a.crisis.waterMult * (1 - 0.7 * t);
-      const kcal = m.age >= 1 ? memberKcal(m, a.plan) * (1 - 0.25 * t * protectedP) : 0;
+      const kcal = m.age >= 1 ? memberKcal(m, a.plan) * (1 - 0.5 * t * protectedP) : 0;
       const foods = [];
       // ค่าประมาณโปรตีนต่อหน่วย (กรัม) ใช้เพื่อเทียบความสมดุล ไม่ใช่ค่าฉลากของทุกยี่ห้อ
       const proteinPerUnit = { jasmine_rice: 70, instant_rice: 5, instant_noodles: 7, canned_fish: 20, instant_porridge: 4, uht_milk: 8, energy_snacks: 8, peanut_butter_nuts: 75 };
@@ -4483,7 +4487,7 @@
       });
 
       // ---- 4 โหมด: แผนต่อวัน (kcal/คน, % ของที่ควรได้) + ของอยู่ได้กี่วัน ----
-      const modes = [['ปกติ', 0], ['เริ่มประหยัด', 40], ['ลดการใช้ระดับสูง', 75], ['ลดการใช้สูงสุด', 100]];
+      const modes = [['ปกติ', 0], ['เริ่มประหยัด', 40], ['ลดการใช้ระดับสูง', 70], ['ลดการใช้สูงสุด', 100]];
       const act = modes.reduce((b, m, i) => Math.abs((state.severity || 0) - m[1]) < Math.abs((state.severity || 0) - modes[b][1]) ? i : b, 0);
       const modeHtml = modes.map(([lb, v], i) => {
         const Ut = computeUsage(a, v / 100), n = Math.max(1, Ut.per.filter(x => x.kcal > 0).length);
@@ -4637,7 +4641,7 @@
       const Kdp = U.kcal, S = inv('water_15l') * 1.5;
       const drinkNeed = U.per.reduce((s, x) => s + x.drink, 0), extraNeed = Math.max(0, U.water - drinkNeed);
       const daysF = Kdp > 0 ? K / Kdp : Infinity, daysW = U.water > 0 ? S / U.water : Infinity;
-      const nShow = target;
+      const nShow = fit ? target : Math.max(target, Math.min(30, Math.ceil(Math.max(isFinite(daysF) ? daysF : 0, isFinite(daysW) ? daysW : 0) - 1e-9)));   // ขยายวันตามของที่ยังเหลือ (อาหารหรือน้ำอย่างใดอย่างหนึ่ง)
 
       // ส่วนที่ได้ของวันที่ d (0..1) — โหมดยืดให้ครบ = เฉลี่ยเท่ากันทุกวัน / ไม่ยืด = กินเต็มส่วนจนของหมด
       const fracFood = d => K <= 0 || Kdp <= 0 ? 0 : (fit ? Math.min(1, K / (Kdp * target)) : Math.max(0, Math.min(1, daysF - (d - 1))));
@@ -4812,18 +4816,22 @@
         const wB = Math.floor(waterLeft / 1.5 + 1e-6), wF = waterLeft / 1.5 - wB, wFt = wF > 0.05 ? (qFrac(wF) || '') : '';
         const bottleTx = `<b>${wB}</b> ขวด${wFt ? ' กับอีก <b>' + wFt + '</b> ของขวด' : ''} <span class="rc-dim">(≈ ${r1(waterLeft)} ลิตร)</span>`;
         const kcalLine = people.filter(p => p.u.kcal > 0).map(p => { const n0 = U0.per[state.members.indexOf(p.m)] ? U0.per[state.members.indexOf(p.m)].kcal : 0, got = eaten * p.share, pc = n0 > 0 ? Math.round(got / n0 * 100) : 100; return `${esc(sn(p.m.name))} <b>${Math.round(got).toLocaleString()}</b> kcal <span class="rw-${pc >= 95 ? 'green' : pc >= 70 ? 'amber' : 'red'}">(${pc}% ของที่ควรได้)</span>`; }).join('<br>');
-        const newBody = `<div class="dp-meals">${noFoodToday ? '<div class="dp-none">ไม่มีอาหารให้กิน</div>' : pBlock}</div><div class="dp-sum"><h6>💧 น้ำที่ต้องดื่ม</h6>${drinkLine}<h6 style="margin-top:8px;">🍲 น้ำที่ใช้ประกอบอาหารทั้งหมด</h6>ใช้ไป <b>${cookAll > 0.005 ? r2(cookAll) : 0}</b> ล.<h6 style="margin-top:8px;">🧴 คงเหลือน้ำ</h6>${bottleTx}</div><div class="dp-sum"><h6>🔥 สรุป kcal ที่ได้วันนี้</h6>${kcalLine || '<span class="rc-dim">—</span>'}</div>`;
-        sim.push({ d, noFoodToday, wAvail, manual: !!manual, done: isDone, clamped, body: newBody });
+        const wNone = U.water > 0 && wAvail <= 1e-6, wShort = !wNone && drinkNeed > 0 && dGive < drinkNeed - 0.01;
+        const warnHtml = (noFoodToday ? `<div class="dp-warn">🍽️ วันนี้ไม่มีอาหารเหลือ — ต้องหาอาหารเพิ่ม${wNone ? '' : ' (ตอนนี้มีแต่น้ำ)'}</div>` : '') + (wNone ? '<div class="dp-warn">🚰 วันนี้ไม่มีน้ำเหลือ — ต้องหาน้ำให้ได้ก่อน</div>' : (wShort ? `<div class="dp-warn">💧 วันนี้น้ำไม่พอ — ดื่มได้เพียง ${r2(dGive)} จากที่ต้องดื่ม ${r2(drinkNeed)} ลิตร ต้องหาน้ำเพิ่ม</div>` : ''));
+        const newBody = `${warnHtml}<div class="dp-meals">${noFoodToday ? '<div class="dp-none">ไม่มีอาหารให้กิน</div>' : pBlock}</div><div class="dp-sum"><h6>💧 น้ำที่ต้องดื่ม</h6>${drinkLine}<h6 style="margin-top:8px;">🍲 น้ำที่ใช้ประกอบอาหารทั้งหมด</h6>ใช้ไป <b>${cookAll > 0.005 ? r2(cookAll) : 0}</b> ล.<h6 style="margin-top:8px;">🧴 คงเหลือน้ำ</h6>${bottleTx}</div><div class="dp-sum"><h6>🔥 สรุป kcal ที่ได้วันนี้</h6>${kcalLine || '<span class="rc-dim">—</span>'}</div>`;
+        sim.push({ d, noFoodToday, wAvail, wNone, wShort, manual: !!manual, done: isDone, clamped, body: newBody });
       }
       // ป้ายนับถอยหลัง 3 วันสุดท้าย (อิงจากการจำลองเมนูจริง)
       const lastOk = sim.reduce((m, s) => (!s.noFoodToday && s.wAvail > 1e-6) ? s.d : m, 0);
       const Lsim = (lastOk >= nShow && target > nShow) ? Infinity : lastOk;
       const whatLow = lastOk === 0 || sim.find(s => s.d === lastOk + 1 && s.wAvail <= 1e-6) ? 'น้ำ' : 'อาหาร';
       sim.forEach(s => {
-        if (s.noFoodToday && !s.manual) return;          // แจกแจงเฉพาะวันที่มีอาหารจริง (วันที่ปรับเองแสดงเสมอ)
+        if (s.noFoodToday && !s.manual && s.wAvail <= 1e-6) return;          // แจกแจงเฉพาะวันที่มีอาหารจริง (วันที่ปรับเองแสดงเสมอ)
         const left = (!fit && isFinite(Lsim)) ? Lsim - s.d + 1 : null;
-        const level = left === null ? 'ok' : (left <= 0 ? 'bad' : (left <= 3 ? 'warn' : 'ok'));
-        const badge = left === null || left > 3 ? '' : (left <= 0 ? '<span class="dp-badge bad">🔴 ของหมดแล้ว</span>' : `<span class="dp-badge warn">⚠️ ${whatLow}เหลือ ${left} วัน${left === 1 ? ' (วันสุดท้าย)' : ''}</span>`);
+        const level0 = left === null ? 'ok' : (left <= 0 ? 'bad' : (left <= 3 ? 'warn' : 'ok'));
+        const badge0 = left === null || left > 3 ? '' : (left <= 0 ? '<span class="dp-badge bad">🔴 ของหมดแล้ว</span>' : `<span class="dp-badge warn">⚠️ ${whatLow}เหลือ ${left} วัน${left === 1 ? ' (วันสุดท้าย)' : ''}</span>`);
+        const level = (s.noFoodToday || s.wNone) ? 'bad' : (s.wShort ? 'warn' : level0);
+        const badge = s.noFoodToday ? '<span class="dp-badge bad">🍽️ ไม่มีอาหาร</span>' : (s.wNone ? '<span class="dp-badge bad">🚰 ไม่มีน้ำ</span>' : (s.wShort ? '<span class="dp-badge warn">💧 น้ำไม่พอ</span>' : badge0));
         const act = s.done
           ? `<button type="button" class="dp-btn" onclick="dpDone(${s.d})">↩ ยกเลิก “ผ่านแล้ว”</button>`
           : `<button type="button" class="dp-btn ok" onclick="dpDone(${s.d})">✅ ผ่านพ้นวันนี้แล้ว</button>${s.manual ? `<button type="button" class="dp-btn" onclick="dpReset(${s.d})">↺ ให้ระบบจัดใหม่</button>` : ''}`;
@@ -4833,7 +4841,7 @@
       const foodDaysN = sim.filter(s => !s.noFoodToday).length;
       const lackKcal = Math.max(0, Kdp * target - K);
       let endNote = '';
-      if (foodDaysN < nShow || (foodDaysN === nShow && target <= nShow && daysF < target - 1e-9)) {
+      if (foodDaysN < Math.min(nShow, target) || (foodDaysN === nShow && target <= nShow && daysF < target - 1e-9)) {
         const from = foodDaysN + 1;
         const waterTx = (isFinite(daysW) && Math.floor(daysW + 1e-9) >= from) ? ` · น้ำยังพอถึงวันที่ ${Math.min(target, Math.floor(daysW + 1e-9))}` : (S <= 0 ? ' · ยังไม่มีน้ำขวดในสต๊อก' : '');
         endNote = `<div class="dp-end">🔴 ${foodDaysN === 0 ? 'ยังไม่มีอาหารในสต๊อก' : `วันที่ ${from}${target > from ? '–' + target : ''} ไม่มีอาหารเหลือ`} — ต้องหามาเพิ่มอีก ~${Math.round(lackKcal).toLocaleString()} kcal${waterTx}</div>`;
@@ -4853,7 +4861,7 @@
       if (lab) lab.textContent = `${sevName(t)} · ${state.severity || 0}%`;
       const rate = (x) => `${Math.round(x * 100)}%`;
       document.getElementById('sev-desc').innerHTML =
-        `<b>ตอนนี้ (${sevName(t)}):</b> ผู้ใหญ่ดื่มน้ำ ~${r1(2 * (1 - 0.25 * t) * (PLANS[a.plan].drink / 2) * a.crisis.waterMult)} ลิตร/วัน · น้ำใช้ ${rate(1 - 0.7 * t)} ของปกติ · อาหาร ${rate(1 - 0.25 * t)} ของปกติ (เด็กเล็ก/ตั้งครรภ์/ผู้ป่วยลดน้อยกว่า) · แก๊ส ${rate(1 - 0.45 * t)} · ถ่าน ${rate(1 - 0.4 * t)} · ชาร์จมือถือ ${rate(1 - 0.6 * t)}<br><span style="color: var(--text-sub);">ยา นมผง ผ้าอ้อม ไม่ลดการใช้ทุกกรณี · น้ำดื่มผู้ใหญ่ไม่ควรต่ำกว่า ~1.5 ลิตร/วันในอากาศร้อน</span>`;
+        `<b>ตอนนี้ (${sevName(t)}):</b> ผู้ใหญ่ดื่มน้ำ ~${r1(2 * (1 - 0.25 * t) * (PLANS[a.plan].drink / 2) * a.crisis.waterMult)} ลิตร/วัน · น้ำใช้ ${rate(1 - 0.7 * t)} ของปกติ · อาหาร ${rate(1 - 0.5 * t)} ของปกติ (เด็กเล็ก/ตั้งครรภ์/ผู้ป่วยลดน้อยกว่า) · แก๊ส ${rate(1 - 0.45 * t)} · ถ่าน ${rate(1 - 0.4 * t)} · ชาร์จมือถือ ${rate(1 - 0.6 * t)}<br><span style="color: var(--text-sub);">ยา นมผง ผ้าอ้อม ไม่ลดการใช้ทุกกรณี · น้ำดื่มผู้ใหญ่ไม่ควรต่ำกว่า ~1.5 ลิตร/วันในอากาศร้อน</span>`;
       const target = a.days;
       const tone = d => d >= target ? 'green' : d >= target * 0.5 ? 'amber' : 'red';
       const ov = R.overall;
@@ -5238,7 +5246,7 @@
     function setSeverity(v) {
       state.severity = Math.max(0, Math.min(100, parseInt(v) || 0));
       saveState();
-      renderReport();
+      renderAll();
     }
 
     function renderAllExtras() {
